@@ -7,15 +7,7 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
     try {
       const stored = localStorage.getItem('code3d_user');
-      return stored ? JSON.parse(stored) : {
-        id: 1,
-        username: 'himanshu',
-        email: 'himanshu@code3d.edu',
-        fullName: 'Himanshu (Lead Architect)',
-        role: 'Lead Architect',
-        avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-        token: 'code3d_demo_token'
-      };
+      return stored ? JSON.parse(stored) : null;
     } catch {
       return null;
     }

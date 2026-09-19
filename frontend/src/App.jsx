@@ -8,12 +8,19 @@ import HistoryPage from './pages/HistoryPage';
 import SettingsPage from './pages/SettingsPage';
 import LoginModal from './components/LoginModal';
 import CodeDoctorModal from './components/CodeDoctorModal';
-import { AuthProvider } from './context/AuthContext';
+import AuthGate from './components/AuthGate';
+import { AuthProvider, useAuth } from './context/AuthContext';
 
 function MainApp() {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [selectedConcept, setSelectedConcept] = useState(null);
   const [isDoctorOpen, setIsDoctorOpen] = useState(false);
+
+  // If user is not logged in, enforce AuthGate so the site is NOT accessible
+  if (!user) {
+    return <AuthGate />;
+  }
 
   const handleLaunchConcept = (concept) => {
     setSelectedConcept(concept);
