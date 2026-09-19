@@ -24,6 +24,6 @@ USER appuser
 COPY --from=builder /app/target/code3d-backend-1.0.0.jar app.jar
 
 ENV PORT=8080
-EXPOSE 8080
+EXPOSE 8080 10000
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["sh", "-c", "java -Dserver.port=${PORT:-8080} -jar app.jar"]
