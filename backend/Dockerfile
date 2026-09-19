@@ -1,17 +1,14 @@
 # Multi-stage Dockerfile for CODE3D AI Spring Boot Backend
-FROM eclipse-temurin:21-jdk-alpine AS builder
+FROM maven:3.9-eclipse-temurin-21-alpine AS builder
 WORKDIR /app
 
-# Copy maven wrapper and project definition
-COPY .mvn/ .mvn/
-COPY mvnw pom.xml ./
+# Copy pom.xml and pre-fetch dependencies
+COPY pom.xml ./
+RUN mvn dependency:go-offline -B
 
-# Download dependencies
-RUN chmod +x mvnw && ./mvnw dependency:go-offline -B
-
-# Copy source code and build jar
+# Copy source code and build production jar
 COPY src/ src/
-RUN ./mvnw clean package -DskipTests
+RUN mvn clean package -DskipTests
 
 # Runtime stage
 FROM eclipse-temurin:21-jre-alpine
