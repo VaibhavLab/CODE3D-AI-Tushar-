@@ -42,7 +42,7 @@ function MainApp() {
   };
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-[#070b14] overflow-hidden">
+    <div className="flex flex-col h-[100dvh] w-full bg-[#070b14] overflow-hidden">
       {/* Top Application Navbar */}
       <Navbar
         activeTab={activeTab}
@@ -51,7 +51,7 @@ function MainApp() {
       />
 
       {/* Main View Container */}
-      <main className="flex-1 flex flex-col overflow-hidden">
+      <main className="flex-1 flex flex-col overflow-hidden pb-14 md:pb-0">
         {activeTab === 'dashboard' && (
           <Dashboard onNavigate={(tab) => setActiveTab(tab)} />
         )}
@@ -71,6 +71,57 @@ function MainApp() {
           <SettingsPage />
         )}
       </main>
+
+      {/* Mobile Bottom Navigation Bar (Visible only on mobile devices) */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-14 bg-slate-950/95 backdrop-blur-xl border-t border-slate-800/80 px-2 flex items-center justify-around z-40 select-none">
+        <button
+          onClick={() => setActiveTab('dashboard')}
+          className={`flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-lg transition ${
+            activeTab === 'dashboard' ? 'text-cyan-400' : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <span className="text-lg">🏠</span>
+          <span className="text-[9px] font-medium">Home</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('visualizer')}
+          className={`flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-lg transition ${
+            activeTab === 'visualizer' ? 'text-cyan-400' : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <span className="text-lg">🧊</span>
+          <span className="text-[9px] font-medium">3D Code</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('dsa')}
+          className={`flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-lg transition ${
+            activeTab === 'dsa' ? 'text-cyan-400' : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <span className="text-lg">📚</span>
+          <span className="text-[9px] font-medium">DSA Hub</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('quiz')}
+          className={`flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-lg transition ${
+            activeTab === 'quiz' ? 'text-cyan-400' : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <span className="text-lg">🏆</span>
+          <span className="text-[9px] font-medium">Quiz</span>
+        </button>
+
+        <button
+          onClick={() => setIsDoctorOpen(true)}
+          className="flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-lg text-amber-400 hover:text-amber-300"
+        >
+          <span className="text-lg">🩺</span>
+          <span className="text-[9px] font-medium">AI Doctor</span>
+        </button>
+      </nav>
 
       {/* Global Modals */}
       <LoginModal />

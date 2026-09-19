@@ -68,7 +68,7 @@ export default function AuthGate() {
   };
 
   return (
-    <div className="min-h-screen w-screen bg-[#060911] text-slate-100 flex flex-col justify-between overflow-y-auto selection:bg-cyan-500/30">
+    <div className="min-h-screen w-full bg-[#060911] text-slate-100 flex flex-col justify-between overflow-x-hidden overflow-y-auto selection:bg-cyan-500/30">
       {/* Subtle Background Glows */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-[-10%] left-[20%] w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[140px]" />
@@ -76,25 +76,25 @@ export default function AuthGate() {
       </div>
 
       {/* Top Simple Header */}
-      <header className="relative z-10 w-full px-6 py-4 flex items-center justify-between border-b border-slate-900 bg-slate-950/60 backdrop-blur-md">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
-            <Box size={20} className="text-white" />
+      <header className="relative z-10 w-full px-4 sm:px-6 py-3.5 flex items-center justify-between border-b border-slate-900 bg-slate-950/70 backdrop-blur-md">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-cyan-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+            <Box size={18} className="text-white" />
           </div>
           <div>
-            <h1 className="text-sm font-bold tracking-wider text-white">CODE3D <span className="text-cyan-400">AI</span></h1>
-            <p className="text-[10px] text-slate-500 font-mono">Algorithm & AST Spatial Visualizer</p>
+            <h1 className="text-xs sm:text-sm font-bold tracking-wider text-white">CODE3D <span className="text-cyan-400">AI</span></h1>
+            <p className="text-[9px] sm:text-[10px] text-slate-500 font-mono">Algorithm & AST 3D Visualizer</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-mono">
-          <Database size={12} className="animate-pulse" />
-          <span>Neon PostgreSQL: Live</span>
+        <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] sm:text-[11px] font-mono">
+          <Database size={11} className="animate-pulse" />
+          <span>Neon DB: Live</span>
         </div>
       </header>
 
-      {/* Main Center Content */}
-      <div className="relative z-10 flex-1 max-w-5xl mx-auto w-full px-4 py-8 flex flex-col lg:flex-row items-center justify-center gap-10">
+      {/* Main Center Content: On mobile, Form Card shows at the top! */}
+      <div className="relative z-10 flex-1 max-w-5xl mx-auto w-full px-4 py-6 sm:py-8 flex flex-col-reverse lg:flex-row items-center justify-center gap-8 lg:gap-10">
         
         {/* Left Side: Product Value & Exhibition Info */}
         <div className="flex-1 space-y-6 text-center lg:text-left">

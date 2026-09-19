@@ -24,11 +24,12 @@ export default function Visualizer({ initialConcept }) {
   const [timeComplexity, setTimeComplexity] = useState(initialConcept?.timeComplexity || SAMPLE_PROGRAMS[0].timeComplexity);
   const [spaceComplexity, setSpaceComplexity] = useState(initialConcept?.spaceComplexity || SAMPLE_PROGRAMS[0].spaceComplexity);
 
-  // Modals state
+  // Modals & responsive view state
   const [isAiOpen, setIsAiOpen] = useState(false);
   const [isQuizOpen, setIsQuizOpen] = useState(false);
   const [isCustomCodeOpen, setIsCustomCodeOpen] = useState(false);
   const [isCodeDoctorOpen, setIsCodeDoctorOpen] = useState(false);
+  const [mobileTab, setMobileTab] = useState('3d'); // '3d' | 'code' | 'state'
 
   useEffect(() => {
     if (initialConcept) {
@@ -214,8 +215,8 @@ export default function Visualizer({ initialConcept }) {
   return (
     <div className="flex-1 flex flex-col h-[calc(100vh-3.5rem)] overflow-hidden bg-slate-950 select-none">
       {/* Visualizer Header Controls */}
-      <div className="h-10 bg-slate-900/90 border-b border-slate-800/80 px-4 flex items-center justify-between text-xs text-slate-300">
-        <div className="flex items-center gap-2 sm:gap-3">
+      <div className="min-h-10 bg-slate-900/95 border-b border-slate-800/80 px-3 py-1.5 flex items-center justify-between text-xs text-slate-300 overflow-x-auto no-scrollbar gap-2">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <span className="font-semibold text-slate-200 flex items-center gap-1.5">
             <Layers size={14} className="text-cyan-400" />
             <span className="hidden sm:inline">Concept:</span>
@@ -226,7 +227,7 @@ export default function Visualizer({ initialConcept }) {
               const found = SAMPLE_PROGRAMS.find((p) => p.id === e.target.value);
               if (found) handleSelectProgram(found);
             }}
-            className="bg-slate-950 border border-slate-700/80 rounded-md px-2.5 py-1 text-xs text-cyan-300 font-mono focus:outline-none focus:border-cyan-500 cursor-pointer"
+            className="bg-slate-950 border border-slate-700/80 rounded-md px-2 py-1 text-xs text-cyan-300 font-mono focus:outline-none focus:border-cyan-500 cursor-pointer max-w-[140px] sm:max-w-none"
           >
             {SAMPLE_PROGRAMS.map((p) => (
               <option key={p.id} value={p.id}>
@@ -238,7 +239,7 @@ export default function Visualizer({ initialConcept }) {
           {/* Prominent AI Code Doctor Button */}
           <button
             onClick={() => setIsCodeDoctorOpen(true)}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-semibold transition shadow-sm"
+            className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-semibold transition shadow-sm shrink-0"
             title="AI Code Doctor: Fix broken syntax/loops and auto-visualize in 3D"
           >
             <Stethoscope size={13} className="text-amber-400" />
@@ -248,7 +249,7 @@ export default function Visualizer({ initialConcept }) {
           {/* Prominent "Input Any Code" Button */}
           <button
             onClick={() => setIsCustomCodeOpen(true)}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gradient-to-r from-cyan-500/20 to-blue-500/20 hover:from-cyan-500/30 hover:to-blue-500/30 text-cyan-300 border border-cyan-500/40 text-xs font-semibold transition shadow-sm"
+            className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-gradient-to-r from-cyan-500/20 to-blue-500/20 hover:from-cyan-500/30 hover:to-blue-500/30 text-cyan-300 border border-cyan-500/40 text-xs font-semibold transition shadow-sm shrink-0"
             title="Input any code in JS, C, C++, Python, or Java to visualize in 3D"
           >
             <Code2 size={13} className="text-cyan-400" />
@@ -257,7 +258,7 @@ export default function Visualizer({ initialConcept }) {
         </div>
 
         {/* Center: Complexity Badges & Backend status */}
-        <div className="hidden lg:flex items-center gap-3 text-[11px] font-mono">
+        <div className="hidden lg:flex items-center gap-3 text-[11px] font-mono shrink-0">
           <div className="bg-slate-950/70 border border-slate-800 rounded px-2 py-0.5">
             Time: <strong className="text-cyan-400 font-bold">{timeComplexity}</strong>
           </div>
@@ -273,10 +274,10 @@ export default function Visualizer({ initialConcept }) {
         </div>
 
         {/* Right: AI Assistant & Quiz Mode triggers */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={() => setIsAiOpen(true)}
-            className="flex items-center gap-1.5 bg-cyan-950/70 hover:bg-cyan-900 border border-cyan-700/50 text-cyan-300 px-3 py-1 rounded-md text-xs font-semibold transition"
+            className="flex items-center gap-1.5 bg-cyan-950/70 hover:bg-cyan-900 border border-cyan-700/50 text-cyan-300 px-2.5 py-1 rounded-md text-xs font-semibold transition"
           >
             <Sparkles size={13} className="text-cyan-400" />
             <span>AI Tutor</span>
@@ -284,7 +285,7 @@ export default function Visualizer({ initialConcept }) {
 
           <button
             onClick={() => setIsQuizOpen(true)}
-            className="flex items-center gap-1.5 bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-700/50 text-emerald-300 px-3 py-1 rounded-md text-xs font-semibold transition"
+            className="flex items-center gap-1.5 bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-700/50 text-emerald-300 px-2.5 py-1 rounded-md text-xs font-semibold transition"
           >
             <HelpCircle size={13} className="text-emerald-400" />
             <span>Quiz Mode</span>
@@ -292,10 +293,44 @@ export default function Visualizer({ initialConcept }) {
         </div>
       </div>
 
+      {/* Mobile View Switcher (Visible only on mobile devices) */}
+      <div className="md:hidden flex items-center bg-slate-950 border-b border-slate-800/80 p-1 shrink-0">
+        <button
+          onClick={() => setMobileTab('3d')}
+          className={`flex-1 py-1.5 text-xs font-semibold rounded-md flex items-center justify-center gap-1.5 transition ${
+            mobileTab === '3d'
+              ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm'
+              : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <span>🧊 3D Scene</span>
+        </button>
+        <button
+          onClick={() => setMobileTab('code')}
+          className={`flex-1 py-1.5 text-xs font-semibold rounded-md flex items-center justify-center gap-1.5 transition ${
+            mobileTab === 'code'
+              ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm'
+              : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <span>💻 Code Editor</span>
+        </button>
+        <button
+          onClick={() => setMobileTab('state')}
+          className={`flex-1 py-1.5 text-xs font-semibold rounded-md flex items-center justify-center gap-1.5 transition ${
+            mobileTab === 'state'
+              ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm'
+              : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <span>📊 Variables</span>
+        </button>
+      </div>
+
       {/* Main 3-Column Studio Workspace */}
       <div className="flex-1 grid grid-cols-1 md:grid-cols-12 overflow-hidden">
-        {/* Left Column: Monaco Code Editor (4 cols) */}
-        <div className="md:col-span-4 h-full overflow-hidden">
+        {/* Left Column: Monaco Code Editor (4 cols on desktop, responsive on mobile) */}
+        <div className={`${mobileTab === 'code' ? 'block' : 'hidden'} md:block md:col-span-4 h-full overflow-hidden`}>
           <CodeEditor
             code={code}
             onChangeCode={setCode}
@@ -315,10 +350,10 @@ export default function Visualizer({ initialConcept }) {
           />
         </div>
 
-        {/* Center Column: 3D Visualization + Console (5 cols) */}
-        <div className="md:col-span-5 h-full flex flex-col border-r border-slate-800/80 overflow-hidden">
+        {/* Center Column: 3D Visualization + Console (5 cols on desktop, responsive on mobile) */}
+        <div className={`${mobileTab === '3d' ? 'flex' : 'hidden'} md:flex md:col-span-5 h-full flex-col border-r border-slate-800/80 overflow-hidden`}>
           {/* 3D Canvas Viewport */}
-          <div className="flex-1 relative min-h-[340px]">
+          <div className="flex-1 relative min-h-[260px] sm:min-h-[340px]">
             <SceneContainer
               statusLabel={currentStep?.dataStructureState?.label || null}
               activeDetails={currentStep?.dataStructureState?.focusInfo || null}
@@ -330,13 +365,13 @@ export default function Visualizer({ initialConcept }) {
           </div>
 
           {/* Integrated Output Console */}
-          <div className="h-44">
+          <div className="h-36 sm:h-44 shrink-0">
             <OutputConsole output={currentStep?.output || []} />
           </div>
         </div>
 
-        {/* Right Column: Program State Inspector (3 cols) */}
-        <div className="md:col-span-3 h-full overflow-hidden">
+        {/* Right Column: Program State Inspector (3 cols on desktop, responsive on mobile) */}
+        <div className={`${mobileTab === 'state' ? 'block' : 'hidden'} md:block md:col-span-3 h-full overflow-hidden`}>
           <StatePanel
             currentStep={currentStep}
             totalSteps={totalSteps}
