@@ -40,21 +40,34 @@ public class DsaExecutionService {
     private ExecuteResponse generateConceptTrace(String conceptId) {
         return switch (conceptId.toLowerCase()) {
             case "2d-array", "matrix" -> generateMatrixTrace();
+            case "two-pointer-reverse" -> generateTwoPointerReverseTrace();
+            case "sliding-window" -> generateSlidingWindowTrace();
             case "linked-list" -> generateLinkedListTrace();
             case "doubly-linked-list", "doubly-ll" -> generateDoublyLinkedListTrace();
+            case "circular-linked-list" -> generateCircularLinkedListTrace();
+            case "cycle-detection" -> generateCycleDetectionTrace();
             case "stack" -> generateStackTrace();
             case "parentheses-stack", "stack-parentheses", "balanced-parentheses" -> generateParenthesesTrace();
             case "queue" -> generateQueueTrace();
             case "circular-queue" -> generateCircularQueueTrace();
+            case "deque" -> generateDequeTrace();
             case "bst", "tree" -> generateBstTrace();
             case "tree-traversals", "tree-traversal" -> generateTreeTraversalsTrace();
             case "avl-tree", "avl" -> generateAvlTreeTrace();
+            case "trie" -> generateTrieTrace();
             case "bubble-sort", "sorting" -> generateBubbleSortTrace();
+            case "insertion-sort" -> generateInsertionSortTrace();
+            case "merge-sort" -> generateMergeSortTrace();
+            case "quick-sort" -> generateQuickSortTrace();
             case "binary-search", "searching" -> generateBinarySearchTrace();
-            case "recursion", "factorial" -> generateRecursionTrace();
-            case "graph-bfs", "graph", "graphs" -> generateGraphBfsTrace();
-            case "dp-knapsack", "knapsack", "dp" -> generateDpKnapsackTrace();
             case "hash-table", "hashing" -> generateHashTableTrace();
+            case "graph-bfs", "graph", "graphs" -> generateGraphBfsTrace();
+            case "graph-dfs" -> generateGraphDfsTrace();
+            case "dijkstra" -> generateDijkstraTrace();
+            case "recursion", "factorial" -> generateRecursionTrace();
+            case "fibonacci-memo" -> generateFibonacciMemoTrace();
+            case "dp-knapsack", "knapsack", "dp" -> generateDpKnapsackTrace();
+            case "lcs" -> generateLcsTrace();
             default -> generateArrayLoopTrace(List.of(10, 20, 30, 40));
         };
     }
@@ -1195,6 +1208,682 @@ public class DsaExecutionService {
                     (buckets.get(bucketIdx).size() > 1 ? "Collision resolved via Separate Chaining linked node." : "Clean insertion."));
             s.setAiHint("With low load factor α < 0.75, Hash Table lookups run in amortized O(1) constant time.");
             steps.add(s);
+        }
+
+        return new ExecuteResponse("SUCCESS", steps.size(), steps);
+    }
+
+    // ==========================================
+    // 14. Two-Pointer Array Reversal
+    // ==========================================
+    private ExecuteResponse generateTwoPointerReverseTrace() {
+        return multiLanguageExecutionService.executeUserCode(
+                new ExecuteRequest("int[] arr = {10, 20, 30, 40, 50}; int left = 0, right = arr.length - 1; while(left < right) { int temp = arr[left]; arr[left] = arr[right]; arr[right] = temp; left++; right--; }", "two-pointer-reverse", "java")
+        );
+    }
+
+    // ==========================================
+    // 15. Sliding Window Subarray Sum
+    // ==========================================
+    private ExecuteResponse generateSlidingWindowTrace() {
+        List<ExecutionStep> steps = new ArrayList<>();
+        List<Integer> arr = List.of(2, 1, 5, 1, 3, 2);
+        int k = 3;
+        int step = 1;
+
+        // Init window [2, 1, 5]
+        int currentSum = 2 + 1 + 5;
+        int maxSum = currentSum;
+
+        ExecutionStep sInit = new ExecutionStep();
+        sInit.setStepNumber(step++);
+        sInit.setLineNumber(4);
+        sInit.setEventType("WINDOW_INIT");
+        sInit.setVariables(Map.of("arr", arr.toString(), "k", k, "windowSum", currentSum, "maxSum", maxSum));
+        DataStructureState dsInit = new DataStructureState();
+        dsInit.setType("sorting");
+        dsInit.setValues(new ArrayList<>(arr));
+        dsInit.setComparedIndices(List.of(0, 1, 2));
+        dsInit.setPointers(Map.of("low", 0, "high", 2));
+        dsInit.setLabel("Initial Window [0..2]: Sum = " + currentSum);
+        dsInit.setFocusInfo("Elements: 2 + 1 + 5 = 8 | MaxSum = 8");
+        sInit.setDataStructureState(dsInit);
+        sInit.setExplanation("Computed initial sum of first " + k + " items: 2 + 1 + 5 = " + currentSum + ".");
+        sInit.setAiHint("Sliding window replaces O(k) recalculations with O(1) additions and subtractions.");
+        steps.add(sInit);
+
+        for (int i = k; i < arr.size(); i++) {
+            int outgoing = arr.get(i - k);
+            int incoming = arr.get(i);
+            currentSum = currentSum - outgoing + incoming;
+            boolean newMax = currentSum > maxSum;
+            if (newMax) maxSum = currentSum;
+
+            ExecutionStep sSlide = new ExecutionStep();
+            sSlide.setStepNumber(step++);
+            sSlide.setLineNumber(7);
+            sSlide.setEventType("WINDOW_SLIDE");
+            sSlide.setVariables(Map.of("outgoing", outgoing, "incoming", incoming, "windowSum", currentSum, "maxSum", maxSum));
+            DataStructureState dsSlide = new DataStructureState();
+            dsSlide.setType("sorting");
+            dsSlide.setValues(new ArrayList<>(arr));
+            dsSlide.setComparedIndices(List.of(i - k + 1, i - 1, i));
+            dsSlide.setPointers(Map.of("low", i - k + 1, "high", i));
+            dsSlide.setLabel("Slide to [" + (i - k + 1) + ".." + i + "]: Sum = " + currentSum);
+            dsSlide.setFocusInfo("-" + outgoing + " + " + incoming + " = " + currentSum + (newMax ? " (New Max!)" : ""));
+            sSlide.setDataStructureState(dsSlide);
+            sSlide.setExplanation("Window slides: Subtract arr[" + (i - k) + "] (" + outgoing + ") and add arr[" + i + "] (" + incoming + "). New sum: " + currentSum + ".");
+            sSlide.setAiHint(newMax ? "New maximum found! Updated maxSum to " + maxSum + "." : "Window sum does not exceed previous maximum.");
+            steps.add(sSlide);
+        }
+
+        return new ExecuteResponse("SUCCESS", steps.size(), steps);
+    }
+
+    // ==========================================
+    // 16. Circular Linked List
+    // ==========================================
+    private ExecuteResponse generateCircularLinkedListTrace() {
+        List<ExecutionStep> steps = new ArrayList<>();
+        List<Integer> values = List.of(10, 20, 30, 40);
+        int step = 1;
+
+        for (int i = 0; i < values.size(); i++) {
+            int val = values.get(i);
+            ExecutionStep s = new ExecutionStep();
+            s.setStepNumber(step++);
+            s.setLineNumber(8);
+            s.setEventType("LIST_TRAVERSE");
+            s.setVariables(Map.of("curr.val", val, "next", values.get((i + 1) % values.size())));
+
+            DataStructureState ds = new DataStructureState();
+            ds.setType("linked-list");
+            ds.setValues(new ArrayList<>(values));
+            ds.setActiveIndex(i);
+            ds.setPointers(Map.of("HEAD", 0, "CURR", i, "TAIL", values.size() - 1));
+            ds.setLabel("Circular Node: " + val + " → Next: " + values.get((i + 1) % values.size()));
+            ds.setFocusInfo("Node " + i + " points to " + ((i + 1) % values.size() == 0 ? "HEAD (0)" : "Node " + (i + 1)));
+            s.setDataStructureState(ds);
+            s.setExplanation("Visiting node with value " + val + ". Pointer moves along the circular chain.");
+            s.setAiHint("In a circular linked list, the tail node's next reference points back to head instead of null.");
+            steps.add(s);
+        }
+
+        // Loop back to head
+        ExecutionStep sHead = new ExecutionStep();
+        sHead.setStepNumber(step);
+        sHead.setLineNumber(12);
+        sHead.setEventType("CIRCULAR_CYCLE_BACK");
+        sHead.setVariables(Map.of("curr", "HEAD", "val", 10));
+        DataStructureState dsHead = new DataStructureState();
+        dsHead.setType("linked-list");
+        dsHead.setValues(new ArrayList<>(values));
+        dsHead.setActiveIndex(0);
+        dsHead.setPointers(Map.of("HEAD", 0, "CURR", 0));
+        dsHead.setLabel("Loop wrapped back to HEAD (10)!");
+        dsHead.setFocusInfo("Full circle completed");
+        sHead.setDataStructureState(dsHead);
+        sHead.setExplanation("Tail's next reference returned execution to HEAD (node 0). Circular traversal completed.");
+        sHead.setAiHint("Circular traversal condition checks if curr == head to prevent infinite looping.");
+        steps.add(sHead);
+
+        return new ExecuteResponse("SUCCESS", steps.size(), steps);
+    }
+
+    // ==========================================
+    // 17. Cycle Detection (Floyd's Tortoise & Hare)
+    // ==========================================
+    private ExecuteResponse generateCycleDetectionTrace() {
+        List<ExecutionStep> steps = new ArrayList<>();
+        List<Integer> values = List.of(1, 2, 3, 4, 5);
+        int step = 1;
+
+        int[] slowPath = {0, 1, 2, 3, 4, 2};
+        int[] fastPath = {0, 2, 4, 3, 2, 2};
+
+        for (int i = 0; i < slowPath.length; i++) {
+            int sIdx = slowPath[i];
+            int fIdx = fastPath[i];
+            boolean met = i == slowPath.length - 1;
+
+            ExecutionStep s = new ExecutionStep();
+            s.setStepNumber(step++);
+            s.setLineNumber(10);
+            s.setEventType(met ? "CYCLE_DETECTED" : "POINTERS_ADVANCE");
+            s.setVariables(Map.of("slow", values.get(sIdx), "fast", values.get(fIdx), "iteration", i));
+
+            DataStructureState ds = new DataStructureState();
+            ds.setType("linked-list");
+            ds.setValues(new ArrayList<>(values));
+            ds.setActiveIndex(sIdx);
+            ds.setPointers(Map.of("SLOW", sIdx, "FAST", fIdx));
+            ds.setLabel(met ? "CYCLE DETECTED! Slow == Fast at Node " + values.get(sIdx) : "Iteration " + i + ": Slow at Node " + values.get(sIdx) + ", Fast at Node " + values.get(fIdx));
+            ds.setFocusInfo(met ? "Collision at node " + values.get(sIdx) : "Slow moves 1 step, Fast moves 2 steps");
+            s.setDataStructureState(ds);
+            s.setExplanation(met ? "Slow and Fast pointers collided at node with value " + values.get(sIdx) + ". Cycle confirmed!"
+                    : "Slow advances 1 step to " + values.get(sIdx) + ", Fast advances 2 steps to " + values.get(fIdx) + ".");
+            s.setAiHint("Floyd's algorithm detects cycles in O(n) time with O(1) memory.");
+            steps.add(s);
+        }
+
+        return new ExecuteResponse("SUCCESS", steps.size(), steps);
+    }
+
+    // ==========================================
+    // 18. Double-Ended Queue (Deque)
+    // ==========================================
+    private ExecuteResponse generateDequeTrace() {
+        List<ExecutionStep> steps = new ArrayList<>();
+        List<Integer> deque = new ArrayList<>();
+        int step = 1;
+
+        // 1. addFirst(10)
+        deque.add(0, 10);
+        ExecutionStep s1 = new ExecutionStep();
+        s1.setStepNumber(step++);
+        s1.setLineNumber(3);
+        s1.setEventType("DEQUE_ADD_FIRST");
+        s1.setVariables(Map.of("op", "addFirst(10)", "deque", deque.toString()));
+        DataStructureState ds1 = new DataStructureState();
+        ds1.setType("queue");
+        ds1.setValues(new ArrayList<>(deque));
+        ds1.setPointers(Map.of("FRONT", 0, "REAR", 0));
+        ds1.setLabel("addFirst(10)");
+        ds1.setFocusInfo("10 inserted at front");
+        s1.setDataStructureState(ds1);
+        s1.setExplanation("addFirst(10): Inserted element 10 at the front of the deque.");
+        s1.setAiHint("Deque supports constant time O(1) insertions and removals at both ends.");
+        steps.add(s1);
+
+        // 2. addLast(20)
+        deque.add(20);
+        ExecutionStep s2 = new ExecutionStep();
+        s2.setStepNumber(step++);
+        s2.setLineNumber(4);
+        s2.setEventType("DEQUE_ADD_LAST");
+        s2.setVariables(Map.of("op", "addLast(20)", "deque", deque.toString()));
+        DataStructureState ds2 = new DataStructureState();
+        ds2.setType("queue");
+        ds2.setValues(new ArrayList<>(deque));
+        ds2.setPointers(Map.of("FRONT", 0, "REAR", deque.size() - 1));
+        ds2.setLabel("addLast(20)");
+        ds2.setFocusInfo("20 appended to rear");
+        s2.setDataStructureState(ds2);
+        s2.setExplanation("addLast(20): Appended element 20 to the rear of the deque.");
+        s2.setAiHint("Rear index moves rightward.");
+        steps.add(s2);
+
+        // 3. addFirst(5)
+        deque.add(0, 5);
+        ExecutionStep s3 = new ExecutionStep();
+        s3.setStepNumber(step++);
+        s3.setLineNumber(5);
+        s3.setEventType("DEQUE_ADD_FIRST");
+        s3.setVariables(Map.of("op", "addFirst(5)", "deque", deque.toString()));
+        DataStructureState ds3 = new DataStructureState();
+        ds3.setType("queue");
+        ds3.setValues(new ArrayList<>(deque));
+        ds3.setPointers(Map.of("FRONT", 0, "REAR", deque.size() - 1));
+        ds3.setLabel("addFirst(5)");
+        ds3.setFocusInfo("5 prepended to front");
+        s3.setDataStructureState(ds3);
+        s3.setExplanation("addFirst(5): Prepended 5. Current deque: " + deque);
+        s3.setAiHint("Front index stays at 0 as elements shift.");
+        steps.add(s3);
+
+        // 4. removeLast()
+        int removedLast = deque.remove(deque.size() - 1);
+        ExecutionStep s4 = new ExecutionStep();
+        s4.setStepNumber(step++);
+        s4.setLineNumber(6);
+        s4.setEventType("DEQUE_REMOVE_LAST");
+        s4.setVariables(Map.of("op", "removeLast()", "removed", removedLast, "deque", deque.toString()));
+        DataStructureState ds4 = new DataStructureState();
+        ds4.setType("queue");
+        ds4.setValues(new ArrayList<>(deque));
+        ds4.setPointers(Map.of("FRONT", 0, "REAR", deque.size() - 1));
+        ds4.setLabel("removeLast() -> " + removedLast);
+        ds4.setFocusInfo("Removed " + removedLast + " from rear");
+        s4.setDataStructureState(ds4);
+        s4.setExplanation("removeLast(): Removed and returned element " + removedLast + " from rear.");
+        s4.setAiHint("Remaining deque: " + deque);
+        steps.add(s4);
+
+        return new ExecuteResponse("SUCCESS", steps.size(), steps);
+    }
+
+    // ==========================================
+    // 19. Trie (Prefix Tree)
+    // ==========================================
+    private ExecuteResponse generateTrieTrace() {
+        List<ExecutionStep> steps = new ArrayList<>();
+        int step = 1;
+
+        List<String> words = List.of("CAT", "CAR");
+        for (String word : words) {
+            for (int i = 0; i < word.length(); i++) {
+                char ch = word.charAt(i);
+                ExecutionStep s = new ExecutionStep();
+                s.setStepNumber(step++);
+                s.setLineNumber(5);
+                s.setEventType("TRIE_INSERT_CHAR");
+                s.setVariables(Map.of("word", word, "char", String.valueOf(ch), "depth", i + 1));
+
+                DataStructureState ds = new DataStructureState();
+                ds.setType("tree");
+                ds.setNodes(List.of(
+                        Map.of("id", 0, "val", "ROOT", "left", 1, "right", -1),
+                        Map.of("id", 1, "val", "C", "left", 2, "right", -1),
+                        Map.of("id", 2, "val", "A", "left", 3, "right", -1),
+                        Map.of("id", 3, "val", String.valueOf(ch) + (i == 2 ? "*" : ""), "left", -1, "right", -1)
+                ));
+                ds.setLabel("Inserting '" + word + "': Node '" + ch + "'");
+                ds.setFocusInfo("Prefix depth " + (i + 1) + (i == word.length() - 1 ? " (isEndOfWord = true)" : ""));
+                s.setDataStructureState(ds);
+                s.setExplanation("Inserting character '" + ch + "' of word '" + word + "' into Trie node branch.");
+                s.setAiHint("Trie prefix searches run in O(m) time where m is key length, independent of tree size.");
+                steps.add(s);
+            }
+        }
+
+        return new ExecuteResponse("SUCCESS", steps.size(), steps);
+    }
+
+    // ==========================================
+    // 20. Insertion Sort
+    // ==========================================
+    private ExecuteResponse generateInsertionSortTrace() {
+        List<ExecutionStep> steps = new ArrayList<>();
+        List<Integer> arr = new ArrayList<>(List.of(35, 12, 45, 8, 20));
+        int step = 1;
+
+        for (int i = 1; i < arr.size(); i++) {
+            int key = arr.get(i);
+            int j = i - 1;
+
+            ExecutionStep sKey = new ExecutionStep();
+            sKey.setStepNumber(step++);
+            sKey.setLineNumber(5);
+            sKey.setEventType("PICK_KEY");
+            sKey.setVariables(Map.of("arr", arr.toString(), "i", i, "key", key));
+            DataStructureState dsKey = new DataStructureState();
+            dsKey.setType("sorting");
+            dsKey.setValues(new ArrayList<>(arr));
+            dsKey.setActiveIndex(i);
+            dsKey.setLabel("Selected Key: " + key + " at index " + i);
+            dsKey.setFocusInfo("Inserting " + key + " into sorted prefix [0.." + (i - 1) + "]");
+            sKey.setDataStructureState(dsKey);
+            sKey.setExplanation("Selected key = " + key + ". Comparing backwards through sorted subarray.");
+            sKey.setAiHint("Insertion sort builds the final sorted array one item at a time.");
+            steps.add(sKey);
+
+            while (j >= 0 && arr.get(j) > key) {
+                arr.set(j + 1, arr.get(j));
+                ExecutionStep sShift = new ExecutionStep();
+                sShift.setStepNumber(step++);
+                sShift.setLineNumber(8);
+                sShift.setEventType("SHIFT_ELEMENT");
+                sShift.setVariables(Map.of("shifted", arr.get(j), "toIndex", j + 1));
+                DataStructureState dsShift = new DataStructureState();
+                dsShift.setType("sorting");
+                dsShift.setValues(new ArrayList<>(arr));
+                dsShift.setSwappedIndices(List.of(j, j + 1));
+                dsShift.setLabel("Shifted " + arr.get(j) + " rightward to make space");
+                dsShift.setFocusInfo("j = " + j);
+                sShift.setDataStructureState(dsShift);
+                sShift.setExplanation("arr[" + j + "] (" + arr.get(j) + ") > key (" + key + "). Shifted to index " + (j + 1) + ".");
+                sShift.setAiHint("Elements greater than key are shifted right.");
+                steps.add(sShift);
+                j--;
+            }
+            arr.set(j + 1, key);
+
+            ExecutionStep sPlace = new ExecutionStep();
+            sPlace.setStepNumber(step++);
+            sPlace.setLineNumber(11);
+            sPlace.setEventType("PLACE_KEY");
+            sPlace.setVariables(Map.of("placedKey", key, "atIndex", j + 1, "arr", arr.toString()));
+            DataStructureState dsPlace = new DataStructureState();
+            dsPlace.setType("sorting");
+            dsPlace.setValues(new ArrayList<>(arr));
+            dsPlace.setActiveIndex(j + 1);
+            dsPlace.setLabel("Placed Key " + key + " at index " + (j + 1));
+            dsPlace.setFocusInfo("Prefix [0.." + i + "] is now sorted: " + arr.subList(0, i + 1));
+            sPlace.setDataStructureState(dsPlace);
+            sPlace.setExplanation("Inserted key " + key + " into its correct sorted position at index " + (j + 1) + ".");
+            sPlace.setAiHint("Subarray up to index " + i + " is now strictly sorted.");
+            steps.add(sPlace);
+        }
+
+        return new ExecuteResponse("SUCCESS", steps.size(), steps);
+    }
+
+    // ==========================================
+    // 21. Merge Sort
+    // ==========================================
+    private ExecuteResponse generateMergeSortTrace() {
+        List<ExecutionStep> steps = new ArrayList<>();
+        List<Integer> arr = new ArrayList<>(List.of(38, 27, 43, 3, 9, 82, 10));
+        int step = 1;
+
+        // Stage 1: Initial Array
+        ExecutionStep s1 = new ExecutionStep();
+        s1.setStepNumber(step++);
+        s1.setLineNumber(3);
+        s1.setEventType("DIVIDE");
+        s1.setVariables(Map.of("arr", arr.toString(), "size", arr.size()));
+        DataStructureState ds1 = new DataStructureState();
+        ds1.setType("sorting");
+        ds1.setValues(new ArrayList<>(arr));
+        ds1.setLabel("Merge Sort: Divide Array of Size " + arr.size());
+        ds1.setFocusInfo("Divide & conquer split into subarrays");
+        s1.setDataStructureState(ds1);
+        s1.setExplanation("Merge sort begins: Recursively divide array into halves until subarrays of size 1 are reached.");
+        s1.setAiHint("Merge sort guarantees O(n log n) time in all cases (worst, average, best).");
+        steps.add(s1);
+
+        // Stage 2: Merge left halves [27, 38, 43]
+        List<Integer> stage2 = List.of(27, 38, 43, 3, 9, 82, 10);
+        ExecutionStep s2 = new ExecutionStep();
+        s2.setStepNumber(step++);
+        s2.setLineNumber(8);
+        s2.setEventType("MERGE_SUBARRAY");
+        s2.setVariables(Map.of("merged", "[27, 38, 43]"));
+        DataStructureState ds2 = new DataStructureState();
+        ds2.setType("sorting");
+        ds2.setValues(new ArrayList<>(stage2));
+        ds2.setComparedIndices(List.of(0, 1, 2));
+        ds2.setLabel("Merged Left Subarray: [27, 38, 43]");
+        ds2.setFocusInfo("Indices [0..2] merged in sorted order");
+        s2.setDataStructureState(ds2);
+        s2.setExplanation("Merged left halves into sorted sequence [27, 38, 43].");
+        s2.setAiHint("Two-way merge compares head pointers of both subarrays.");
+        steps.add(s2);
+
+        // Stage 3: Merge right halves [3, 9, 10, 82]
+        List<Integer> stage3 = List.of(27, 38, 43, 3, 9, 10, 82);
+        ExecutionStep s3 = new ExecutionStep();
+        s3.setStepNumber(step++);
+        s3.setLineNumber(8);
+        s3.setEventType("MERGE_SUBARRAY");
+        s3.setVariables(Map.of("merged", "[3, 9, 10, 82]"));
+        DataStructureState ds3 = new DataStructureState();
+        ds3.setType("sorting");
+        ds3.setValues(new ArrayList<>(stage3));
+        ds3.setComparedIndices(List.of(3, 4, 5, 6));
+        ds3.setLabel("Merged Right Subarray: [3, 9, 10, 82]");
+        ds3.setFocusInfo("Indices [3..6] merged in sorted order");
+        s3.setDataStructureState(ds3);
+        s3.setExplanation("Merged right halves into sorted sequence [3, 9, 10, 82].");
+        s3.setAiHint("Both halves are now individually sorted and ready for final combine.");
+        steps.add(s3);
+
+        // Stage 4: Final Merge [3, 9, 10, 27, 38, 43, 82]
+        List<Integer> finalSorted = List.of(3, 9, 10, 27, 38, 43, 82);
+        ExecutionStep s4 = new ExecutionStep();
+        s4.setStepNumber(step);
+        s4.setLineNumber(12);
+        s4.setEventType("MERGE_COMPLETE");
+        s4.setVariables(Map.of("sortedArr", finalSorted.toString()));
+        DataStructureState ds4 = new DataStructureState();
+        ds4.setType("sorting");
+        ds4.setValues(new ArrayList<>(finalSorted));
+        ds4.setLabel("Final Merge Complete: " + finalSorted);
+        ds4.setFocusInfo("O(n log n) sorting completed");
+        s4.setDataStructureState(ds4);
+        s4.setExplanation("Final merge complete: Array fully sorted into " + finalSorted + ".");
+        s4.setAiHint("Merge sort is stable and ideal for external sorting.");
+        steps.add(s4);
+
+        return new ExecuteResponse("SUCCESS", steps.size(), steps);
+    }
+
+    // ==========================================
+    // 22. Quick Sort
+    // ==========================================
+    private ExecuteResponse generateQuickSortTrace() {
+        List<ExecutionStep> steps = new ArrayList<>();
+        List<Integer> arr = new ArrayList<>(List.of(10, 80, 30, 90, 40, 50, 70));
+        int step = 1;
+
+        // Step 1: Pick Pivot 70
+        ExecutionStep s1 = new ExecutionStep();
+        s1.setStepNumber(step++);
+        s1.setLineNumber(5);
+        s1.setEventType("PIVOT_SELECT");
+        s1.setVariables(Map.of("pivot", 70, "pivotIndex", 6));
+        DataStructureState ds1 = new DataStructureState();
+        ds1.setType("sorting");
+        ds1.setValues(new ArrayList<>(arr));
+        ds1.setActiveIndex(6);
+        ds1.setLabel("Pivot Selected: 70 (Last element)");
+        ds1.setFocusInfo("Partitioning elements relative to 70");
+        s1.setDataStructureState(ds1);
+        s1.setExplanation("Lomuto partitioning: Selected pivot = 70 at end index 6.");
+        s1.setAiHint("Elements smaller than pivot will be partitioned to the left; larger to the right.");
+        steps.add(s1);
+
+        // Step 2: Swap 80 and 30
+        arr.set(1, 30);
+        arr.set(2, 80);
+        ExecutionStep s2 = new ExecutionStep();
+        s2.setStepNumber(step++);
+        s2.setLineNumber(8);
+        s2.setEventType("PARTITION_SWAP");
+        s2.setVariables(Map.of("swapped", "80 <-> 30", "arr", arr.toString()));
+        DataStructureState ds2 = new DataStructureState();
+        ds2.setType("sorting");
+        ds2.setValues(new ArrayList<>(arr));
+        ds2.setSwappedIndices(List.of(1, 2));
+        ds2.setActiveIndex(6);
+        ds2.setLabel("Swapped 80 and 30: Smaller element moved left");
+        ds2.setFocusInfo("30 < 70, placed into left partition");
+        s2.setDataStructureState(ds2);
+        s2.setExplanation("30 is smaller than pivot 70, swapped into left partition position.");
+        s2.setAiHint("Pointer 'i' tracks the boundary of elements <= pivot.");
+        steps.add(s2);
+
+        // Step 3: Swap 90 and 40
+        arr.set(3, 40);
+        arr.set(4, 90);
+        ExecutionStep s3 = new ExecutionStep();
+        s3.setStepNumber(step++);
+        s3.setLineNumber(8);
+        s3.setEventType("PARTITION_SWAP");
+        s3.setVariables(Map.of("swapped", "90 <-> 40", "arr", arr.toString()));
+        DataStructureState ds3 = new DataStructureState();
+        ds3.setType("sorting");
+        ds3.setValues(new ArrayList<>(arr));
+        ds3.setSwappedIndices(List.of(3, 4));
+        ds3.setActiveIndex(6);
+        ds3.setLabel("Swapped 90 and 40: Smaller element moved left");
+        ds3.setFocusInfo("40 < 70, placed into left partition");
+        s3.setDataStructureState(ds3);
+        s3.setExplanation("40 is smaller than pivot 70, swapped into left partition position.");
+        s3.setAiHint("Partition maintains contiguous block of smaller elements.");
+        steps.add(s3);
+
+        // Step 4: Pivot to final spot: swap pivot 70 with 90 at index 4
+        arr.set(6, 90);
+        arr.set(4, 70);
+        ExecutionStep s4 = new ExecutionStep();
+        s4.setStepNumber(step);
+        s4.setLineNumber(12);
+        s4.setEventType("PIVOT_PLACED");
+        s4.setVariables(Map.of("pivot", 70, "finalIndex", 4, "arr", arr.toString()));
+        DataStructureState ds4 = new DataStructureState();
+        ds4.setType("sorting");
+        ds4.setValues(new ArrayList<>(arr));
+        ds4.setActiveIndex(4);
+        ds4.setSwappedIndices(List.of(4, 6));
+        ds4.setLabel("Pivot 70 Locked at Index 4!");
+        ds4.setFocusInfo("All elements left <= 70, all right >= 70");
+        s4.setDataStructureState(ds4);
+        s4.setExplanation("Pivot 70 placed into its final sorted position at index 4. Array is partitioned.");
+        s4.setAiHint("Quick Sort now recurses independently on left and right partitions.");
+        steps.add(s4);
+
+        return new ExecuteResponse("SUCCESS", steps.size(), steps);
+    }
+
+    // ==========================================
+    // 23. Graph DFS Traversal
+    // ==========================================
+    private ExecuteResponse generateGraphDfsTrace() {
+        List<ExecutionStep> steps = new ArrayList<>();
+        int step = 1;
+        int[] visitOrder = {0, 1, 3, 2, 4};
+
+        for (int v : visitOrder) {
+            ExecutionStep s = new ExecutionStep();
+            s.setStepNumber(step++);
+            s.setLineNumber(6);
+            s.setEventType("DFS_VISIT");
+            s.setVariables(Map.of("vertex", v, "visited", "true"));
+
+            DataStructureState ds = new DataStructureState();
+            ds.setType("tree");
+            ds.setNodes(List.of(
+                    Map.of("id", 0, "val", "V0", "left", 1, "right", 2),
+                    Map.of("id", 1, "val", "V1", "left", 3, "right", -1),
+                    Map.of("id", 2, "val", "V2", "left", 4, "right", -1),
+                    Map.of("id", 3, "val", "V3", "left", -1, "right", -1),
+                    Map.of("id", 4, "val", "V4", "left", -1, "right", -1)
+            ));
+            ds.setActiveIndex(v);
+            ds.setLabel("DFS Visiting Vertex: " + v);
+            ds.setFocusInfo("Depth-first exploration via Call Stack");
+            s.setDataStructureState(ds);
+            s.setExplanation("DFS visits vertex " + v + ", marking it visited and exploring adjacent unvisited neighbors.");
+            s.setAiHint("DFS explores deeply along each branch before backtracking.");
+            steps.add(s);
+        }
+
+        return new ExecuteResponse("SUCCESS", steps.size(), steps);
+    }
+
+    // ==========================================
+    // 24. Dijkstra's Shortest Path
+    // ==========================================
+    private ExecuteResponse generateDijkstraTrace() {
+        List<ExecutionStep> steps = new ArrayList<>();
+        int step = 1;
+
+        List<Integer> dist = new ArrayList<>(List.of(0, 999, 999, 999, 999));
+        int[] relaxedVertices = {0, 1, 2, 3, 4};
+        int[][] newDists = {
+                {0, 4, 2, 999, 999},
+                {0, 4, 2, 7, 999},
+                {0, 3, 2, 6, 999},
+                {0, 3, 2, 6, 8},
+                {0, 3, 2, 6, 8}
+        };
+
+        for (int i = 0; i < relaxedVertices.length; i++) {
+            int u = relaxedVertices[i];
+            List<Integer> currDist = new ArrayList<>();
+            for (int d : newDists[i]) currDist.add(d);
+
+            ExecutionStep s = new ExecutionStep();
+            s.setStepNumber(step++);
+            s.setLineNumber(8);
+            s.setEventType("RELAX_EDGES");
+            s.setVariables(Map.of("minVertex", u, "dist", currDist.toString()));
+
+            DataStructureState ds = new DataStructureState();
+            ds.setType("sorting");
+            ds.setValues(new ArrayList<Object>(currDist));
+            ds.setActiveIndex(u);
+            ds.setLabel("Relaxing Edges from Vertex " + u + ": dist[] = " + currDist);
+            ds.setFocusInfo("Shortest distance to " + u + " finalized: " + currDist.get(u));
+            s.setDataStructureState(ds);
+            s.setExplanation("Extracted minimum distance vertex " + u + ". Relaxing all outgoing edges (v) where dist[u] + wt < dist[v].");
+            s.setAiHint("Dijkstra's greedy algorithm finds single-source shortest paths in O((V + E) log V).");
+            steps.add(s);
+        }
+
+        return new ExecuteResponse("SUCCESS", steps.size(), steps);
+    }
+
+    // ==========================================
+    // 25. Fibonacci with Memoization (DP)
+    // ==========================================
+    private ExecuteResponse generateFibonacciMemoTrace() {
+        List<ExecutionStep> steps = new ArrayList<>();
+        int step = 1;
+        List<Integer> memo = new ArrayList<>(List.of(0, 1, 1, 2, 3, 5));
+
+        for (int n = 2; n <= 5; n++) {
+            ExecutionStep s = new ExecutionStep();
+            s.setStepNumber(step++);
+            s.setLineNumber(6);
+            s.setEventType("DP_MEMO_STORE");
+            s.setVariables(Map.of("n", n, "fib(n-1)", memo.get(n - 1), "fib(n-2)", memo.get(n - 2), "memo[" + n + "]", memo.get(n)));
+
+            DataStructureState ds = new DataStructureState();
+            ds.setType("sorting");
+            ds.setValues(new ArrayList<Object>(memo.subList(0, n + 1)));
+            ds.setActiveIndex(n);
+            ds.setLabel("Computed fib(" + n + ") = " + memo.get(n) + " (Cached in memo[" + n + "])");
+            ds.setFocusInfo("Subproblem n=" + n + " solved in O(1) from cached children");
+            s.setDataStructureState(ds);
+            s.setExplanation("Computed fib(" + n + ") = fib(" + (n - 1) + ") + fib(" + (n - 2) + ") = " +
+                    memo.get(n - 1) + " + " + memo.get(n - 2) + " = " + memo.get(n) + ". Stored in memo table.");
+            s.setAiHint("Memoization prunes redundant exponential branches down to O(n) linear time.");
+            steps.add(s);
+        }
+
+        return new ExecuteResponse("SUCCESS", steps.size(), steps);
+    }
+
+    // ==========================================
+    // 26. Longest Common Subsequence (LCS)
+    // ==========================================
+    private ExecuteResponse generateLcsTrace() {
+        List<ExecutionStep> steps = new ArrayList<>();
+        int step = 1;
+
+        String s1 = "ABC";
+        String s2 = "AC";
+        int[][] dp = new int[4][3];
+
+        for (int r = 1; r <= 3; r++) {
+            for (int c = 1; c <= 2; c++) {
+                char c1 = s1.charAt(r - 1);
+                char c2 = s2.charAt(c - 1);
+                boolean match = c1 == c2;
+                if (match) {
+                    dp[r][c] = 1 + dp[r - 1][c - 1];
+                } else {
+                    dp[r][c] = Math.max(dp[r - 1][c], dp[r][c - 1]);
+                }
+
+                ExecutionStep s = new ExecutionStep();
+                s.setStepNumber(step++);
+                s.setLineNumber(7);
+                s.setEventType(match ? "LCS_CHAR_MATCH" : "LCS_MAX_PICK");
+                s.setVariables(Map.of("char1", String.valueOf(c1), "char2", String.valueOf(c2), "match", match, "dp[r][c]", dp[r][c]));
+
+                DataStructureState ds = new DataStructureState();
+                ds.setType("matrix");
+                List<List<Object>> matrix = new ArrayList<>();
+                for (int i = 0; i < 4; i++) {
+                    List<Object> row = new ArrayList<>();
+                    for (int j = 0; j < 3; j++) {
+                        row.add(dp[i][j]);
+                    }
+                    matrix.add(row);
+                }
+                ds.setMatrix(matrix);
+                ds.setPointers(Map.of("R", r, "C", c));
+                ds.setLabel(match ? "Match ('" + c1 + "')! dp[" + r + "][" + c + "] = " + dp[r][c] : "Mismatch: dp[" + r + "][" + c + "] = " + dp[r][c]);
+                ds.setFocusInfo("Comparing '" + c1 + "' vs '" + c2 + "'");
+                s.setDataStructureState(ds);
+                s.setExplanation(match ? "Characters matched ('" + c1 + "'). Value = 1 + diagonal: " + dp[r][c]
+                        : "Characters do not match. Value = max(top, left): " + dp[r][c] + ".");
+                s.setAiHint("LCS dynamic programming constructs optimal common subsequence length in O(m * n) time.");
+                steps.add(s);
+            }
         }
 
         return new ExecuteResponse("SUCCESS", steps.size(), steps);

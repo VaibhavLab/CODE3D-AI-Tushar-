@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import Editor from '@monaco-editor/react';
 import { Play, Pause, SkipBack, SkipForward, RotateCcw, FileCode, CheckCircle2, Code2, Sparkles } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 const LANGUAGE_CONFIG = {
   java: {
@@ -53,14 +54,17 @@ export default function CodeEditor({
   isAtEnd,
 }) {
   const editorRef = useRef(null);
+  const monacoRef = useRef(null);
   const decorationsRef = useRef([]);
+  const { isBright } = useTheme();
 
   const currentLangConfig = LANGUAGE_CONFIG[language] || LANGUAGE_CONFIG.java;
 
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
+    monacoRef.current = monaco;
 
-    // Custom styling rules for line decoration and tokens
+    // Dark Theme definition
     monaco.editor.defineTheme('code3dDark', {
       base: 'vs-dark',
       inherit: true,
@@ -79,8 +83,34 @@ export default function CodeEditor({
       },
     });
 
-    monaco.editor.setTheme('code3dDark');
+    // Bright Theme definition
+    monaco.editor.defineTheme('code3dLight', {
+      base: 'vs',
+      inherit: true,
+      rules: [
+        { token: 'keyword', foreground: '0284c7', fontStyle: 'bold' },
+        { token: 'type', foreground: '0369a1' },
+        { token: 'string', foreground: '059669' },
+        { token: 'number', foreground: 'd97706' },
+        { token: 'comment', foreground: '94a3b8', fontStyle: 'italic' },
+      ],
+      colors: {
+        'editor.background': '#ffffff',
+        'editor.lineHighlightBackground': '#f1f5f9',
+        'editorLineNumber.foreground': '#94a3b8',
+        'editorLineNumber.activeForeground': '#0284c7',
+      },
+    });
+
+    monaco.editor.setTheme(isBright ? 'code3dLight' : 'code3dDark');
   };
+
+  // Switch editor theme whenever bright mode changes
+  useEffect(() => {
+    if (monacoRef.current) {
+      monacoRef.current.editor.setTheme(isBright ? 'code3dLight' : 'code3dDark');
+    }
+  }, [isBright]);
 
   // Update line highlighting whenever currentLineNumber changes
   useEffect(() => {
@@ -109,12 +139,16 @@ export default function CodeEditor({
   }, [currentLineNumber]);
 
   return (
-    <div className="flex flex-col h-full bg-[#0b0f19] border-r border-slate-800/80 select-none">
+    <div className={`flex flex-col h-full border-r select-none transition-colors duration-200 ${
+      isBright ? 'bg-white border-slate-200' : 'bg-[#0b0f19] border-slate-800/80'
+    }`}>
       {/* Editor Header Bar with Language Switcher */}
-      <div className="h-10 bg-slate-900/90 border-b border-slate-800/70 px-3 flex items-center justify-between gap-2">
+      <div className={`h-10 border-b px-3 flex items-center justify-between gap-2 transition-colors ${
+        isBright ? 'bg-slate-50 border-slate-200' : 'bg-slate-900/90 border-slate-800/70'
+      }`}>
         <div className="flex items-center gap-2">
-          <FileCode size={14} className="text-cyan-400" />
-          <span className="text-xs font-mono font-medium text-slate-200">
+          <FileCode size={14} className={isBright ? 'text-cyan-600' : 'text-cyan-400'} />
+          <span className={`text-xs font-mono font-medium ${isBright ? 'text-slate-800' : 'text-slate-200'}`}>
             {currentLangConfig.fileName}
           </span>
           
@@ -122,7 +156,11 @@ export default function CodeEditor({
           <select
             value={language}
             onChange={(e) => onChangeLanguage && onChangeLanguage(e.target.value)}
-            className="bg-slate-950 border border-slate-700 rounded px-1.5 py-0.5 text-[11px] text-cyan-300 font-mono focus:outline-none focus:border-cyan-500 cursor-pointer"
+            className={`border rounded px-1.5 py-0.5 text-[11px] font-mono focus:outline-none focus:border-cyan-500 cursor-pointer ${
+              isBright
+                ? 'bg-white border-slate-300 text-slate-800'
+                : 'bg-slate-950 border-slate-700 text-cyan-300'
+            }`}
           >
             <option value="java">☕ Java</option>
             <option value="javascript">🟨 JavaScript</option>
@@ -131,7 +169,9 @@ export default function CodeEditor({
             <option value="cpp">⚡ C++</option>
           </select>
 
-          <span className="hidden sm:inline-block text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 font-mono">
+          <span className={`hidden sm:inline-block text-[10px] px-1.5 py-0.5 rounded font-mono ${
+            isBright ? 'bg-slate-200 text-slate-700' : 'bg-slate-800 text-slate-400'
+          }`}>
             {currentLangConfig.badge}
           </span>
         </div>
@@ -141,7 +181,11 @@ export default function CodeEditor({
           {onOpenCodeDoctor && (
             <button
               onClick={onOpenCodeDoctor}
-              className="flex items-center gap-1 text-[11px] px-2 py-0.5 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 transition font-mono font-medium shadow-sm"
+              className={`flex items-center gap-1 text-[11px] px-2 py-0.5 rounded border transition font-mono font-medium shadow-sm ${
+                isBright
+                  ? 'bg-amber-100 text-amber-800 border-amber-300 hover:bg-amber-200'
+                  : 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border-amber-500/30'
+              }`}
               title="AI Code Doctor: Fix broken syntax and visualize in 3D"
             >
               <span>🩺 AI Doctor</span>
@@ -152,17 +196,25 @@ export default function CodeEditor({
           {onOpenCustomCode && (
             <button
               onClick={onOpenCustomCode}
-              className="flex items-center gap-1 text-[11px] px-2 py-0.5 rounded bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 transition font-mono font-medium shadow-sm shadow-cyan-950"
+              className={`flex items-center gap-1 text-[11px] px-2 py-0.5 rounded border transition font-mono font-medium shadow-sm ${
+                isBright
+                  ? 'bg-cyan-100 text-cyan-800 border-cyan-300 hover:bg-cyan-200'
+                  : 'bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border-cyan-500/30 shadow-cyan-950'
+              }`}
               title="Input Any Code in JS, C, C++, Python, or Java to visualize in 3D"
             >
-              <Code2 size={11} className="text-cyan-400" />
+              <Code2 size={11} className={isBright ? 'text-cyan-700' : 'text-cyan-400'} />
               <span>Input Code ⚡</span>
             </button>
           )}
 
           {currentLineNumber && (
-            <div className="flex items-center gap-1.5 text-[11px] font-mono text-cyan-400 bg-cyan-950/60 border border-cyan-800/50 px-2 py-0.5 rounded">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+            <div className={`flex items-center gap-1.5 text-[11px] font-mono px-2 py-0.5 rounded border ${
+              isBright
+                ? 'text-cyan-700 bg-cyan-50 border-cyan-300'
+                : 'text-cyan-400 bg-cyan-950/60 border-cyan-800/50'
+            }`}>
+              <span className={`w-1.5 h-1.5 rounded-full animate-ping ${isBright ? 'bg-cyan-600' : 'bg-cyan-400'}`}></span>
               <span>Line {currentLineNumber}</span>
             </div>
           )}
@@ -174,7 +226,7 @@ export default function CodeEditor({
         <Editor
           height="100%"
           language={currentLangConfig.monacoLang}
-          theme="vs-dark"
+          theme={isBright ? 'code3dLight' : 'code3dDark'}
           value={code}
           onChange={(val) => onChangeCode && onChangeCode(val)}
           onMount={handleEditorDidMount}
@@ -197,13 +249,19 @@ export default function CodeEditor({
       </div>
 
       {/* Editor Controls Bar */}
-      <div className="bg-slate-900/90 border-t border-slate-800/80 p-2.5 flex items-center justify-between gap-2">
+      <div className={`border-t p-2.5 flex items-center justify-between gap-2 transition-colors ${
+        isBright ? 'bg-slate-50 border-slate-200' : 'bg-slate-900/90 border-slate-800/80'
+      }`}>
         <div className="flex items-center gap-1.5">
           {/* Play / Pause */}
           {isPlaying ? (
             <button
               onClick={onPause}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 text-xs font-medium transition"
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded border text-xs font-medium transition ${
+                isBright
+                  ? 'bg-amber-100 text-amber-800 border-amber-300 hover:bg-amber-200'
+                  : 'bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30'
+              }`}
               title="Pause Simulation"
             >
               <Pause size={13} className="fill-current" />
@@ -212,7 +270,11 @@ export default function CodeEditor({
           ) : (
             <button
               onClick={onPlay}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-cyan-500 text-slate-950 hover:bg-cyan-400 text-xs font-semibold transition shadow-sm shadow-cyan-500/20"
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold transition shadow-sm ${
+                isBright
+                  ? 'bg-cyan-600 text-white hover:bg-cyan-500 shadow-cyan-600/20'
+                  : 'bg-cyan-500 text-slate-950 hover:bg-cyan-400 shadow-cyan-500/20'
+              }`}
               title="Run / Play Simulation"
             >
               <Play size={13} className="fill-current" />
@@ -223,7 +285,11 @@ export default function CodeEditor({
           {/* Reset */}
           <button
             onClick={onReset}
-            className="p-1.5 rounded text-slate-400 hover:text-slate-200 hover:bg-slate-800/80 transition"
+            className={`p-1.5 rounded transition ${
+              isBright
+                ? 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/80'
+            }`}
             title="Reset to Step 1"
           >
             <RotateCcw size={14} />
@@ -237,8 +303,10 @@ export default function CodeEditor({
             disabled={isAtStart}
             className={`flex items-center gap-1 px-2.5 py-1.5 rounded text-xs font-medium transition border ${
               isAtStart
-                ? 'opacity-40 cursor-not-allowed border-slate-800 text-slate-500'
-                : 'border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white'
+                ? 'opacity-40 cursor-not-allowed border-slate-300 dark:border-slate-800 text-slate-400 dark:text-slate-500'
+                : isBright
+                  ? 'border-slate-300 text-slate-700 hover:bg-slate-100'
+                  : 'border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white'
             }`}
             title="Previous Execution Step"
           >
@@ -251,8 +319,10 @@ export default function CodeEditor({
             disabled={isAtEnd}
             className={`flex items-center gap-1 px-2.5 py-1.5 rounded text-xs font-medium transition border ${
               isAtEnd
-                ? 'opacity-40 cursor-not-allowed border-slate-800 text-slate-500'
-                : 'border-cyan-600/60 bg-cyan-950/40 text-cyan-300 hover:bg-cyan-900/60'
+                ? 'opacity-40 cursor-not-allowed border-slate-300 dark:border-slate-800 text-slate-400 dark:text-slate-500'
+                : isBright
+                  ? 'border-cyan-400 bg-cyan-50 text-cyan-800 hover:bg-cyan-100'
+                  : 'border-cyan-600/60 bg-cyan-950/40 text-cyan-300 hover:bg-cyan-900/60'
             }`}
             title="Next Execution Step"
           >
@@ -264,3 +334,4 @@ export default function CodeEditor({
     </div>
   );
 }
+

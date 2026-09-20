@@ -9,10 +9,16 @@ export function useExecutionTimeline(trace = []) {
   const [playbackSpeed, setPlaybackSpeed] = useState(1); // 0.5, 1, 1.5, 2
   const timerRef = useRef(null);
 
-  const totalSteps = trace.length;
-  const currentStep = trace[currentStepIndex] || null;
+  const totalSteps = trace ? trace.length : 0;
+  const currentStep = (trace && trace[currentStepIndex]) || null;
   const isAtStart = currentStepIndex === 0;
   const isAtEnd = currentStepIndex >= totalSteps - 1;
+
+  // Auto-reset whenever a new execution trace is loaded
+  useEffect(() => {
+    setCurrentStepIndex(0);
+    setIsPlaying(false);
+  }, [trace]);
 
   const pause = useCallback(() => {
     setIsPlaying(false);

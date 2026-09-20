@@ -1,58 +1,154 @@
 import React from 'react';
-import { Settings, Cpu, HardDrive, CheckCircle2, ShieldCheck, Terminal, Layers } from 'lucide-react';
+import { Settings, Cpu, HardDrive, CheckCircle2, ShieldCheck, Terminal, Layers, Sun, Moon, Palette } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 export default function SettingsPage() {
+  const { theme, setTheme, isBright } = useTheme();
+
   return (
-    <div className="flex-1 overflow-y-auto bg-[#070b14] text-slate-100 p-6 md:p-10 select-none">
+    <div className={`flex-1 overflow-y-auto p-6 md:p-10 select-none transition-colors duration-200 ${
+      isBright ? 'bg-slate-50 text-slate-900' : 'bg-[#070b14] text-slate-100'
+    }`}>
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-800/50 text-cyan-400 text-xs font-mono font-medium mb-2">
+          <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-medium mb-2 border ${
+            isBright
+              ? 'bg-cyan-50 border-cyan-300 text-cyan-700'
+              : 'bg-cyan-950/60 border-cyan-800/50 text-cyan-400'
+          }`}>
             <Settings size={13} />
             <span>Platform Configuration &amp; Diagnostics</span>
           </div>
-          <h1 className="text-3xl font-extrabold text-white">System Settings &amp; Health</h1>
-          <p className="text-xs text-slate-400 mt-1">
-            Environment specifications, compiler runtimes, and 3D rendering configurations.
+          <h1 className={`text-3xl font-extrabold ${isBright ? 'text-slate-900' : 'text-white'}`}>
+            System Settings &amp; Appearance
+          </h1>
+          <p className={`text-xs mt-1 ${isBright ? 'text-slate-600' : 'text-slate-400'}`}>
+            Configure color themes, compiler runtimes, AST sandboxes, and 3D WebGL rendering settings.
           </p>
         </div>
 
+        {/* Theme Customizer Card */}
+        <div className={`border rounded-2xl p-6 space-y-4 transition-colors ${
+          isBright ? 'bg-white border-slate-200 shadow-sm' : 'bg-slate-900/60 border-slate-800'
+        }`}>
+          <div className="flex items-center justify-between">
+            <h2 className={`text-sm font-bold flex items-center gap-2 ${isBright ? 'text-slate-900' : 'text-white'}`}>
+              <Palette size={16} className="text-cyan-500" />
+              <span>Appearance &amp; Display Theme</span>
+            </h2>
+            <span className={`text-[10px] font-mono px-2 py-0.5 rounded border ${
+              isBright ? 'bg-amber-100 border-amber-300 text-amber-800' : 'bg-slate-800 border-slate-700 text-slate-400'
+            }`}>
+              Active: {isBright ? 'Bright Mode ☀️' : 'Dark Mode 🌙'}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Dark Mode Card */}
+            <button
+              onClick={() => setTheme('dark')}
+              className={`p-4 rounded-xl border text-left flex items-start gap-3.5 transition-all ${
+                !isBright
+                  ? 'bg-slate-950 border-cyan-500/80 ring-2 ring-cyan-500/30 shadow-lg shadow-cyan-950/40'
+                  : 'bg-slate-100/80 border-slate-300 hover:border-slate-400 opacity-70 hover:opacity-100'
+              }`}
+            >
+              <div className="w-10 h-10 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-cyan-400 shrink-0">
+                <Moon size={18} />
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-slate-100">Nebula Dark Space</span>
+                  {!isBright && (
+                    <span className="text-[9px] px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-mono">
+                      Current
+                    </span>
+                  )}
+                </div>
+                <p className="text-[11px] text-slate-400 leading-snug">
+                  Immersive deep space aesthetic (`#070b14`), glowing neon pointers, vs-dark Monaco code editor.
+                </p>
+              </div>
+            </button>
+
+            {/* Bright Mode Card */}
+            <button
+              onClick={() => setTheme('bright')}
+              className={`p-4 rounded-xl border text-left flex items-start gap-3.5 transition-all ${
+                isBright
+                  ? 'bg-white border-amber-400 ring-2 ring-amber-400/30 shadow-lg shadow-amber-100'
+                  : 'bg-slate-950/60 border-slate-800 hover:border-slate-700 opacity-70 hover:opacity-100'
+              }`}
+            >
+              <div className="w-10 h-10 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 shrink-0">
+                <Sun size={18} />
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs font-bold ${isBright ? 'text-slate-900' : 'text-slate-200'}`}>
+                    Daylight Studio Bright
+                  </span>
+                  {isBright && (
+                    <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 border border-amber-300 font-mono">
+                      Current
+                    </span>
+                  )}
+                </div>
+                <p className={`text-[11px] leading-snug ${isBright ? 'text-slate-600' : 'text-slate-400'}`}>
+                  Crisp daylight studio lighting, clean high-contrast text, soft studio 3D floor, light Monaco editor.
+                </p>
+              </div>
+            </button>
+          </div>
+        </div>
+
         {/* Runtime Stack Info */}
-        <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 space-y-4">
-          <h2 className="text-sm font-bold text-white flex items-center gap-2">
-            <Cpu size={16} className="text-cyan-400" />
+        <div className={`border rounded-2xl p-6 space-y-4 transition-colors ${
+          isBright ? 'bg-white border-slate-200 shadow-sm' : 'bg-slate-900/60 border-slate-800'
+        }`}>
+          <h2 className={`text-sm font-bold flex items-center gap-2 ${isBright ? 'text-slate-900' : 'text-white'}`}>
+            <Cpu size={16} className="text-cyan-500" />
             <span>Active Software Runtimes</span>
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
-            <div className="bg-slate-950 border border-slate-800 rounded-xl p-3.5 space-y-1">
-              <div className="text-slate-500 uppercase text-[10px]">Java Compiler &amp; Runtime</div>
-              <div className="text-white font-bold">Java(TM) SE Runtime 21.0.12 LTS</div>
-              <div className="text-emerald-400 text-[11px] flex items-center gap-1 mt-1">
+            <div className={`border rounded-xl p-3.5 space-y-1 ${
+              isBright ? 'bg-slate-50 border-slate-200' : 'bg-slate-950 border-slate-800'
+            }`}>
+              <div className={`uppercase text-[10px] ${isBright ? 'text-slate-500' : 'text-slate-400'}`}>Java Compiler &amp; Runtime</div>
+              <div className={`font-bold ${isBright ? 'text-slate-900' : 'text-white'}`}>Java(TM) SE Runtime 21.0.12 LTS</div>
+              <div className="text-emerald-600 dark:text-emerald-400 text-[11px] flex items-center gap-1 mt-1">
                 <CheckCircle2 size={12} /> JDK 21 Active
               </div>
             </div>
 
-            <div className="bg-slate-950 border border-slate-800 rounded-xl p-3.5 space-y-1">
-              <div className="text-slate-500 uppercase text-[10px]">Backend Server</div>
-              <div className="text-white font-bold">Spring Boot 3.2.4 (Apache Tomcat 10.1)</div>
-              <div className="text-emerald-400 text-[11px] flex items-center gap-1 mt-1">
+            <div className={`border rounded-xl p-3.5 space-y-1 ${
+              isBright ? 'bg-slate-50 border-slate-200' : 'bg-slate-950 border-slate-800'
+            }`}>
+              <div className={`uppercase text-[10px] ${isBright ? 'text-slate-500' : 'text-slate-400'}`}>Backend Server</div>
+              <div className={`font-bold ${isBright ? 'text-slate-900' : 'text-white'}`}>Spring Boot 3.2.4 (Apache Tomcat 10.1)</div>
+              <div className="text-emerald-600 dark:text-emerald-400 text-[11px] flex items-center gap-1 mt-1">
                 <CheckCircle2 size={12} /> Port 8080 (REST + JPA)
               </div>
             </div>
 
-            <div className="bg-slate-950 border border-slate-800 rounded-xl p-3.5 space-y-1">
-              <div className="text-slate-500 uppercase text-[10px]">Frontend Bundler</div>
-              <div className="text-white font-bold">Vite 5.4 + React 18</div>
-              <div className="text-emerald-400 text-[11px] flex items-center gap-1 mt-1">
+            <div className={`border rounded-xl p-3.5 space-y-1 ${
+              isBright ? 'bg-slate-50 border-slate-200' : 'bg-slate-950 border-slate-800'
+            }`}>
+              <div className={`uppercase text-[10px] ${isBright ? 'text-slate-500' : 'text-slate-400'}`}>Frontend Bundler</div>
+              <div className={`font-bold ${isBright ? 'text-slate-900' : 'text-white'}`}>Vite 5.4 + React 18</div>
+              <div className="text-emerald-600 dark:text-emerald-400 text-[11px] flex items-center gap-1 mt-1">
                 <CheckCircle2 size={12} /> Port 5173 (HMR Active)
               </div>
             </div>
 
-            <div className="bg-slate-950 border border-slate-800 rounded-xl p-3.5 space-y-1">
-              <div className="text-slate-500 uppercase text-[10px]">3D Graphics Pipeline</div>
-              <div className="text-white font-bold">Three.js + React Three Fiber 8</div>
-              <div className="text-cyan-400 text-[11px] flex items-center gap-1 mt-1">
+            <div className={`border rounded-xl p-3.5 space-y-1 ${
+              isBright ? 'bg-slate-50 border-slate-200' : 'bg-slate-950 border-slate-800'
+            }`}>
+              <div className={`uppercase text-[10px] ${isBright ? 'text-slate-500' : 'text-slate-400'}`}>3D Graphics Pipeline</div>
+              <div className={`font-bold ${isBright ? 'text-slate-900' : 'text-white'}`}>Three.js + React Three Fiber 8</div>
+              <div className="text-cyan-600 dark:text-cyan-400 text-[11px] flex items-center gap-1 mt-1">
                 <CheckCircle2 size={12} /> WebGL 2.0 Hardware Accelerated
               </div>
             </div>
@@ -60,12 +156,14 @@ export default function SettingsPage() {
         </div>
 
         {/* Security & Sandboxing Info */}
-        <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 space-y-3">
-          <h2 className="text-sm font-bold text-white flex items-center gap-2">
-            <ShieldCheck size={16} className="text-emerald-400" />
+        <div className={`border rounded-2xl p-6 space-y-3 transition-colors ${
+          isBright ? 'bg-white border-slate-200 shadow-sm' : 'bg-slate-900/60 border-slate-800'
+        }`}>
+          <h2 className={`text-sm font-bold flex items-center gap-2 ${isBright ? 'text-slate-900' : 'text-white'}`}>
+            <ShieldCheck size={16} className="text-emerald-500" />
             <span>Code Execution Sandbox &amp; Security Protocol</span>
           </h2>
-          <p className="text-xs text-slate-300 leading-relaxed font-sans">
+          <p className={`text-xs leading-relaxed font-sans ${isBright ? 'text-slate-600' : 'text-slate-300'}`}>
             In compliance with Section 29, user-submitted code is first verified through JavaParser AST validation.
             The backend rejects filesystem operations, reflection, network requests, and dangerous system calls,
             executing only controlled AST program models within an isolated simulation sandbox.
@@ -73,10 +171,16 @@ export default function SettingsPage() {
         </div>
 
         {/* Exhibition Info */}
-        <div className="bg-gradient-to-r from-cyan-950/40 to-slate-900/60 border border-cyan-800/40 rounded-2xl p-6 flex items-center justify-between">
+        <div className={`border rounded-2xl p-6 flex items-center justify-between transition-colors ${
+          isBright
+            ? 'bg-gradient-to-r from-cyan-50 to-blue-50 border-cyan-200 text-slate-800'
+            : 'bg-gradient-to-r from-cyan-950/40 to-slate-900/60 border-cyan-800/40 text-white'
+        }`}>
           <div className="space-y-1">
-            <h3 className="text-sm font-bold text-white">Student Technology Exhibition Build</h3>
-            <p className="text-xs text-slate-400 font-sans">
+            <h3 className={`text-sm font-bold ${isBright ? 'text-slate-900' : 'text-white'}`}>
+              Student Technology Exhibition Build
+            </h3>
+            <p className={`text-xs font-sans ${isBright ? 'text-slate-600' : 'text-slate-400'}`}>
               Designed for high-impact live student demonstrations, interactive code walkthroughs, and Big-O complexity explanations.
             </p>
           </div>
@@ -88,3 +192,4 @@ export default function SettingsPage() {
     </div>
   );
 }
+

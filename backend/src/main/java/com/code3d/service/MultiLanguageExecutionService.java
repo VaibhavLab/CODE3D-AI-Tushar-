@@ -37,13 +37,33 @@ public class MultiLanguageExecutionService {
         if (loopLine <= 0) loopLine = 3;
         if (printLine <= 0) printLine = 4;
 
-        // 3. Check if user is performing bubble sort or search
-        boolean isSort = code.toLowerCase().contains("swap") || (code.contains(">") && code.contains("temp"));
+        String lowerCode = code.toLowerCase();
+
+        // 3. Algorithm Pattern Detection
+        // Sorting
+        boolean isSort = lowerCode.contains("swap") ||
+                         (lowerCode.contains(">") && lowerCode.contains("temp")) ||
+                         lowerCode.contains("sort");
         if (isSort && values.size() >= 2) {
             return generateUserSortTrace(values, arrayLine, loopLine, printLine, language);
         }
 
-        // 4. Generate dynamic linear traversal trace matching user's exact code
+        // Two-Pointer Reversal
+        boolean isReverse = lowerCode.contains("reverse") ||
+                            (lowerCode.contains("left") && lowerCode.contains("right")) ||
+                            (lowerCode.contains("start") && lowerCode.contains("end"));
+        if (isReverse && values.size() >= 2) {
+            return generateUserReverseTrace(values, arrayLine, loopLine, language);
+        }
+
+        // Binary Search
+        boolean isSearch = lowerCode.contains("binary") ||
+                           (lowerCode.contains("mid") && lowerCode.contains("high"));
+        if (isSearch && values.size() >= 2) {
+            return generateUserBinarySearchTrace(values, arrayLine, loopLine, language);
+        }
+
+        // 4. Default: Dynamic linear traversal trace matching user's exact code and numbers
         return generateUserArrayTrace(values, arrayLine, loopLine, printLine, language);
     }
 
@@ -56,13 +76,31 @@ public class MultiLanguageExecutionService {
         Matcher m = p.matcher(code);
         if (m.find()) {
             String inner = m.group(1);
-            String[] tokens = inner.split(",");
+            String[] tokens = inner.split("[,\\s]+");
             for (String tok : tokens) {
                 try {
-                    list.add(Integer.parseInt(tok.trim()));
+                    String trimmed = tok.trim();
+                    if (!trimmed.isEmpty()) {
+                        list.add(Integer.parseInt(trimmed));
+                    }
                 } catch (NumberFormatException ignored) {}
             }
         }
+
+        // If bracket match yielded nothing, look for comma or space separated numbers
+        if (list.isEmpty()) {
+            Pattern numPat = Pattern.compile("-?\\b\\d+\\b");
+            Matcher numMatcher = numPat.matcher(code);
+            while (numMatcher.find() && list.size() < 12) {
+                try {
+                    int val = Integer.parseInt(numMatcher.group());
+                    if (val < 10000) { // filter out ports / giant line numbers
+                        list.add(val);
+                    }
+                } catch (NumberFormatException ignored) {}
+            }
+        }
+
         return list;
     }
 
@@ -78,6 +116,7 @@ public class MultiLanguageExecutionService {
         }
         return 1;
     }
+
 
     private ExecuteResponse generateUserArrayTrace(List<Integer> values, int arrayLine, int loopLine, int printLine, String lang) {
         List<ExecutionStep> steps = new ArrayList<>();
@@ -302,6 +341,244 @@ public class MultiLanguageExecutionService {
                     sSwap.setAiHint("Heavier element moves rightward.");
                     steps.add(sSwap);
                 }
+            }
+        }
+
+        return new ExecuteResponse("SUCCESS", steps.size(), steps);
+    }
+
+    private ExecuteResponse generateUserReverseTrace(List<Integer> values, int arrayLine, int loopLine, String lang) {
+        List<ExecutionStep> steps = new ArrayList<>();
+        List<Integer> arr = new ArrayList<>(values);
+        int left = 0;
+        int right = arr.size() - 1;
+        int step = 1;
+
+        // Step 1: Initial Array & Pointers
+        ExecutionStep sInit = new ExecutionStep();
+        sInit.setStepNumber(step++);
+        sInit.setLineNumber(arrayLine);
+        sInit.setEventType("INIT");
+        sInit.setVariables(Map.of("arr", arr.toString(), "left", left, "right", right));
+        sInit.setChangedVariable("pointers");
+        sInit.setCurrentValue("left=0, right=" + right);
+
+        DataStructureState dsInit = new DataStructureState();
+        dsInit.setType("sorting");
+        dsInit.setValues(new ArrayList<>(arr));
+        dsInit.setComparedIndices(List.of(left, right));
+        dsInit.setPointers(Map.of("low", left, "high", right));
+        dsInit.setLabel("Two-Pointer Reverse Initialized");
+        dsInit.setFocusInfo("left = " + left + " (" + arr.get(left) + ") | right = " + right + " (" + arr.get(right) + ")");
+        sInit.setDataStructureState(dsInit);
+        sInit.setExplanation("[" + lang.toUpperCase() + "] Two pointers set: 'left' at index 0, 'right' at index " + right + ".");
+        sInit.setAiHint("Two-pointer array reversal runs in O(n) time with O(1) auxiliary space.");
+        steps.add(sInit);
+
+        // While loop
+        while (left < right) {
+            // Condition Check
+            ExecutionStep sCond = new ExecutionStep();
+            sCond.setStepNumber(step++);
+            sCond.setLineNumber(loopLine);
+            sCond.setEventType("CONDITION_CHECK");
+            sCond.setVariables(Map.of("arr", arr.toString(), "left", left, "right", right));
+            sCond.setCondition(new ConditionInfo("left < right", left + " < " + right, true, "ENTER LOOP"));
+
+            DataStructureState dsCond = new DataStructureState();
+            dsCond.setType("sorting");
+            dsCond.setValues(new ArrayList<>(arr));
+            dsCond.setComparedIndices(List.of(left, right));
+            dsCond.setPointers(Map.of("low", left, "high", right));
+            dsCond.setLabel("Comparing Pointers: " + left + " < " + right + " (TRUE)");
+            dsCond.setFocusInfo("Ready to swap elements at indices " + left + " and " + right);
+            sCond.setDataStructureState(dsCond);
+            sCond.setExplanation("[" + lang.toUpperCase() + "] Condition (" + left + " < " + right + ") is TRUE. Swapping arr[" + left + "] and arr[" + right + "].");
+            sCond.setAiHint("Symmetric elements are swapped inwards.");
+            steps.add(sCond);
+
+            // Swap
+            int tempA = arr.get(left);
+            int tempB = arr.get(right);
+            arr.set(left, tempB);
+            arr.set(right, tempA);
+
+            ExecutionStep sSwap = new ExecutionStep();
+            sSwap.setStepNumber(step++);
+            sSwap.setLineNumber(loopLine + 1);
+            sSwap.setEventType("SWAP");
+            sSwap.setVariables(Map.of("swapped", tempA + " <-> " + tempB, "left", left, "right", right));
+            sSwap.setChangedVariable("arr");
+            sSwap.setCurrentValue(arr.toString());
+
+            DataStructureState dsSwap = new DataStructureState();
+            dsSwap.setType("sorting");
+            dsSwap.setValues(new ArrayList<>(arr));
+            dsSwap.setSwappedIndices(List.of(left, right));
+            dsSwap.setPointers(Map.of("low", left, "high", right));
+            dsSwap.setLabel("Swapped " + tempA + " and " + tempB);
+            dsSwap.setFocusInfo("Array is now: " + arr);
+            sSwap.setDataStructureState(dsSwap);
+            sSwap.setExplanation("[" + lang.toUpperCase() + "] Swapped elements at indices " + left + " and " + right + ".");
+            sSwap.setAiHint("Elements are placed into their mirrored positions.");
+            steps.add(sSwap);
+
+            // Advance pointers
+            left++;
+            right--;
+
+            ExecutionStep sAdv = new ExecutionStep();
+            sAdv.setStepNumber(step++);
+            sAdv.setLineNumber(loopLine + 2);
+            sAdv.setEventType("POINTER_UPDATE");
+            sAdv.setVariables(Map.of("arr", arr.toString(), "left", left, "right", right));
+            sAdv.setChangedVariable("pointers");
+            sAdv.setCurrentValue("left=" + left + ", right=" + right);
+
+            DataStructureState dsAdv = new DataStructureState();
+            dsAdv.setType("sorting");
+            dsAdv.setValues(new ArrayList<>(arr));
+            if (left <= right) {
+                dsAdv.setComparedIndices(List.of(left, right));
+                dsAdv.setPointers(Map.of("low", left, "high", right));
+            }
+            dsAdv.setLabel("Pointers Advanced: left=" + left + ", right=" + right);
+            dsAdv.setFocusInfo("Converging towards array midpoint");
+            sAdv.setDataStructureState(dsAdv);
+            sAdv.setExplanation("[" + lang.toUpperCase() + "] Advanced pointers: left incremented to " + left + ", right decremented to " + right + ".");
+            sAdv.setAiHint("Pointers converge by 2 steps per iteration.");
+            steps.add(sAdv);
+        }
+
+        // Program End
+        ExecutionStep sEnd = new ExecutionStep();
+        sEnd.setStepNumber(step);
+        sEnd.setLineNumber(loopLine + 3);
+        sEnd.setEventType("PROGRAM_END");
+        sEnd.setVariables(Map.of("reversedArr", arr.toString()));
+
+        DataStructureState dsEnd = new DataStructureState();
+        dsEnd.setType("sorting");
+        dsEnd.setValues(new ArrayList<>(arr));
+        dsEnd.setLabel("Reversal Complete: " + arr);
+        dsEnd.setFocusInfo("In-place reversal finished in O(n/2) iterations");
+        sEnd.setDataStructureState(dsEnd);
+        sEnd.setExplanation("[" + lang.toUpperCase() + "] Array reversal complete! Final array: " + arr);
+        sEnd.setAiHint("Original array inverted in-place with O(1) extra memory.");
+        steps.add(sEnd);
+
+        return new ExecuteResponse("SUCCESS", steps.size(), steps);
+    }
+
+    private ExecuteResponse generateUserBinarySearchTrace(List<Integer> values, int arrayLine, int loopLine, String lang) {
+        List<ExecutionStep> steps = new ArrayList<>();
+        List<Integer> arr = new ArrayList<>(values);
+        Collections.sort(arr);
+
+        int low = 0;
+        int high = arr.size() - 1;
+        int target = arr.get(arr.size() / 2); // Default to middle element
+        int step = 1;
+
+        // Step 1: Init Binary Search
+        ExecutionStep sInit = new ExecutionStep();
+        sInit.setStepNumber(step++);
+        sInit.setLineNumber(arrayLine);
+        sInit.setEventType("INIT");
+        sInit.setVariables(Map.of("arr", arr.toString(), "target", target, "low", low, "high", high));
+
+        DataStructureState dsInit = new DataStructureState();
+        dsInit.setType("searching");
+        dsInit.setValues(new ArrayList<>(arr));
+        dsInit.setPointers(Map.of("low", low, "high", high));
+        dsInit.setLabel("Binary Search Initialized (Target: " + target + ")");
+        dsInit.setFocusInfo("Range: [" + low + "..." + high + "]");
+        sInit.setDataStructureState(dsInit);
+        sInit.setExplanation("[" + lang.toUpperCase() + "] Binary search initialized for target " + target + " on sorted array " + arr + ".");
+        sInit.setAiHint("Binary search requires array to be in ascending sorted order.");
+        steps.add(sInit);
+
+        boolean found = false;
+        while (low <= high) {
+            int mid = low + (high - low) / 2;
+            int midVal = arr.get(mid);
+
+            // Step: Calculate Mid
+            ExecutionStep sMid = new ExecutionStep();
+            sMid.setStepNumber(step++);
+            sMid.setLineNumber(loopLine);
+            sMid.setEventType("MID_CALCULATION");
+            sMid.setVariables(Map.of("low", low, "mid", mid, "high", high, "arr[mid]", midVal, "target", target));
+
+            DataStructureState dsMid = new DataStructureState();
+            dsMid.setType("searching");
+            dsMid.setValues(new ArrayList<>(arr));
+            dsMid.setActiveIndex(mid);
+            dsMid.setPointers(Map.of("low", low, "mid", mid, "high", high));
+            dsMid.setLabel("Mid Calculated: mid = " + mid + " (Value: " + midVal + ")");
+            dsMid.setFocusInfo("Comparing arr[" + mid + "] (" + midVal + ") with target (" + target + ")");
+            sMid.setDataStructureState(dsMid);
+            sMid.setExplanation("[" + lang.toUpperCase() + "] Calculated midpoint index " + mid + ": arr[" + mid + "] = " + midVal + ".");
+            sMid.setAiHint("Mid divides remaining search space in half.");
+            steps.add(sMid);
+
+            if (midVal == target) {
+                found = true;
+                ExecutionStep sFound = new ExecutionStep();
+                sFound.setStepNumber(step++);
+                sFound.setLineNumber(loopLine + 1);
+                sFound.setEventType("TARGET_FOUND");
+                sFound.setVariables(Map.of("target", target, "foundAtIndex", mid));
+
+                DataStructureState dsFound = new DataStructureState();
+                dsFound.setType("searching");
+                dsFound.setValues(new ArrayList<>(arr));
+                dsFound.setActiveIndex(mid);
+                dsFound.setSwappedIndices(List.of(mid));
+                dsFound.setPointers(Map.of("mid", mid));
+                dsFound.setLabel("TARGET FOUND at index " + mid + "!");
+                dsFound.setFocusInfo("arr[" + mid + "] == " + target);
+                sFound.setDataStructureState(dsFound);
+                sFound.setExplanation("[" + lang.toUpperCase() + "] Success! Found target " + target + " at index " + mid + ".");
+                sFound.setAiHint("Binary search terminated successfully in O(log n) time.");
+                steps.add(sFound);
+                break;
+            } else if (midVal < target) {
+                low = mid + 1;
+                ExecutionStep sAdj = new ExecutionStep();
+                sAdj.setStepNumber(step++);
+                sAdj.setLineNumber(loopLine + 2);
+                sAdj.setEventType("RANGE_ADJUST");
+                sAdj.setVariables(Map.of("low", low, "high", high, "target", target));
+
+                DataStructureState dsAdj = new DataStructureState();
+                dsAdj.setType("searching");
+                dsAdj.setValues(new ArrayList<>(arr));
+                dsAdj.setPointers(Map.of("low", low, "high", high));
+                dsAdj.setLabel("Target > Mid: Discarding left half (low -> " + low + ")");
+                dsAdj.setFocusInfo("New Search Range: [" + low + "..." + high + "]");
+                sAdj.setDataStructureState(dsAdj);
+                sAdj.setExplanation("[" + lang.toUpperCase() + "] arr[" + mid + "] < target (" + midVal + " < " + target + "). Search right subarray.");
+                sAdj.setAiHint("Discarding all elements at indices <= " + mid + ".");
+                steps.add(sAdj);
+            } else {
+                high = mid - 1;
+                ExecutionStep sAdj = new ExecutionStep();
+                sAdj.setStepNumber(step++);
+                sAdj.setLineNumber(loopLine + 3);
+                sAdj.setEventType("RANGE_ADJUST");
+                sAdj.setVariables(Map.of("low", low, "high", high, "target", target));
+
+                DataStructureState dsAdj = new DataStructureState();
+                dsAdj.setType("searching");
+                dsAdj.setValues(new ArrayList<>(arr));
+                dsAdj.setPointers(Map.of("low", low, "high", high));
+                dsAdj.setLabel("Target < Mid: Discarding right half (high -> " + high + ")");
+                dsAdj.setFocusInfo("New Search Range: [" + low + "..." + high + "]");
+                sAdj.setDataStructureState(dsAdj);
+                sAdj.setExplanation("[" + lang.toUpperCase() + "] arr[" + mid + "] > target (" + midVal + " > " + target + "). Search left subarray.");
+                sAdj.setAiHint("Discarding all elements at indices >= " + mid + ".");
+                steps.add(sAdj);
             }
         }
 

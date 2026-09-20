@@ -223,7 +223,26 @@ for (let i = 0; i < arr.length; i++) {
 }
 """.formatted(joined);
 
-            case "c" -> """
+            case "c" -> isSort ? """
+// Repaired C Bubble Sort
+#include <stdio.h>
+
+int main() {
+    int arr[] = {%s};
+    int n = %d;
+
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (arr[j] > arr[j + 1]) {
+                int temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
+    return 0;
+}
+""".formatted(joined, n) : """
 // Repaired C Program
 #include <stdio.h>
 
@@ -238,7 +257,26 @@ int main() {
 }
 """.formatted(joined, n);
 
-            case "cpp" -> """
+            case "cpp" -> isSort ? """
+// Repaired C++ Vector Bubble Sort
+#include <iostream>
+#include <vector>
+
+int main() {
+    std::vector<int> arr = {%s};
+
+    for (int i = 0; i < arr.size() - 1; i++) {
+        for (int j = 0; j < arr.size() - i - 1; j++) {
+            if (arr[j] > arr[j + 1]) {
+                int temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
+    return 0;
+}
+""".formatted(joined) : """
 // Repaired C++ Vector Program
 #include <iostream>
 #include <vector>
@@ -253,7 +291,24 @@ int main() {
 }
 """.formatted(joined);
 
-            default -> """
+            default -> isSort ? """
+// Repaired Java Bubble Sort
+public class Main {
+    public static void main(String[] args) {
+        int[] arr = {%s};
+
+        for (int i = 0; i < arr.length - 1; i++) {
+            for (int j = 0; j < arr.length - i - 1; j++) {
+                if (arr[j] > arr[j + 1]) {
+                    int temp = arr[j];
+                    arr[j] = arr[j + 1];
+                    arr[j + 1] = temp;
+                }
+            }
+        }
+    }
+}
+""".formatted(joined) : """
 // Repaired Java Program
 public class Main {
     public static void main(String[] args) {
