@@ -231,36 +231,70 @@ public class MultiLanguageExecutionService {
 
     public List<Integer> extractArrayValues(String code, String lang) {
         List<Integer> list = new ArrayList<>();
-        if (code == null) return list;
+        if (code == null || code.isBlank()) return list;
 
-        // Matches {1, 2, 3} or [1, 2, 3] or negative numbers like [-2, 1, -3, 4]
-        Pattern p = Pattern.compile("[\\[{]([0-9,\\s\\-]+)[\\]}]");
+        String trimmed = code.trim();
+
+        // 1. Direct comma or space separated numbers
+        if (trimmed.matches("^[0-9,\\s\\-]+$")) {
+            String[] tokens = trimmed.split("[,\\s]+");
+            for (String tok : tokens) {
+                try {
+                    String clean = tok.trim();
+                    if (!clean.isEmpty() && !clean.equals("-")) {
+                        list.add(Integer.parseInt(clean));
+                    }
+                } catch (NumberFormatException ignored) {}
+            }
+            if (!list.isEmpty()) return list.subList(0, Math.min(list.size(), 12));
+        }
+
+        // 2. Matches {1, 2, 3} or [1, 2, 3] or (1, 2, 3) or negative numbers like [-2, 1, -3, 4]
+        Pattern p = Pattern.compile("[\\[{(]([0-9,\\s\\-]+)[\\]})]");
         Matcher m = p.matcher(code);
         if (m.find()) {
             String inner = m.group(1);
             String[] tokens = inner.split("[,\\s]+");
             for (String tok : tokens) {
                 try {
-                    String trimmed = tok.trim();
-                    if (!trimmed.isEmpty() && !trimmed.equals("-")) {
-                        list.add(Integer.parseInt(trimmed));
+                    String clean = tok.trim();
+                    if (!clean.isEmpty() && !clean.equals("-")) {
+                        list.add(Integer.parseInt(clean));
                     }
                 } catch (NumberFormatException ignored) {}
             }
+            if (!list.isEmpty()) return list.subList(0, Math.min(list.size(), 12));
         }
 
-        // If bracket match yielded nothing, look for comma or space separated numbers
-        if (list.isEmpty()) {
-            Pattern numPat = Pattern.compile("-?\\b\\d+\\b");
-            Matcher numMatcher = numPat.matcher(code);
-            while (numMatcher.find() && list.size() < 12) {
-                try {
-                    int val = Integer.parseInt(numMatcher.group());
-                    if (Math.abs(val) < 10000) { // filter out ports / giant line numbers
-                        list.add(val);
-                    }
-                } catch (NumberFormatException ignored) {}
-            }
+        // 3. Detect Python range(N) or loop bounds i < N
+        Pattern rangePat = Pattern.compile("(?:range\\s*\\(\\s*(\\d+)\\s*\\)|[ijk]\\s*<\\s*(\\d+))");
+        Matcher rangeMatcher = rangePat.matcher(code);
+        if (rangeMatcher.find()) {
+            String matchStr = rangeMatcher.group(1) != null ? rangeMatcher.group(1) : rangeMatcher.group(2);
+            try {
+                int count = Math.min(10, Math.max(2, Integer.parseInt(matchStr)));
+                for (int k = 0; k < count; k++) {
+                    list.add((k + 1) * 10);
+                }
+                return list;
+            } catch (NumberFormatException ignored) {}
+        }
+
+        // 4. Match individual numbers in the string
+        Pattern numPat = Pattern.compile("-?\\b\\d+\\b");
+        Matcher numMatcher = numPat.matcher(code);
+        while (numMatcher.find() && list.size() < 12) {
+            try {
+                int val = Integer.parseInt(numMatcher.group());
+                if (Math.abs(val) < 10000) {
+                    list.add(val);
+                }
+            } catch (NumberFormatException ignored) {}
+        }
+
+        if (list.size() == 1) {
+            int single = list.get(0);
+            return List.of(single, single + 10, single + 20, single + 30);
         }
 
         return list;

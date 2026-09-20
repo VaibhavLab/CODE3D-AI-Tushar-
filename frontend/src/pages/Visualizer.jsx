@@ -10,11 +10,26 @@ import QuizModal from '../components/QuizModal';
 import CustomCodeModal from '../components/CustomCodeModal';
 import CodeDoctorModal from '../components/CodeDoctorModal';
 import { useExecutionTimeline } from '../hooks/useExecutionTimeline';
-import { getExecutionTrace } from '../services/executionSimulator';
+import { getExecutionTrace, extractNumbersFromCode } from '../services/executionSimulator';
 import { DEFAULT_JAVA_CODE, SAMPLE_PROGRAMS, LANGUAGE_DEFAULTS, CURRICULUM_CATEGORIES } from '../utils/sampleCodes';
 import { executeProgram, analyzeCode, checkBackendHealth } from '../services/apiService';
 import { useTheme } from '../context/ThemeContext';
-import { Code2, Sparkles, HelpCircle, Layers, Cpu, Server, Check, Stethoscope } from 'lucide-react';
+import {
+  Code2,
+  Sparkles,
+  HelpCircle,
+  Layers,
+  Cpu,
+  Server,
+  Check,
+  Stethoscope,
+  Maximize2,
+  Minimize2,
+  SlidersHorizontal,
+  Eye,
+  EyeOff,
+  Play
+} from 'lucide-react';
 
 export default function Visualizer({ initialConcept }) {
   const { isBright } = useTheme();
@@ -30,6 +45,15 @@ export default function Visualizer({ initialConcept }) {
   const [backendOnline, setBackendOnline] = useState(false);
   const [timeComplexity, setTimeComplexity] = useState(initialConcept?.timeComplexity || SAMPLE_PROGRAMS[0].timeComplexity);
   const [spaceComplexity, setSpaceComplexity] = useState(initialConcept?.spaceComplexity || SAMPLE_PROGRAMS[0].spaceComplexity);
+
+  // View Layout Toggles requested by user:
+  // 1. Program State panel visibility toggle
+  // 2. 100% Fullscreen 3D Theater Mode
+  const [showStatePanel, setShowStatePanel] = useState(true);
+  const [isFull3DView, setIsFull3DView] = useState(false);
+
+  // Direct Form User Input
+  const [formInputValues, setFormInputValues] = useState('10, 20, 30, 40');
 
   // Modals & responsive view state
   const [isAiOpen, setIsAiOpen] = useState(false);
@@ -62,7 +86,15 @@ export default function Visualizer({ initialConcept }) {
     });
   }, []);
 
-  // Update visualizer state whenever initialConcept changes (e.g. from AI Doctor or DSA Hub)
+  // Synchronize formInputValues whenever code or selected sample changes
+  useEffect(() => {
+    const nums = extractNumbersFromCode(code);
+    if (nums && nums.length > 0) {
+      setFormInputValues(nums.join(', '));
+    }
+  }, [selectedSample]);
+
+  // Update visualizer state whenever initialConcept changes
   useEffect(() => {
     if (initialConcept) {
       setSelectedSample(initialConcept);
@@ -73,7 +105,6 @@ export default function Visualizer({ initialConcept }) {
       setTimeComplexity(initialConcept.timeComplexity || 'O(n)');
       setSpaceComplexity(initialConcept.spaceComplexity || 'O(1)');
 
-      // If AI Doctor or caller provided a custom 3D execution trace, use it directly!
       if (initialConcept.trace && initialConcept.trace.length > 0) {
         setTrace(initialConcept.trace);
         reset();
@@ -110,7 +141,12 @@ export default function Visualizer({ initialConcept }) {
     setTimeComplexity(prog.timeComplexity);
     setSpaceComplexity(prog.spaceComplexity);
 
-    // Fetch execution trace from backend if online
+    // Update form input field with preset numbers
+    const nums = extractNumbersFromCode(prog.code);
+    if (nums && nums.length > 0) {
+      setFormInputValues(nums.join(', '));
+    }
+
     if (backendOnline) {
       const res = await executeProgram(prog.code, prog.id, 'java');
       if (res && res.steps && res.steps.length > 0) {
@@ -121,12 +157,10 @@ export default function Visualizer({ initialConcept }) {
       }
     }
 
-    // Fallback to local trace
     setTrace(getExecutionTrace(prog.code, 'java'));
     reset();
     setTimeout(() => play(), 100);
   };
-
 
   // Handle language change from editor
   const handleLanguageChange = async (newLang) => {
@@ -144,6 +178,11 @@ export default function Visualizer({ initialConcept }) {
       code: template,
     });
 
+    const nums = extractNumbersFromCode(template);
+    if (nums && nums.length > 0) {
+      setFormInputValues(nums.join(', '));
+    }
+
     if (backendOnline) {
       const [execRes, astRes] = await Promise.all([
         executeProgram(template, 'custom', newLang),
@@ -157,7 +196,60 @@ export default function Visualizer({ initialConcept }) {
         if (astRes.timeComplexity) setTimeComplexity(astRes.timeComplexity);
         if (astRes.spaceComplexity) setSpaceComplexity(astRes.spaceComplexity);
       }
+    } else {
+      setTrace(getExecutionTrace(template, newLang));
+      reset();
     }
+  };
+
+  // Directly apply User Form Input into code and 3D visualizer
+  const applyNewValuesToCode = async (vals) => {
+    if (!vals || vals.length === 0) return;
+
+    let updatedCode = code;
+    if (language === 'python' || language === 'javascript') {
+      if (updatedCode.includes('[')) {
+        updatedCode = updatedCode.replace(/\[[0-9,\s\-]+\]/, `[${vals.join(', ')}]`);
+      } else {
+        updatedCode = `arr = [${vals.join(', ')}]\nfor i in range(len(arr)):\n    print(arr[i])\n`;
+      }
+    } else {
+      if (updatedCode.includes('{')) {
+        updatedCode = updatedCode.replace(/\{[0-9,\s\-]+\}/, `{${vals.join(', ')}}`);
+      } else {
+        updatedCode = `public class Main {\n    public static void main(String[] args) {\n        int[] arr = {${vals.join(', ')}};\n        for(int i = 0; i < arr.length; i++) {\n            System.out.println(arr[i]);\n        }\n    }\n}\n`;
+      }
+    }
+    setCode(updatedCode);
+
+    // Run dynamic trace
+    let newSteps = null;
+    if (backendOnline) {
+      try {
+        const res = await executeProgram(updatedCode, 'custom', language);
+        if (res?.steps?.length > 0) newSteps = res.steps;
+      } catch (e) {}
+    }
+
+    if (!newSteps || newSteps.length === 0) {
+      newSteps = getExecutionTrace(updatedCode, language);
+    }
+
+    if (newSteps && newSteps.length > 0) {
+      setTrace(newSteps);
+      reset();
+      setTimeout(() => play(), 80);
+    }
+  };
+
+  const handleApplyFormInput = () => {
+    const vals = extractNumbersFromCode(formInputValues);
+    applyNewValuesToCode(vals);
+  };
+
+  const handleApplyPresetValues = (vals) => {
+    setFormInputValues(vals.join(', '));
+    applyNewValuesToCode(vals);
   };
 
   // Handle user applying custom code from modal
@@ -174,6 +266,11 @@ export default function Visualizer({ initialConcept }) {
       spaceComplexity: 'O(1)',
       code: customCode,
     });
+
+    const nums = extractNumbersFromCode(customCode);
+    if (nums && nums.length > 0) {
+      setFormInputValues(nums.join(', '));
+    }
 
     let newSteps = null;
     if (backendOnline) {
@@ -221,6 +318,11 @@ export default function Visualizer({ initialConcept }) {
       code: correctedCode,
     });
 
+    const nums = extractNumbersFromCode(correctedCode);
+    if (nums && nums.length > 0) {
+      setFormInputValues(nums.join(', '));
+    }
+
     if (correctedTrace && correctedTrace.length > 0) {
       setTrace(correctedTrace);
       reset();
@@ -255,15 +357,12 @@ export default function Visualizer({ initialConcept }) {
 
   // Run user code dynamically against backend or simulator
   const handleRunCode = async () => {
-    const isCustom = selectedSample.id === 'custom' || code.trim() !== (selectedSample.code || '').trim();
-    const conceptIdToUse = isCustom ? 'custom' : selectedSample.id;
-
     let newSteps = null;
 
     if (backendOnline) {
       try {
         const [execRes, astRes] = await Promise.all([
-          executeProgram(code, conceptIdToUse, language),
+          executeProgram(code, 'custom', language),
           analyzeCode(code, language),
         ]);
 
@@ -371,7 +470,7 @@ export default function Visualizer({ initialConcept }) {
         </div>
 
         {/* Center: Complexity Badges & Backend status */}
-        <div className="hidden lg:flex items-center gap-3 text-[11px] font-mono shrink-0">
+        <div className="hidden lg:flex items-center gap-2.5 text-[11px] font-mono shrink-0">
           <div className={`border rounded px-2 py-0.5 ${
             isBright ? 'bg-slate-50 border-slate-300 text-slate-700' : 'bg-slate-950/70 border-slate-800'
           }`}>
@@ -392,30 +491,65 @@ export default function Visualizer({ initialConcept }) {
           </div>
         </div>
 
-        {/* Right: AI Assistant & Quiz Mode triggers */}
-        <div className="flex items-center gap-2 shrink-0">
+        {/* Right Controls: State Panel Toggle, Full 3D Theater Mode, AI Tutor & Quiz */}
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          {/* Toggle Program State Panel Button */}
+          <button
+            onClick={() => setShowStatePanel((prev) => !prev)}
+            className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold transition border ${
+              showStatePanel
+                ? isBright
+                  ? 'bg-cyan-50 border-cyan-300 text-cyan-800'
+                  : 'bg-cyan-950/70 border-cyan-700/50 text-cyan-300'
+                : isBright
+                  ? 'bg-slate-100 border-slate-300 text-slate-500 hover:text-slate-800'
+                  : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
+            }`}
+            title={showStatePanel ? 'Hide Program State panel to expand 3D viewport' : 'Show Program State panel'}
+          >
+            {showStatePanel ? <Eye size={12} /> : <EyeOff size={12} />}
+            <span className="hidden sm:inline">State:</span>
+            <span>{showStatePanel ? 'ON' : 'OFF'}</span>
+          </button>
+
+          {/* Fullscreen 3D Theater Mode Toggle Button */}
+          <button
+            onClick={() => setIsFull3DView((prev) => !prev)}
+            className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold transition border ${
+              isFull3DView
+                ? 'bg-purple-600 border-purple-400 text-white shadow-md shadow-purple-600/30'
+                : isBright
+                  ? 'bg-purple-50 hover:bg-purple-100 border-purple-300 text-purple-800'
+                  : 'bg-purple-950/70 hover:bg-purple-900 border-purple-700/50 text-purple-300'
+            }`}
+            title={isFull3DView ? 'Exit Full 3D Theater mode and show Studio' : 'Full 3D Mode: Expand 3D canvas to 100% full screen'}
+          >
+            {isFull3DView ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
+            <span className="hidden sm:inline">{isFull3DView ? 'Exit 3D' : 'Full 3D'}</span>
+          </button>
+
           <button
             onClick={() => setIsAiOpen(true)}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold transition border ${
+            className={`flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-semibold transition border ${
               isBright
                 ? 'bg-cyan-50 hover:bg-cyan-100 border-cyan-300 text-cyan-800'
                 : 'bg-cyan-950/70 hover:bg-cyan-900 border-cyan-700/50 text-cyan-300'
             }`}
           >
             <Sparkles size={13} className={isBright ? 'text-cyan-600' : 'text-cyan-400'} />
-            <span>AI Tutor</span>
+            <span className="hidden sm:inline">AI Tutor</span>
           </button>
 
           <button
             onClick={() => setIsQuizOpen(true)}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold transition border ${
+            className={`flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-semibold transition border ${
               isBright
                 ? 'bg-emerald-50 hover:bg-emerald-100 border-emerald-300 text-emerald-800'
                 : 'bg-emerald-950/70 hover:bg-emerald-900 border-emerald-700/50 text-emerald-300'
             }`}
           >
             <HelpCircle size={13} className={isBright ? 'text-emerald-600' : 'text-emerald-400'} />
-            <span>Quiz Mode</span>
+            <span className="hidden sm:inline">Quiz</span>
           </button>
         </div>
       </div>
@@ -462,37 +596,130 @@ export default function Visualizer({ initialConcept }) {
         </button>
       </div>
 
-
-      {/* Main 3-Column Studio Workspace */}
+      {/* Main Studio Workspace */}
       <div className="flex-1 grid grid-cols-1 md:grid-cols-12 overflow-hidden">
-        {/* Left Column: Monaco Code Editor (4 cols on desktop, responsive on mobile) */}
-        <div className={`${mobileTab === 'code' ? 'block' : 'hidden'} md:block md:col-span-4 h-full overflow-hidden`}>
-          <CodeEditor
-            code={code}
-            onChangeCode={setCode}
-            language={language}
-            onChangeLanguage={handleLanguageChange}
-            onOpenCustomCode={() => setIsCustomCodeOpen(true)}
-            onOpenCodeDoctor={() => setIsCodeDoctorOpen(true)}
-            currentLineNumber={currentStep?.lineNumber || null}
-            isPlaying={isPlaying}
-            onPlay={handleRunCode}
-            onPause={pause}
-            onNext={nextStep}
-            onPrev={prevStep}
-            onReset={reset}
-            isAtStart={isAtStart}
-            isAtEnd={isAtEnd}
-          />
-        </div>
+        {/* Left Column: Monaco Code Editor */}
+        {!isFull3DView && (
+          <div className={`${mobileTab === 'code' ? 'block' : 'hidden'} md:block md:col-span-4 h-full overflow-hidden`}>
+            <CodeEditor
+              code={code}
+              onChangeCode={setCode}
+              language={language}
+              onChangeLanguage={handleLanguageChange}
+              onOpenCustomCode={() => setIsCustomCodeOpen(true)}
+              onOpenCodeDoctor={() => setIsCodeDoctorOpen(true)}
+              currentLineNumber={currentStep?.lineNumber || null}
+              isPlaying={isPlaying}
+              onPlay={handleRunCode}
+              onPause={pause}
+              onNext={nextStep}
+              onPrev={prevStep}
+              onReset={reset}
+              isAtStart={isAtStart}
+              isAtEnd={isAtEnd}
+            />
+          </div>
+        )}
 
-        {/* Center Column: 3D Visualization + Console (5 cols on desktop, responsive on mobile) */}
-        <div className={`${mobileTab === '3d' ? 'flex' : 'hidden'} md:flex md:col-span-5 h-full flex-col border-r border-slate-800/80 overflow-hidden`}>
+        {/* Center Column: 3D Visualization + Console + User Input Bar */}
+        <div className={`
+          ${mobileTab === '3d' ? 'flex' : 'hidden'} 
+          ${isFull3DView ? 'md:col-span-12' : showStatePanel ? 'md:col-span-5' : 'md:col-span-8'}
+          md:flex h-full flex-col border-r border-slate-800/80 overflow-hidden transition-all duration-300
+        `}>
+          {/* Direct Interactive Form User Input Bar */}
+          <div className={`px-3 py-1.5 border-b flex flex-wrap items-center justify-between gap-2 text-xs transition-colors shrink-0 ${
+            isBright ? 'bg-slate-50 border-slate-200 text-slate-800' : 'bg-slate-900/90 border-slate-800 text-slate-200'
+          }`}>
+            <div className="flex items-center gap-2 flex-1 min-w-[240px]">
+              <span className={`font-semibold text-[11px] shrink-0 flex items-center gap-1 ${
+                isBright ? 'text-cyan-700' : 'text-cyan-400'
+              }`}>
+                <Sparkles size={13} />
+                <span>Input Data:</span>
+              </span>
+              <input
+                type="text"
+                value={formInputValues}
+                onChange={(e) => setFormInputValues(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleApplyFormInput()}
+                placeholder="e.g. 15, 42, 8, 99, 23, 67 or [10, 20, 30]"
+                className={`flex-1 px-2.5 py-0.5 rounded text-xs font-mono border focus:outline-none focus:ring-1 focus:ring-cyan-500 transition ${
+                  isBright
+                    ? 'bg-white border-slate-300 text-slate-900'
+                    : 'bg-slate-950 border-slate-700 text-cyan-300 placeholder:text-slate-600'
+                }`}
+              />
+              <button
+                onClick={handleApplyFormInput}
+                className={`px-2.5 py-0.5 rounded font-semibold text-xs transition shadow-sm shrink-0 ${
+                  isBright
+                    ? 'bg-cyan-600 hover:bg-cyan-700 text-white shadow-cyan-600/20'
+                    : 'bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold shadow-cyan-500/20'
+                }`}
+                title="Apply these values directly into code and visualize in 3D"
+              >
+                Apply & Run ⚡
+              </button>
+            </div>
+
+            {/* Quick Data Presets */}
+            <div className="flex items-center gap-1 shrink-0 text-[11px]">
+              <span className="text-slate-500 hidden xl:inline">Presets:</span>
+              <button
+                onClick={() => handleApplyPresetValues([14, 52, 8, 91, 33, 47])}
+                className={`px-1.5 py-0.5 rounded transition ${
+                  isBright
+                    ? 'bg-slate-200 hover:bg-slate-300 text-slate-700'
+                    : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
+                }`}
+                title="Random custom numbers"
+              >
+                🎲 Random
+              </button>
+              <button
+                onClick={() => handleApplyPresetValues([5, 12, 19, 28, 35, 42])}
+                className={`px-1.5 py-0.5 rounded transition ${
+                  isBright
+                    ? 'bg-slate-200 hover:bg-slate-300 text-slate-700'
+                    : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
+                }`}
+                title="Sorted ascending numbers"
+              >
+                📈 Sorted
+              </button>
+              <button
+                onClick={() => handleApplyPresetValues([50, 40, 30, 20, 10])}
+                className={`px-1.5 py-0.5 rounded transition ${
+                  isBright
+                    ? 'bg-slate-200 hover:bg-slate-300 text-slate-700'
+                    : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
+                }`}
+                title="Reverse descending numbers"
+              >
+                📉 Reverse
+              </button>
+              <button
+                onClick={() => handleApplyPresetValues([1, 8, 6, 2, 5, 4, 8, 3, 7])}
+                className={`px-1.5 py-0.5 rounded transition ${
+                  isBright
+                    ? 'bg-slate-200 hover:bg-slate-300 text-slate-700'
+                    : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
+                }`}
+                title="Peaks and water walls"
+              >
+                🌊 Waves
+              </button>
+            </div>
+          </div>
+
           {/* 3D Canvas Viewport */}
           <div className="flex-1 relative min-h-[260px] sm:min-h-[340px]">
             <SceneContainer
               statusLabel={currentStep?.dataStructureState?.label || null}
               activeDetails={currentStep?.dataStructureState?.focusInfo || null}
+              isFull3DView={isFull3DView}
+              onToggleFull3D={() => setIsFull3DView((prev) => !prev)}
             >
               <DsaSceneDispatcher
                 dataStructureState={currentStep?.dataStructureState}
@@ -501,18 +728,22 @@ export default function Visualizer({ initialConcept }) {
           </div>
 
           {/* Integrated Output Console */}
-          <div className="h-36 sm:h-44 shrink-0">
-            <OutputConsole output={currentStep?.output || []} />
-          </div>
+          {!isFull3DView && (
+            <div className="h-36 sm:h-44 shrink-0">
+              <OutputConsole output={currentStep?.output || []} />
+            </div>
+          )}
         </div>
 
-        {/* Right Column: Program State Inspector (3 cols on desktop, responsive on mobile) */}
-        <div className={`${mobileTab === 'state' ? 'block' : 'hidden'} md:block md:col-span-3 h-full overflow-hidden`}>
-          <StatePanel
-            currentStep={currentStep}
-            totalSteps={totalSteps}
-          />
-        </div>
+        {/* Right Column: Program State Inspector */}
+        {!isFull3DView && showStatePanel && (
+          <div className={`${mobileTab === 'state' ? 'block' : 'hidden'} md:block md:col-span-3 h-full overflow-hidden transition-all duration-300`}>
+            <StatePanel
+              currentStep={currentStep}
+              totalSteps={totalSteps}
+            />
+          </div>
+        )}
       </div>
 
       {/* Bottom Full-Width Time Machine Timeline */}

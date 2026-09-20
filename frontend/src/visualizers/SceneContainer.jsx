@@ -1,15 +1,47 @@
-import React, { Suspense } from 'react';
-import { Canvas } from '@react-three/fiber';
+import React, { Suspense, useState, useEffect, useRef } from 'react';
+import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, Center, Grid, Sparkles, ContactShadows } from '@react-three/drei';
-import { Compass, RotateCw, ZoomIn } from 'lucide-react';
+import { Compass, RotateCw, ZoomIn, Maximize2, Minimize2, Camera, RefreshCw } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import * as THREE from 'three';
 
 /**
- * SceneContainer provides the 3D viewport canvas, lighting, and camera controls.
- * Adapts dynamically between deep dark space and crisp daylight studio lighting.
+ * Handles smooth dynamic camera transitions to preset viewpoints (Top, Front, Isometric, Reset).
  */
-export default function SceneContainer({ children, statusLabel, activeDetails }) {
+function CameraPresetHandler({ preset, onApplied }) {
+  const { camera } = useThree();
+
+  useEffect(() => {
+    if (!preset) return;
+    if (preset === 'top') {
+      camera.position.set(0, 16, 0.01);
+    } else if (preset === 'front') {
+      camera.position.set(0, 2, 11);
+    } else if (preset === 'iso') {
+      camera.position.set(8, 8, 9);
+    } else if (preset === 'reset') {
+      camera.position.set(0, 4, 9);
+    }
+    camera.lookAt(0, 0, 0);
+    onApplied();
+  }, [preset, camera, onApplied]);
+
+  return null;
+}
+
+/**
+ * SceneContainer provides the 3D viewport canvas, lighting, camera controls,
+ * and realistic studio cyber-pedestal stage.
+ */
+export default function SceneContainer({
+  children,
+  statusLabel,
+  activeDetails,
+  isFull3DView = false,
+  onToggleFull3D
+}) {
   const { isBright } = useTheme();
+  const [cameraPreset, setCameraPreset] = useState(null);
 
   return (
     <div className={`relative w-full h-full min-h-[360px] overflow-hidden select-none transition-colors duration-200 ${
@@ -18,79 +50,173 @@ export default function SceneContainer({ children, statusLabel, activeDetails })
       {/* 3D Viewport Header Overlay */}
       <div className={`absolute top-3 left-3 z-10 flex items-center gap-2 backdrop-blur-md border rounded-lg px-3 py-1.5 shadow-lg transition-colors ${
         isBright
-          ? 'bg-white/90 border-slate-200 text-slate-800'
-          : 'bg-slate-900/80 border-slate-800/80 text-slate-200'
+          ? 'bg-white/90 border-slate-200 text-slate-800 shadow-slate-200'
+          : 'bg-slate-900/80 border-slate-800/80 text-slate-200 shadow-black/40'
       }`}>
         <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse"></span>
-        <span className="text-xs font-semibold tracking-wide uppercase">3D Execution Engine</span>
+        <span className="text-xs font-bold tracking-wide uppercase">3D Execution Engine</span>
         {statusLabel && (
           <>
             <span className={isBright ? 'text-slate-400' : 'text-slate-600'}>|</span>
-            <span className={`text-xs font-mono font-medium ${isBright ? 'text-cyan-700' : 'text-cyan-300'}`}>
+            <span className={`text-xs font-mono font-semibold ${isBright ? 'text-cyan-700' : 'text-cyan-300'}`}>
               {statusLabel}
             </span>
           </>
         )}
       </div>
 
-      {/* Active Element Banner */}
-      {activeDetails && (
-        <div className={`absolute top-3 right-3 z-10 backdrop-blur-md border rounded-lg px-3 py-1.5 shadow-lg transition-colors ${
-          isBright
-            ? 'bg-white/95 border-cyan-300 text-cyan-800 shadow-slate-200'
-            : 'bg-slate-900/85 border-cyan-500/30 text-cyan-400 shadow-cyan-950/40'
-        }`}>
-          <span className="text-xs font-mono font-medium">{activeDetails}</span>
-        </div>
-      )}
+      {/* Top-Right Control Bar: Camera Presets & Theater Mode */}
+      <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
+        {/* Active Element Banner */}
+        {activeDetails && (
+          <div className={`backdrop-blur-md border rounded-lg px-2.5 py-1 shadow-lg transition-colors hidden sm:block ${
+            isBright
+              ? 'bg-white/95 border-cyan-300 text-cyan-800 shadow-slate-200'
+              : 'bg-slate-900/85 border-cyan-500/30 text-cyan-400 shadow-cyan-950/40'
+          }`}>
+            <span className="text-xs font-mono font-medium">{activeDetails}</span>
+          </div>
+        )}
 
-      {/* 3D Canvas */}
+        {/* Camera Angle Presets */}
+        <div className={`flex items-center backdrop-blur-md border rounded-lg p-0.5 shadow-lg transition-colors ${
+          isBright ? 'bg-white/90 border-slate-200 text-slate-700' : 'bg-slate-900/85 border-slate-800 text-slate-300'
+        }`}>
+          <button
+            onClick={() => setCameraPreset('iso')}
+            className={`px-2 py-0.5 rounded text-[11px] font-medium transition hover:text-cyan-500 ${
+              cameraPreset === 'iso' ? 'bg-cyan-500/20 text-cyan-400 font-bold' : ''
+            }`}
+            title="Isometric 3D Perspective"
+          >
+            3D
+          </button>
+          <button
+            onClick={() => setCameraPreset('front')}
+            className={`px-2 py-0.5 rounded text-[11px] font-medium transition hover:text-cyan-500 ${
+              cameraPreset === 'front' ? 'bg-cyan-500/20 text-cyan-400 font-bold' : ''
+            }`}
+            title="Front Direct Elevation"
+          >
+            Front
+          </button>
+          <button
+            onClick={() => setCameraPreset('top')}
+            className={`px-2 py-0.5 rounded text-[11px] font-medium transition hover:text-cyan-500 ${
+              cameraPreset === 'top' ? 'bg-cyan-500/20 text-cyan-400 font-bold' : ''
+            }`}
+            title="Top-Down Plan View"
+          >
+            Top
+          </button>
+          <button
+            onClick={() => setCameraPreset('reset')}
+            className="p-1 rounded text-[11px] transition hover:text-cyan-500 text-slate-400"
+            title="Reset Camera Position"
+          >
+            <RefreshCw size={11} />
+          </button>
+        </div>
+
+        {/* Full 3D Theater Mode Button */}
+        {onToggleFull3D && (
+          <button
+            onClick={onToggleFull3D}
+            className={`p-1.5 rounded-lg border backdrop-blur-md transition shadow-lg ${
+              isFull3DView
+                ? 'bg-purple-600 border-purple-400 text-white shadow-purple-600/30'
+                : isBright
+                  ? 'bg-white/90 border-slate-200 text-slate-700 hover:text-purple-600 hover:bg-purple-50'
+                  : 'bg-slate-900/85 border-slate-800 text-slate-300 hover:text-purple-400 hover:bg-purple-950/40'
+            }`}
+            title={isFull3DView ? 'Exit Full 3D Theater Mode' : 'Enter Full 3D Theater Mode (Max Screen)'}
+          >
+            {isFull3DView ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
+          </button>
+        )}
+      </div>
+
+      {/* 3D Canvas Viewport */}
       <Canvas
         camera={{ position: [0, 4, 9], fov: 42 }}
         className="w-full h-full cursor-grab active:cursor-grabbing"
       >
-        <color attach="background" args={[isBright ? '#f1f5f9' : '#090d16']} />
-        <ambientLight intensity={isBright ? 1.25 : 0.8} />
-        <directionalLight position={[10, 15, 10]} intensity={isBright ? 1.8 : 1.5} castShadow />
-        <pointLight position={[-10, 8, -5]} intensity={0.6} color={isBright ? '#0284c7' : '#00f2fe'} />
-        <pointLight position={[10, 6, 5]} intensity={0.4} color={isBright ? '#2563eb' : '#3b82f6'} />
+        <color attach="background" args={[isBright ? '#f8fafc' : '#070b14']} />
+        
+        {/* Dynamic Studio Lighting */}
+        <ambientLight intensity={isBright ? 1.3 : 0.85} />
+        <directionalLight
+          position={[12, 18, 12]}
+          intensity={isBright ? 2.0 : 1.6}
+          castShadow
+          shadow-mapSize-width={1024}
+          shadow-mapSize-height={1024}
+        />
+        <pointLight position={[-12, 10, -6]} intensity={0.7} color={isBright ? '#0284c7' : '#00f2fe'} />
+        <pointLight position={[12, 8, 6]} intensity={0.5} color={isBright ? '#6366f1' : '#818cf8'} />
 
         <Suspense fallback={null}>
+          <CameraPresetHandler
+            preset={cameraPreset}
+            onApplied={() => setCameraPreset(null)}
+          />
+
           <Center top>
             {children}
           </Center>
 
+          {/* Realistic Cyber Pedestal Stage */}
+          <group position={[0, -0.04, 0]}>
+            <mesh receiveShadow>
+              <cylinderGeometry args={[9.5, 10.2, 0.08, 64]} />
+              <meshStandardMaterial
+                color={isBright ? '#e2e8f0' : '#0a101f'}
+                roughness={0.25}
+                metalness={0.75}
+              />
+            </mesh>
+            {/* Glowing Perimeter Ring */}
+            <mesh position={[0, 0.05, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+              <ringGeometry args={[9.4, 9.55, 64]} />
+              <meshBasicMaterial
+                color={isBright ? '#0284c7' : '#00f2fe'}
+                transparent
+                opacity={0.7}
+              />
+            </mesh>
+          </group>
+
           {/* Cinematic Ambient Particle Sparkles */}
           <Sparkles
-            count={45}
-            scale={14}
-            size={2.5}
+            count={50}
+            scale={16}
+            size={2.8}
             speed={0.35}
-            opacity={isBright ? 0.35 : 0.55}
+            opacity={isBright ? 0.35 : 0.65}
             color={isBright ? '#0284c7' : '#38bdf8'}
           />
 
           {/* Soft Grounding Contact Shadows */}
           <ContactShadows
             position={[0, -0.02, 0]}
-            opacity={isBright ? 0.45 : 0.75}
-            scale={24}
-            blur={2.4}
-            far={4.5}
+            opacity={isBright ? 0.5 : 0.85}
+            scale={26}
+            blur={2.5}
+            far={4.8}
             color={isBright ? '#64748b' : '#000000'}
           />
 
-          {/* Floor Grid for depth perception */}
+          {/* Floor Depth Grid */}
           <Grid
             position={[0, -0.01, 0]}
-            args={[30, 30]}
-            cellSize={0.7}
+            args={[32, 32]}
+            cellSize={0.75}
             cellThickness={0.7}
             cellColor={isBright ? '#cbd5e1' : '#1e293b'}
-            sectionSize={2.1}
+            sectionSize={2.25}
             sectionThickness={1.2}
             sectionColor={isBright ? '#94a3b8' : '#334155'}
-            fadeDistance={18}
+            fadeDistance={20}
             fadeStrength={1.5}
           />
         </Suspense>
@@ -98,9 +224,9 @@ export default function SceneContainer({ children, statusLabel, activeDetails })
         <OrbitControls
           enableDamping
           dampingFactor={0.08}
-          minDistance={4}
-          maxDistance={22}
-          maxPolarAngle={Math.PI / 2 - 0.05} // Prevent going below floor
+          minDistance={3.5}
+          maxDistance={25}
+          maxPolarAngle={Math.PI / 2 - 0.05}
         />
       </Canvas>
 
@@ -108,21 +234,20 @@ export default function SceneContainer({ children, statusLabel, activeDetails })
       <div className={`absolute bottom-3 left-3 z-10 flex items-center gap-3 text-[11px] backdrop-blur-sm border rounded px-2.5 py-1 transition-colors ${
         isBright
           ? 'bg-white/80 border-slate-200 text-slate-600'
-          : 'bg-slate-900/70 border-slate-800/60 text-slate-500'
+          : 'bg-slate-900/70 border-slate-800/60 text-slate-400'
       }`}>
         <span className="flex items-center gap-1">
-          <RotateCw size={11} className={isBright ? 'text-slate-600' : 'text-slate-400'} /> Rotate: Left-drag
+          <RotateCw size={11} className={isBright ? 'text-slate-600' : 'text-cyan-400'} /> Rotate: Left-drag
         </span>
         <span>•</span>
         <span className="flex items-center gap-1">
-          <ZoomIn size={11} className={isBright ? 'text-slate-600' : 'text-slate-400'} /> Zoom: Scroll
+          <ZoomIn size={11} className={isBright ? 'text-slate-600' : 'text-cyan-400'} /> Zoom: Scroll
         </span>
         <span>•</span>
         <span className="flex items-center gap-1">
-          <Compass size={11} className={isBright ? 'text-slate-600' : 'text-slate-400'} /> Pan: Right-drag
+          <Compass size={11} className={isBright ? 'text-slate-600' : 'text-cyan-400'} /> Pan: Right-drag
         </span>
       </div>
     </div>
   );
 }
-

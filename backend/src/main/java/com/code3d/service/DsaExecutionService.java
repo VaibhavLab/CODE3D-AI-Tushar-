@@ -23,14 +23,14 @@ public class DsaExecutionService {
         String code = request.getCode();
         String language = request.getLanguage();
 
-        // 1. If a specific built-in DSA concept is selected (not "custom"), generate its rich 3D visualization trace
-        if (conceptId != null && !conceptId.isBlank() && !"custom".equalsIgnoreCase(conceptId)) {
-            return generateConceptTrace(conceptId);
-        }
-
-        // 2. Custom code execution in any language (Java, Python, C, C++, JavaScript)
+        // 1. If code is provided by user (custom or edited preset), always dynamically execute it!
         if (code != null && !code.isBlank()) {
             return multiLanguageExecutionService.executeUserCode(request);
+        }
+
+        // 2. If a specific built-in DSA concept is selected without custom code
+        if (conceptId != null && !conceptId.isBlank() && !"custom".equalsIgnoreCase(conceptId)) {
+            return generateConceptTrace(conceptId);
         }
 
         // Default to array loop
@@ -68,6 +68,11 @@ public class DsaExecutionService {
             case "fibonacci-memo" -> generateFibonacciMemoTrace();
             case "dp-knapsack", "knapsack", "dp" -> generateDpKnapsackTrace();
             case "lcs" -> generateLcsTrace();
+            case "heap-priority-queue", "heap", "priority-queue", "min-heap", "max-heap" -> multiLanguageExecutionService.executeUserCode(new ExecuteRequest("heap", "java", "PriorityQueue<Integer> minHeap = new PriorityQueue<>(); int[] arr = {10, 15, 20, 17, 25, 30}; minHeap.add(8);"));
+            case "container-most-water", "most-water", "container-water" -> multiLanguageExecutionService.executeUserCode(new ExecuteRequest("container-most-water", "java", "int[] height = {1, 8, 6, 2, 5, 4, 8, 3, 7}; int left = 0, right = 8; maxArea = 0;"));
+            case "monotonic-stack", "next-greater" -> multiLanguageExecutionService.executeUserCode(new ExecuteRequest("monotonic-stack", "java", "int[] arr = {4, 5, 2, 25, 7, 8}; Stack<Integer> stack = new Stack<>();"));
+            case "coin-change-dp", "coin-change" -> multiLanguageExecutionService.executeUserCode(new ExecuteRequest("coin-change-dp", "java", "int[] coins = {1, 2, 5}; int amount = 7; int[] dp = new int[8];"));
+            case "topological-sort-dag", "topological-sort", "toposort" -> multiLanguageExecutionService.executeUserCode(new ExecuteRequest("topological-sort-dag", "java", "int[] inDegree = {0, 1, 1, 2, 1}; Queue<Integer> queue = new LinkedList<>();"));
             default -> generateArrayLoopTrace(List.of(10, 20, 30, 40));
         };
     }

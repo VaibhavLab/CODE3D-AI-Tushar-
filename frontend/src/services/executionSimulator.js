@@ -448,23 +448,47 @@ export const ARRAY_LOOP_EXECUTION_TRACE = [
 export function extractNumbersFromCode(code) {
   if (!code || typeof code !== 'string') return [10, 20, 30, 40];
 
-  // Try matching array inside brackets or braces first: [1, 2, 3] or {1, 2, 3}
-  const bracketMatch = code.match(/[\[{]([0-9,\s\-]+)[\]}]/);
+  const trimmed = code.trim();
+
+  // 1. Direct comma or space-separated numbers: "15, 25, 40, 80" or "10 20 30"
+  if (/^[0-9,\s\-]+$/.test(trimmed)) {
+    const direct = trimmed
+      .split(/[\s,]+/)
+      .map((s) => parseInt(s.trim(), 10))
+      .filter((n) => !isNaN(n));
+    if (direct.length > 0) return direct.slice(0, 12);
+  }
+
+  // 2. Array inside brackets, braces, or parentheses: [1, 2, 3] or {1, 2, 3} or (1, 2, 3)
+  const bracketMatch = code.match(/[\[{(]([0-9,\s\-]+)[\]})]/);
   if (bracketMatch && bracketMatch[1]) {
     const parsed = bracketMatch[1]
       .split(/[\s,]+/)
       .map((s) => parseInt(s.trim(), 10))
       .filter((n) => !isNaN(n));
-    if (parsed.length > 0) return parsed.slice(0, 10);
+    if (parsed.length > 0) return parsed.slice(0, 12);
   }
 
-  // Otherwise match individual numbers in the string
+  // 3. Detect Python range(N) or loop bound `i < N`
+  const rangeMatch = code.match(/range\s*\(\s*(\d+)\s*\)/) || code.match(/[i|j|k]\s*<\s*(\d+)/);
+  if (rangeMatch && rangeMatch[1]) {
+    const count = Math.min(10, Math.max(2, parseInt(rangeMatch[1], 10)));
+    const loopVals = [];
+    for (let k = 0; k < count; k++) {
+      loopVals.push((k + 1) * 10);
+    }
+    return loopVals;
+  }
+
+  // 4. Otherwise match individual numbers in the string
   const allNums = (code.match(/-?\b\d+\b/g) || [])
     .map((s) => parseInt(s, 10))
-    .filter((n) => !isNaN(n) && n < 10000); // Filter out giant literals
+    .filter((n) => !isNaN(n) && Math.abs(n) < 10000);
 
   if (allNums.length >= 2) {
-    return allNums.slice(0, 10);
+    return allNums.slice(0, 12);
+  } else if (allNums.length === 1) {
+    return [allNums[0], allNums[0] + 10, allNums[0] + 20, allNums[0] + 30];
   }
 
   return [10, 20, 30, 40];
