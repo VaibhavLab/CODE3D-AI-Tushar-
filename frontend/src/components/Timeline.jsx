@@ -8,6 +8,7 @@ import {
   Clock,
   Gauge,
 } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 export default function Timeline({
   currentStepIndex,
@@ -24,18 +25,27 @@ export default function Timeline({
   isAtStart,
   isAtEnd,
 }) {
+  const { isBright } = useTheme();
   const speeds = [0.5, 1, 1.5, 2];
 
   return (
-    <div className="bg-slate-900/95 border-t border-slate-800/90 px-4 py-3 select-none flex flex-col gap-2">
+    <div className={`border-t px-4 py-2.5 select-none flex flex-col gap-2 transition-colors ${
+      isBright
+        ? 'bg-white border-slate-200 text-slate-800 shadow-sm'
+        : 'bg-slate-900/95 border-slate-800/90 text-slate-200'
+    }`}>
       {/* Top Bar: Controls & Status */}
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex items-center justify-between gap-3 overflow-x-auto no-scrollbar">
         {/* Playback Buttons */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={onReset}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
-            title="Reset Time Machine (Step 1)"
+            className={`p-1.5 rounded-lg transition ${
+              isBright
+                ? 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800'
+            }`}
+            title="Reset to Step 1"
           >
             <RotateCcw size={15} />
           </button>
@@ -45,7 +55,11 @@ export default function Timeline({
             disabled={isAtStart}
             className={`p-1.5 rounded-lg border transition ${
               isAtStart
-                ? 'border-slate-800 text-slate-600 cursor-not-allowed'
+                ? isBright
+                  ? 'border-slate-200 text-slate-300 cursor-not-allowed'
+                  : 'border-slate-800 text-slate-600 cursor-not-allowed'
+                : isBright
+                ? 'border-slate-300 text-slate-700 hover:bg-slate-100'
                 : 'border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white'
             }`}
             title="Step Back"
@@ -56,7 +70,12 @@ export default function Timeline({
           {isPlaying ? (
             <button
               onClick={onPause}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 text-xs font-semibold transition"
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition border ${
+                isBright
+                  ? 'bg-amber-100 text-amber-900 border-amber-300 hover:bg-amber-200'
+                  : 'bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30'
+              }`}
+              title="Pause Simulation"
             >
               <Pause size={14} className="fill-current" />
               <span>Pause</span>
@@ -64,7 +83,12 @@ export default function Timeline({
           ) : (
             <button
               onClick={onPlay}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500 text-slate-950 hover:bg-cyan-400 text-xs font-bold transition shadow-md shadow-cyan-500/20"
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition shadow-md ${
+                isBright
+                  ? 'bg-cyan-600 text-white hover:bg-cyan-500 shadow-cyan-600/30'
+                  : 'bg-cyan-500 text-slate-950 hover:bg-cyan-400 shadow-cyan-500/20'
+              }`}
+              title="Play Simulation"
             >
               <Play size={14} className="fill-current" />
               <span>{isAtEnd ? 'Replay' : 'Play'}</span>
@@ -76,7 +100,11 @@ export default function Timeline({
             disabled={isAtEnd}
             className={`p-1.5 rounded-lg border transition ${
               isAtEnd
-                ? 'border-slate-800 text-slate-600 cursor-not-allowed'
+                ? isBright
+                  ? 'border-slate-200 text-slate-300 cursor-not-allowed'
+                  : 'border-slate-800 text-slate-600 cursor-not-allowed'
+                : isBright
+                ? 'border-cyan-500 bg-cyan-50 text-cyan-700 hover:bg-cyan-100'
                 : 'border-cyan-600/70 bg-cyan-950/40 text-cyan-300 hover:bg-cyan-900/60'
             }`}
             title="Step Forward"
@@ -86,27 +114,31 @@ export default function Timeline({
         </div>
 
         {/* Time Machine Label */}
-        <div className="flex items-center gap-2">
-          <Clock size={14} className="text-cyan-400" />
-          <span className="text-xs font-semibold tracking-wider text-slate-300 uppercase">
+        <div className="flex items-center gap-2 shrink-0">
+          <Clock size={14} className={isBright ? 'text-cyan-600' : 'text-cyan-400'} />
+          <span className={`text-xs font-semibold tracking-wider uppercase ${isBright ? 'text-slate-700' : 'text-slate-300'}`}>
             Time Machine
           </span>
-          <span className="text-xs font-mono text-slate-500">
+          <span className={`text-xs font-mono font-medium ${isBright ? 'text-slate-500' : 'text-slate-400'}`}>
             [Step {currentStepIndex + 1} / {totalSteps}]
           </span>
         </div>
 
         {/* Playback Speed Switcher */}
-        <div className="flex items-center gap-1.5">
-          <Gauge size={13} className="text-slate-500" />
-          <span className="text-[11px] text-slate-400 mr-1">Speed:</span>
+        <div className="flex items-center gap-1.5 shrink-0">
+          <Gauge size={13} className={isBright ? 'text-slate-400' : 'text-slate-500'} />
+          <span className={`text-[11px] mr-1 ${isBright ? 'text-slate-500' : 'text-slate-400'}`}>Speed:</span>
           {speeds.map((s) => (
             <button
               key={s}
               onClick={() => setPlaybackSpeed(s)}
               className={`px-2 py-0.5 rounded text-[11px] font-mono transition ${
                 playbackSpeed === s
-                  ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/50 font-bold'
+                  ? isBright
+                    ? 'bg-cyan-100 text-cyan-800 border border-cyan-400 font-bold'
+                    : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/50 font-bold'
+                  : isBright
+                  ? 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
               }`}
             >
@@ -117,9 +149,11 @@ export default function Timeline({
       </div>
 
       {/* Interactive Step Timeline Scrubber */}
-      <div className="relative pt-2 pb-1 flex items-center">
+      <div className="relative pt-1.5 pb-1 flex items-center">
         {/* Background track line */}
-        <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-1 bg-slate-800 rounded-full"></div>
+        <div className={`absolute left-0 right-0 top-1/2 -translate-y-1/2 h-1 rounded-full ${
+          isBright ? 'bg-slate-200' : 'bg-slate-800'
+        }`}></div>
 
         {/* Progress track line */}
         <div
@@ -148,21 +182,33 @@ export default function Timeline({
                 <div
                   className={`w-3.5 h-3.5 rounded-full flex items-center justify-center transition-all ${
                     isActive
-                      ? 'bg-cyan-400 ring-4 ring-cyan-500/30 shadow-lg shadow-cyan-400/50'
+                      ? isBright
+                        ? 'bg-cyan-600 ring-4 ring-cyan-400/40 shadow-md'
+                        : 'bg-cyan-400 ring-4 ring-cyan-500/30 shadow-lg shadow-cyan-400/50'
                       : isCompleted
-                      ? 'bg-cyan-600 border border-cyan-400/50'
+                      ? isBright
+                        ? 'bg-cyan-500 border border-cyan-400'
+                        : 'bg-cyan-600 border border-cyan-400/50'
+                      : isBright
+                      ? 'bg-slate-300 border border-slate-400 group-hover:border-slate-500'
                       : 'bg-slate-800 border border-slate-700 group-hover:border-slate-500'
                   }`}
                 >
-                  {isActive && <div className="w-1.5 h-1.5 rounded-full bg-slate-950" />}
+                  {isActive && <div className={`w-1.5 h-1.5 rounded-full ${isBright ? 'bg-white' : 'bg-slate-950'}`} />}
                 </div>
 
                 {/* Step number label under dot */}
                 <span
                   className={`text-[10px] font-mono mt-1 transition-colors ${
                     isActive
-                      ? 'text-cyan-300 font-bold'
+                      ? isBright
+                        ? 'text-cyan-800 font-bold'
+                        : 'text-cyan-300 font-bold'
                       : isCompleted
+                      ? isBright
+                        ? 'text-slate-600'
+                        : 'text-slate-400'
+                      : isBright
                       ? 'text-slate-400'
                       : 'text-slate-600'
                   }`}

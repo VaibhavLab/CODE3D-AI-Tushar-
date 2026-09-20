@@ -40,6 +40,48 @@ public class MultiLanguageExecutionService {
         String lowerCode = code.toLowerCase();
 
         // 3. Algorithm Pattern Detection
+        // Linked List
+        boolean isLinkedList = lowerCode.contains("node") || lowerCode.contains("head") || lowerCode.contains("->next") || lowerCode.contains(".next") || lowerCode.contains("linkedlist");
+        if (isLinkedList) {
+            return generateUserLinkedListTrace(values, arrayLine, loopLine, language);
+        }
+
+        // Stack (LIFO)
+        boolean isStack = lowerCode.contains("stack") || (lowerCode.contains("push") && lowerCode.contains("pop"));
+        if (isStack) {
+            return generateUserStackTrace(values, arrayLine, loopLine, language);
+        }
+
+        // Queue / Deque (FIFO)
+        boolean isQueue = lowerCode.contains("queue") || lowerCode.contains("deque") || lowerCode.contains("poll") || lowerCode.contains("enqueue");
+        if (isQueue) {
+            return generateUserQueueTrace(values, arrayLine, loopLine, language);
+        }
+
+        // Tree / Binary Search Tree
+        boolean isTree = lowerCode.contains("tree") || lowerCode.contains("root") || (lowerCode.contains("left") && lowerCode.contains("right"));
+        if (isTree) {
+            return generateUserTreeTrace(values, arrayLine, loopLine, language);
+        }
+
+        // 2D Matrix / Grid
+        boolean isMatrix = lowerCode.contains("[][]") || lowerCode.contains("matrix") || lowerCode.contains("grid") || (lowerCode.contains("row") && lowerCode.contains("col"));
+        if (isMatrix) {
+            return generateUserMatrixTrace(values, arrayLine, loopLine, language);
+        }
+
+        // Recursion / Call Stack
+        boolean isRecursion = lowerCode.contains("factorial") || lowerCode.contains("fib") || lowerCode.contains("recur");
+        if (isRecursion) {
+            return generateUserRecursionTrace(values, arrayLine, loopLine, language);
+        }
+
+        // Sliding Window
+        boolean isWindow = lowerCode.contains("window") || (lowerCode.contains("k") && lowerCode.contains("sum"));
+        if (isWindow && values.size() >= 3) {
+            return generateUserSlidingWindowTrace(values, arrayLine, loopLine, language);
+        }
+
         // Sorting
         boolean isSort = lowerCode.contains("swap") ||
                          (lowerCode.contains(">") && lowerCode.contains("temp")) ||
@@ -580,6 +622,337 @@ public class MultiLanguageExecutionService {
                 sAdj.setAiHint("Discarding all elements at indices >= " + mid + ".");
                 steps.add(sAdj);
             }
+        }
+
+        return new ExecuteResponse("SUCCESS", steps.size(), steps);
+    }
+
+    // ==========================================
+    // Linked List Traversal Generator
+    // ==========================================
+    private ExecuteResponse generateUserLinkedListTrace(List<Integer> values, int arrayLine, int loopLine, String lang) {
+        List<ExecutionStep> steps = new ArrayList<>();
+        List<Integer> arr = !values.isEmpty() ? values : List.of(10, 20, 30, 40);
+        int step = 1;
+
+        for (int i = 0; i < arr.size(); i++) {
+            int val = arr.get(i);
+            ExecutionStep s = new ExecutionStep();
+            s.setStepNumber(step++);
+            s.setLineNumber(loopLine);
+            s.setEventType("LIST_TRAVERSAL");
+            s.setVariables(Map.of("curr.val", val, "index", i));
+
+            DataStructureState ds = new DataStructureState();
+            ds.setType("linked-list");
+            ds.setValues(new ArrayList<Object>(arr));
+            ds.setActiveIndex(i);
+            ds.setPointers(Map.of("HEAD", 0, "CURR", i));
+            ds.setLabel("Visiting Node [" + i + "]: " + val);
+            ds.setFocusInfo("curr points to Node with val = " + val);
+            s.setDataStructureState(ds);
+
+            s.setExplanation("[" + lang.toUpperCase() + "] Traversed to linked list node " + i + " with data " + val + ".");
+            s.setAiHint("Linked list traversal runs in O(n) linear sequential time.");
+            steps.add(s);
+        }
+
+        return new ExecuteResponse("SUCCESS", steps.size(), steps);
+    }
+
+    // ==========================================
+    // Stack (LIFO) Push / Pop Generator
+    // ==========================================
+    private ExecuteResponse generateUserStackTrace(List<Integer> values, int arrayLine, int loopLine, String lang) {
+        List<ExecutionStep> steps = new ArrayList<>();
+        List<Integer> arr = !values.isEmpty() ? values : List.of(10, 20, 30);
+        List<Integer> stack = new ArrayList<>();
+        int step = 1;
+
+        // Push elements
+        for (int v : arr) {
+            stack.add(v);
+            ExecutionStep s = new ExecutionStep();
+            s.setStepNumber(step++);
+            s.setLineNumber(loopLine);
+            s.setEventType("STACK_PUSH");
+            s.setVariables(Map.of("pushed", v, "stackSize", stack.size()));
+
+            DataStructureState ds = new DataStructureState();
+            ds.setType("stack");
+            ds.setValues(new ArrayList<Object>(stack));
+            ds.setPointers(Map.of("TOP", stack.size() - 1));
+            ds.setLabel("Pushed " + v + " onto Stack");
+            ds.setFocusInfo("TOP element: " + v + " (Stack size: " + stack.size() + ")");
+            s.setDataStructureState(ds);
+
+            s.setExplanation("[" + lang.toUpperCase() + "] Pushed " + v + " onto top of stack.");
+            s.setAiHint("Push operation executes in constant O(1) time.");
+            steps.add(s);
+        }
+
+        // Pop one element if stack has multiple
+        if (stack.size() > 1) {
+            int popped = stack.remove(stack.size() - 1);
+            ExecutionStep s = new ExecutionStep();
+            s.setStepNumber(step++);
+            s.setLineNumber(loopLine + 1);
+            s.setEventType("STACK_POP");
+            s.setVariables(Map.of("popped", popped, "stackSize", stack.size()));
+
+            DataStructureState ds = new DataStructureState();
+            ds.setType("stack");
+            ds.setValues(new ArrayList<Object>(stack));
+            ds.setPointers(Map.of("TOP", stack.size() - 1));
+            ds.setLabel("Popped " + popped + " from Stack");
+            ds.setFocusInfo("Remaining TOP: " + stack.get(stack.size() - 1));
+            s.setDataStructureState(ds);
+
+            s.setExplanation("[" + lang.toUpperCase() + "] Popped " + popped + " from stack (LIFO).");
+            s.setAiHint("Pop operation removes the most recently pushed element.");
+            steps.add(s);
+        }
+
+        return new ExecuteResponse("SUCCESS", steps.size(), steps);
+    }
+
+    // ==========================================
+    // Queue (FIFO) Enqueue / Dequeue Generator
+    // ==========================================
+    private ExecuteResponse generateUserQueueTrace(List<Integer> values, int arrayLine, int loopLine, String lang) {
+        List<ExecutionStep> steps = new ArrayList<>();
+        List<Integer> arr = !values.isEmpty() ? values : List.of(10, 20, 30);
+        List<Integer> queue = new ArrayList<>();
+        int step = 1;
+
+        // Enqueue elements
+        for (int v : arr) {
+            queue.add(v);
+            ExecutionStep s = new ExecutionStep();
+            s.setStepNumber(step++);
+            s.setLineNumber(loopLine);
+            s.setEventType("QUEUE_ENQUEUE");
+            s.setVariables(Map.of("enqueued", v, "queueSize", queue.size()));
+
+            DataStructureState ds = new DataStructureState();
+            ds.setType("queue");
+            ds.setValues(new ArrayList<Object>(queue));
+            ds.setPointers(Map.of("FRONT", 0, "REAR", queue.size() - 1));
+            ds.setLabel("Enqueued " + v + " to Queue");
+            ds.setFocusInfo("FRONT: [" + queue.get(0) + "] | REAR: [" + queue.get(queue.size() - 1) + "]");
+            s.setDataStructureState(ds);
+
+            s.setExplanation("[" + lang.toUpperCase() + "] Enqueued " + v + " at rear of queue.");
+            s.setAiHint("Queue follows First-In, First-Out (FIFO) ordering.");
+            steps.add(s);
+        }
+
+        // Dequeue one element
+        if (queue.size() > 1) {
+            int dequeued = queue.remove(0);
+            ExecutionStep s = new ExecutionStep();
+            s.setStepNumber(step++);
+            s.setLineNumber(loopLine + 1);
+            s.setEventType("QUEUE_DEQUEUE");
+            s.setVariables(Map.of("dequeued", dequeued, "queueSize", queue.size()));
+
+            DataStructureState ds = new DataStructureState();
+            ds.setType("queue");
+            ds.setValues(new ArrayList<Object>(queue));
+            ds.setPointers(Map.of("FRONT", 0, "REAR", queue.size() - 1));
+            ds.setLabel("Dequeued " + dequeued + " from Front");
+            ds.setFocusInfo("New FRONT: [" + queue.get(0) + "]");
+            s.setDataStructureState(ds);
+
+            s.setExplanation("[" + lang.toUpperCase() + "] Dequeued element " + dequeued + " from front of queue.");
+            s.setAiHint("Dequeue operation runs in O(1) amortized time.");
+            steps.add(s);
+        }
+
+        return new ExecuteResponse("SUCCESS", steps.size(), steps);
+    }
+
+    // ==========================================
+    // Binary Search Tree (BST) Generator
+    // ==========================================
+    private ExecuteResponse generateUserTreeTrace(List<Integer> values, int arrayLine, int loopLine, String lang) {
+        List<ExecutionStep> steps = new ArrayList<>();
+        List<Integer> arr = !values.isEmpty() ? values : List.of(50, 30, 70, 20, 40);
+        int step = 1;
+
+        for (int i = 0; i < arr.size(); i++) {
+            int v = arr.get(i);
+            ExecutionStep s = new ExecutionStep();
+            s.setStepNumber(step++);
+            s.setLineNumber(loopLine);
+            s.setEventType("TREE_NODE_VISIT");
+            s.setVariables(Map.of("nodeVal", v, "treeSize", i + 1));
+
+            DataStructureState ds = new DataStructureState();
+            ds.setType("tree");
+            ds.setValues(new ArrayList<Object>(arr.subList(0, i + 1)));
+            ds.setActiveIndex(i);
+            ds.setLabel("Tree Node: " + v);
+            ds.setFocusInfo("Active Tree Node: " + v + " (Level " + (i == 0 ? "0 Root" : "1 Branch") + ")");
+            s.setDataStructureState(ds);
+
+            s.setExplanation("[" + lang.toUpperCase() + "] Traversed / inserted value " + v + " into Tree structure.");
+            s.setAiHint("BST operations divide search space hierarchically in O(log n) average time.");
+            steps.add(s);
+        }
+
+        return new ExecuteResponse("SUCCESS", steps.size(), steps);
+    }
+
+    // ==========================================
+    // 2D Matrix / Grid Scan Generator
+    // ==========================================
+    private ExecuteResponse generateUserMatrixTrace(List<Integer> values, int arrayLine, int loopLine, String lang) {
+        List<ExecutionStep> steps = new ArrayList<>();
+        List<Integer> arr = !values.isEmpty() ? values : List.of(1, 2, 3, 4, 5, 6, 7, 8, 9);
+        int cols = 3;
+        int rows = Math.max(1, (int) Math.ceil((double) arr.size() / cols));
+
+        List<List<Object>> matrix = new ArrayList<>();
+        for (int r = 0; r < rows; r++) {
+            List<Object> rowList = new ArrayList<>();
+            for (int c = 0; c < cols; c++) {
+                int idx = r * cols + c;
+                rowList.add(idx < arr.size() ? arr.get(idx) : 0);
+            }
+            matrix.add(rowList);
+        }
+
+        int step = 1;
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                Object cellVal = matrix.get(r).get(c);
+                ExecutionStep s = new ExecutionStep();
+                s.setStepNumber(step++);
+                s.setLineNumber(loopLine);
+                s.setEventType("MATRIX_SCAN");
+                s.setVariables(Map.of("row", r, "col", c, "cellValue", cellVal));
+
+                DataStructureState ds = new DataStructureState();
+                ds.setType("matrix");
+                ds.setMatrix(matrix);
+                ds.setPointers(Map.of("activeRow", r, "activeCol", c));
+                ds.setLabel("Matrix Cell [" + r + "][" + c + "] = " + cellVal);
+                ds.setFocusInfo("Row " + r + ", Column " + c + ": Value = " + cellVal);
+                s.setDataStructureState(ds);
+
+                s.setExplanation("[" + lang.toUpperCase() + "] Scanned matrix coordinate [" + r + "][" + c + "] with value " + cellVal + ".");
+                s.setAiHint("Row-major matrix iteration visits memory in contiguous stride order.");
+                steps.add(s);
+            }
+        }
+
+        return new ExecuteResponse("SUCCESS", steps.size(), steps);
+    }
+
+    // ==========================================
+    // Recursion / Call Stack Frames Generator
+    // ==========================================
+    private ExecuteResponse generateUserRecursionTrace(List<Integer> values, int arrayLine, int loopLine, String lang) {
+        List<ExecutionStep> steps = new ArrayList<>();
+        int n = !values.isEmpty() && values.get(0) > 0 && values.get(0) <= 6 ? values.get(0) : 4;
+        int step = 1;
+        List<Map<String, Object>> callStack = new ArrayList<>();
+
+        // Push recursive call frames
+        for (int k = n; k >= 1; k--) {
+            callStack.add(Map.of("func", "solve(" + k + ")", "n", k, "state", k == 1 ? "BASE_CASE" : "CALL"));
+            ExecutionStep s = new ExecutionStep();
+            s.setStepNumber(step++);
+            s.setLineNumber(loopLine);
+            s.setEventType(k == 1 ? "RECURSION_BASE" : "RECURSION_CALL");
+            s.setVariables(Map.of("n", k, "depth", callStack.size()));
+
+            DataStructureState ds = new DataStructureState();
+            ds.setType("recursion");
+            ds.setCallStack(new ArrayList<>(callStack));
+            ds.setLabel(k == 1 ? "Hit Base Case: solve(1)" : "Recursive Call: solve(" + k + ")");
+            ds.setFocusInfo("Stack Depth: " + callStack.size() + " frames");
+            s.setDataStructureState(ds);
+
+            s.setExplanation("[" + lang.toUpperCase() + "] Pushed call stack frame for solve(" + k + "). " + (k == 1 ? "Base case reached!" : "Recursing deeper."));
+            s.setAiHint("Recursion utilizes the JVM execution call stack to preserve function state.");
+            steps.add(s);
+        }
+
+        // Unwind call frames
+        while (callStack.size() > 1) {
+            Map<String, Object> top = callStack.remove(callStack.size() - 1);
+            ExecutionStep s = new ExecutionStep();
+            s.setStepNumber(step++);
+            s.setLineNumber(loopLine + 1);
+            s.setEventType("RECURSION_RETURN");
+            s.setVariables(Map.of("returnedFrom", top.get("func"), "depth", callStack.size()));
+
+            DataStructureState ds = new DataStructureState();
+            ds.setType("recursion");
+            ds.setCallStack(new ArrayList<>(callStack));
+            ds.setLabel("Unwound Return: " + top.get("func"));
+            ds.setFocusInfo("Remaining depth: " + callStack.size());
+            s.setDataStructureState(ds);
+
+            s.setExplanation("[" + lang.toUpperCase() + "] Returned from " + top.get("func") + ", frame popped from call stack.");
+            s.setAiHint("Call stack frame is deallocated upon returning value.");
+            steps.add(s);
+        }
+
+        return new ExecuteResponse("SUCCESS", steps.size(), steps);
+    }
+
+    // ==========================================
+    // Sliding Window Generator
+    // ==========================================
+    private ExecuteResponse generateUserSlidingWindowTrace(List<Integer> values, int arrayLine, int loopLine, String lang) {
+        List<ExecutionStep> steps = new ArrayList<>();
+        List<Integer> arr = values;
+        int k = Math.min(3, arr.size());
+        int currentSum = 0;
+        for (int i = 0; i < k; i++) currentSum += arr.get(i);
+        int maxSum = currentSum;
+        int step = 1;
+
+        ExecutionStep sInit = new ExecutionStep();
+        sInit.setStepNumber(step++);
+        sInit.setLineNumber(loopLine);
+        sInit.setEventType("WINDOW_INIT");
+        sInit.setVariables(Map.of("windowSum", currentSum, "k", k));
+        DataStructureState dsInit = new DataStructureState();
+        dsInit.setType("sorting");
+        dsInit.setValues(new ArrayList<Object>(arr));
+        dsInit.setComparedIndices(List.of(0, k - 1));
+        dsInit.setPointers(Map.of("low", 0, "high", k - 1));
+        dsInit.setLabel("Initial Window [0.." + (k - 1) + "]: Sum = " + currentSum);
+        dsInit.setFocusInfo("Window Size K = " + k);
+        sInit.setDataStructureState(dsInit);
+        sInit.setExplanation("[" + lang.toUpperCase() + "] Computed initial sum of window: " + currentSum + ".");
+        steps.add(sInit);
+
+        for (int i = k; i < arr.size(); i++) {
+            int outgoing = arr.get(i - k);
+            int incoming = arr.get(i);
+            currentSum = currentSum - outgoing + incoming;
+            if (currentSum > maxSum) maxSum = currentSum;
+
+            ExecutionStep s = new ExecutionStep();
+            s.setStepNumber(step++);
+            s.setLineNumber(loopLine + 1);
+            s.setEventType("WINDOW_SLIDE");
+            s.setVariables(Map.of("outgoing", outgoing, "incoming", incoming, "windowSum", currentSum, "maxSum", maxSum));
+            DataStructureState ds = new DataStructureState();
+            ds.setType("sorting");
+            ds.setValues(new ArrayList<Object>(arr));
+            ds.setComparedIndices(List.of(i - k + 1, i));
+            ds.setPointers(Map.of("low", i - k + 1, "high", i));
+            ds.setLabel("Window [" + (i - k + 1) + ".." + i + "]: Sum = " + currentSum);
+            ds.setFocusInfo("-" + outgoing + " + " + incoming + " = " + currentSum + " | Max: " + maxSum);
+            s.setDataStructureState(ds);
+            s.setExplanation("[" + lang.toUpperCase() + "] Sliding window: Removed arr[" + (i - k) + "] (" + outgoing + "), added arr[" + i + "] (" + incoming + ").");
+            steps.add(s);
         }
 
         return new ExecuteResponse("SUCCESS", steps.size(), steps);

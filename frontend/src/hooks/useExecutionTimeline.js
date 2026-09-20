@@ -14,10 +14,9 @@ export function useExecutionTimeline(trace = []) {
   const isAtStart = currentStepIndex === 0;
   const isAtEnd = currentStepIndex >= totalSteps - 1;
 
-  // Auto-reset whenever a new execution trace is loaded
+  // Auto-reset index whenever a new execution trace is loaded
   useEffect(() => {
     setCurrentStepIndex(0);
-    setIsPlaying(false);
   }, [trace]);
 
   const pause = useCallback(() => {
@@ -53,11 +52,9 @@ export function useExecutionTimeline(trace = []) {
   }, [totalSteps]);
 
   const play = useCallback(() => {
-    if (isAtEnd) {
-      setCurrentStepIndex(0);
-    }
+    setCurrentStepIndex((prev) => (prev >= totalSteps - 1 ? 0 : prev));
     setIsPlaying(true);
-  }, [isAtEnd]);
+  }, [totalSteps]);
 
   const togglePlay = useCallback(() => {
     if (isPlaying) {
@@ -75,12 +72,15 @@ export function useExecutionTimeline(trace = []) {
   // Interval timer for playback
   useEffect(() => {
     if (isPlaying) {
-      const intervalMs = Math.round(1500 / playbackSpeed);
+      if (totalSteps <= 1) {
+        setIsPlaying(false);
+        return;
+      }
+      const intervalMs = Math.max(300, Math.round(1400 / playbackSpeed));
       timerRef.current = setInterval(() => {
         setCurrentStepIndex((prev) => {
           if (prev >= totalSteps - 1) {
             setIsPlaying(false);
-            clearInterval(timerRef.current);
             return prev;
           }
           return prev + 1;
@@ -91,6 +91,7 @@ export function useExecutionTimeline(trace = []) {
     return () => {
       if (timerRef.current) {
         clearInterval(timerRef.current);
+        timerRef.current = null;
       }
     };
   }, [isPlaying, playbackSpeed, totalSteps]);

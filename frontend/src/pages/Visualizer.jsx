@@ -175,25 +175,34 @@ export default function Visualizer({ initialConcept }) {
       code: customCode,
     });
 
+    let newSteps = null;
     if (backendOnline) {
-      const [execRes, astRes] = await Promise.all([
-        executeProgram(customCode, 'custom', customLang),
-        analyzeCode(customCode, customLang),
-      ]);
+      try {
+        const [execRes, astRes] = await Promise.all([
+          executeProgram(customCode, 'custom', customLang),
+          analyzeCode(customCode, customLang),
+        ]);
 
-      if (execRes && execRes.steps && execRes.steps.length > 0) {
-        setTrace(execRes.steps);
+        if (execRes && execRes.steps && execRes.steps.length > 0) {
+          newSteps = execRes.steps;
+        }
+        if (astRes) {
+          if (astRes.timeComplexity) setTimeComplexity(astRes.timeComplexity);
+          if (astRes.spaceComplexity) setSpaceComplexity(astRes.spaceComplexity);
+        }
+      } catch (err) {
+        console.warn('Backend custom execution failed, using simulator:', err);
       }
-      if (astRes) {
-        if (astRes.timeComplexity) setTimeComplexity(astRes.timeComplexity);
-        if (astRes.spaceComplexity) setSpaceComplexity(astRes.spaceComplexity);
-      }
+    }
+
+    if (!newSteps || newSteps.length === 0) {
+      newSteps = getExecutionTrace(customCode, customLang);
+    }
+
+    if (newSteps && newSteps.length > 0) {
+      setTrace(newSteps);
       reset();
-      play();
-    } else {
-      setTrace(getExecutionTrace(customCode));
-      reset();
-      play();
+      setTimeout(() => play(), 50);
     }
   };
 
@@ -215,41 +224,72 @@ export default function Visualizer({ initialConcept }) {
     if (correctedTrace && correctedTrace.length > 0) {
       setTrace(correctedTrace);
       reset();
-      play();
-    } else if (backendOnline) {
-      const [execRes, astRes] = await Promise.all([
-        executeProgram(correctedCode, 'custom', correctedLang),
-        analyzeCode(correctedCode, correctedLang),
-      ]);
-      if (execRes?.steps?.length > 0) setTrace(execRes.steps);
-      if (astRes?.timeComplexity) setTimeComplexity(astRes.timeComplexity);
-      if (astRes?.spaceComplexity) setSpaceComplexity(astRes.spaceComplexity);
-      reset();
-      play();
+      setTimeout(() => play(), 50);
     } else {
-      setTrace(getExecutionTrace(correctedCode));
-      reset();
-      play();
+      let newSteps = null;
+      if (backendOnline) {
+        try {
+          const [execRes, astRes] = await Promise.all([
+            executeProgram(correctedCode, 'custom', correctedLang),
+            analyzeCode(correctedCode, correctedLang),
+          ]);
+          if (execRes?.steps?.length > 0) newSteps = execRes.steps;
+          if (astRes?.timeComplexity) setTimeComplexity(astRes.timeComplexity);
+          if (astRes?.spaceComplexity) setSpaceComplexity(astRes.spaceComplexity);
+        } catch (err) {
+          console.warn('Backend repaired execution failed, using simulator:', err);
+        }
+      }
+
+      if (!newSteps || newSteps.length === 0) {
+        newSteps = getExecutionTrace(correctedCode, correctedLang);
+      }
+
+      if (newSteps && newSteps.length > 0) {
+        setTrace(newSteps);
+        reset();
+        setTimeout(() => play(), 50);
+      }
     }
   };
 
-  // Run user code dynamically against backend
+  // Run user code dynamically against backend or simulator
   const handleRunCode = async () => {
-    if (backendOnline) {
-      const [execRes, astRes] = await Promise.all([
-        executeProgram(code, selectedSample.id, language),
-        analyzeCode(code, language),
-      ]);
+    const isCustom = selectedSample.id === 'custom' || code.trim() !== (selectedSample.code || '').trim();
+    const conceptIdToUse = isCustom ? 'custom' : selectedSample.id;
 
-      if (execRes && execRes.steps && execRes.steps.length > 0) {
-        setTrace(execRes.steps);
-      }
-      if (astRes) {
-        if (astRes.timeComplexity) setTimeComplexity(astRes.timeComplexity);
-        if (astRes.spaceComplexity) setSpaceComplexity(astRes.spaceComplexity);
+    let newSteps = null;
+
+    if (backendOnline) {
+      try {
+        const [execRes, astRes] = await Promise.all([
+          executeProgram(code, conceptIdToUse, language),
+          analyzeCode(code, language),
+        ]);
+
+        if (execRes && execRes.steps && execRes.steps.length > 0) {
+          newSteps = execRes.steps;
+        }
+        if (astRes) {
+          if (astRes.timeComplexity) setTimeComplexity(astRes.timeComplexity);
+          if (astRes.spaceComplexity) setSpaceComplexity(astRes.spaceComplexity);
+        }
+      } catch (err) {
+        console.warn('Backend execution error, using client simulator:', err);
       }
     }
-    play();
+
+    if (!newSteps || newSteps.length === 0) {
+      newSteps = getExecutionTrace(code, language);
+    }
+
+    if (newSteps && newSteps.length > 0) {
+      setTrace(newSteps);
+      reset();
+      setTimeout(() => play(), 50);
+    } else {
+      play();
+    }
   };
 
   return (
@@ -483,7 +523,7 @@ export default function Visualizer({ initialConcept }) {
           isPlaying={isPlaying}
           playbackSpeed={playbackSpeed}
           setPlaybackSpeed={setPlaybackSpeed}
-          onPlay={handleRunCode}
+          onPlay={play}
           onPause={pause}
           onPrev={prevStep}
           onNext={nextStep}
