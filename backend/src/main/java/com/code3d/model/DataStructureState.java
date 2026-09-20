@@ -21,6 +21,10 @@ public class DataStructureState {
     private Map<String, Object> window;
     private Map<String, Object> hashTable;
     private Map<String, Object> waterVolume;
+    private List<Object> trappedWater;
+    private List<Object> dpValues;
+    private List<Map<String, Object>> slots;
+    private Boolean targetFound;
     private Integer parentIndex;
     private String heapType;
     private Object target;
@@ -28,6 +32,18 @@ public class DataStructureState {
     private String focusInfo;
 
     public DataStructureState() {}
+
+    public List<Object> getTrappedWater() { return trappedWater; }
+    public void setTrappedWater(List<Object> trappedWater) { this.trappedWater = trappedWater; }
+
+    public List<Object> getDpValues() { return dpValues; }
+    public void setDpValues(List<Object> dpValues) { this.dpValues = dpValues; }
+
+    public List<Map<String, Object>> getSlots() { return slots; }
+    public void setSlots(List<Map<String, Object>> slots) { this.slots = slots; }
+
+    public Boolean getTargetFound() { return targetFound; }
+    public void setTargetFound(Boolean targetFound) { this.targetFound = targetFound; }
 
     public Map<String, Object> getWaterVolume() { return waterVolume; }
     public void setWaterVolume(Map<String, Object> waterVolume) { this.waterVolume = waterVolume; }

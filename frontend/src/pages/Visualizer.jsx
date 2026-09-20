@@ -35,6 +35,9 @@ export default function Visualizer({ initialConcept }) {
   const { isBright } = useTheme();
   const [selectedSample, setSelectedSample] = useState(initialConcept || SAMPLE_PROGRAMS[0]);
   const [code, setCode] = useState(initialConcept?.code || DEFAULT_JAVA_CODE);
+  const [lastExecutedCode, setLastExecutedCode] = useState(initialConcept?.code || DEFAULT_JAVA_CODE);
+  const isCodeDirty = code !== lastExecutedCode;
+
   const [language, setLanguage] = useState(initialConcept?.language || 'java');
   const [trace, setTrace] = useState(() => {
     if (initialConcept?.trace && initialConcept.trace.length > 0) {
@@ -99,6 +102,7 @@ export default function Visualizer({ initialConcept }) {
     if (initialConcept) {
       setSelectedSample(initialConcept);
       setCode(initialConcept.code);
+      setLastExecutedCode(initialConcept.code);
       if (initialConcept.language) {
         setLanguage(initialConcept.language);
       }
@@ -137,6 +141,7 @@ export default function Visualizer({ initialConcept }) {
   const handleSelectProgram = async (prog) => {
     setSelectedSample(prog);
     setCode(prog.code);
+    setLastExecutedCode(prog.code);
     setLanguage('java');
     setTimeComplexity(prog.timeComplexity);
     setSpaceComplexity(prog.spaceComplexity);
@@ -167,6 +172,7 @@ export default function Visualizer({ initialConcept }) {
     setLanguage(newLang);
     const template = LANGUAGE_DEFAULTS[newLang] || DEFAULT_JAVA_CODE;
     setCode(template);
+    setLastExecutedCode(template);
     setSelectedSample({
       id: 'custom',
       title: `${newLang.toUpperCase()} Traversal`,
@@ -221,6 +227,7 @@ export default function Visualizer({ initialConcept }) {
       }
     }
     setCode(updatedCode);
+    setLastExecutedCode(updatedCode);
 
     // Run dynamic trace
     let newSteps = null;
@@ -256,6 +263,7 @@ export default function Visualizer({ initialConcept }) {
   const handleCustomCodeApply = async ({ code: customCode, language: customLang }) => {
     setLanguage(customLang);
     setCode(customCode);
+    setLastExecutedCode(customCode);
     setSelectedSample({
       id: 'custom',
       title: `⚡ Custom ${customLang.toUpperCase()} Code`,
@@ -307,6 +315,7 @@ export default function Visualizer({ initialConcept }) {
   const handleApplyCorrectedCode = async ({ code: correctedCode, language: correctedLang, trace: correctedTrace }) => {
     setLanguage(correctedLang);
     setCode(correctedCode);
+    setLastExecutedCode(correctedCode);
     setSelectedSample({
       id: 'custom',
       title: `🩺 Repaired ${correctedLang.toUpperCase()} Code`,
@@ -357,6 +366,13 @@ export default function Visualizer({ initialConcept }) {
 
   // Run user code dynamically against backend or simulator
   const handleRunCode = async () => {
+    setLastExecutedCode(code);
+
+    const nums = extractNumbersFromCode(code);
+    if (nums && nums.length > 0) {
+      setFormInputValues(nums.join(', '));
+    }
+
     let newSteps = null;
 
     if (backendOnline) {
@@ -391,15 +407,39 @@ export default function Visualizer({ initialConcept }) {
     }
   };
 
+  // Synchronized Timeline Play handler
+  const handleTimelinePlay = () => {
+    if (isCodeDirty) {
+      handleRunCode();
+    } else {
+      if (isAtEnd) {
+        goToStep(0);
+      }
+      play();
+    }
+  };
+
+  // Window-level Ctrl+Enter / Cmd+Enter listener to trigger instant 3D execution
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        handleRunCode();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [code, language, backendOnline, isCodeDirty]);
+
   return (
     <div className={`flex-1 flex flex-col h-[calc(100vh-3.5rem)] overflow-hidden select-none transition-colors duration-200 ${
-      isBright ? 'bg-slate-100 text-slate-900' : 'bg-slate-950 text-slate-100'
+      isBright ? 'bg-slate-100 text-slate-900' : 'bg-[#070b14] text-slate-100'
     }`}>
       {/* Visualizer Header Controls */}
       <div className={`min-h-10 border-b px-3 py-1.5 flex items-center justify-between text-xs overflow-x-auto no-scrollbar gap-2 transition-colors ${
         isBright
           ? 'bg-white border-slate-200 text-slate-700 shadow-sm'
-          : 'bg-slate-900/95 border-slate-800/80 text-slate-300'
+          : 'bg-[#0b0f19] border-slate-800/80 text-slate-300'
       }`}>
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <span className={`font-semibold flex items-center gap-1.5 ${isBright ? 'text-slate-800' : 'text-slate-200'}`}>
@@ -611,6 +651,8 @@ export default function Visualizer({ initialConcept }) {
               currentLineNumber={currentStep?.lineNumber || null}
               isPlaying={isPlaying}
               onPlay={handleRunCode}
+              onRunCode={handleRunCode}
+              isCodeDirty={isCodeDirty}
               onPause={pause}
               onNext={nextStep}
               onPrev={prevStep}
@@ -629,7 +671,7 @@ export default function Visualizer({ initialConcept }) {
         `}>
           {/* Direct Interactive Form User Input Bar */}
           <div className={`px-3 py-1.5 border-b flex flex-wrap items-center justify-between gap-2 text-xs transition-colors shrink-0 ${
-            isBright ? 'bg-slate-50 border-slate-200 text-slate-800' : 'bg-slate-900/90 border-slate-800 text-slate-200'
+            isBright ? 'bg-slate-50 border-slate-200 text-slate-800' : 'bg-[#0b0f19] border-slate-800 text-slate-200'
           }`}>
             <div className="flex items-center gap-2 flex-1 min-w-[240px]">
               <span className={`font-semibold text-[11px] shrink-0 flex items-center gap-1 ${
@@ -754,7 +796,8 @@ export default function Visualizer({ initialConcept }) {
           isPlaying={isPlaying}
           playbackSpeed={playbackSpeed}
           setPlaybackSpeed={setPlaybackSpeed}
-          onPlay={play}
+          onPlay={handleTimelinePlay}
+          isCodeDirty={isCodeDirty}
           onPause={pause}
           onPrev={prevStep}
           onNext={nextStep}

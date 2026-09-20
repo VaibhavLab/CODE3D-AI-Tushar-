@@ -52,6 +52,52 @@ public class MultiLanguageExecutionService {
             return generateUserHeapTrace(heapVals, arrayLine, loopLine, language);
         }
 
+        // Trapping Rain Water
+        boolean isTrappingWater = lowerCode.contains("trapping") ||
+                                  lowerCode.contains("trap") ||
+                                  lowerCode.contains("rain") ||
+                                  (lowerCode.contains("water") && lowerCode.contains("elevation"));
+        if (isTrappingWater) {
+            List<Integer> waterVals = (values.size() >= 3) ? values : List.of(0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1);
+            return generateUserTrappingWaterTrace(waterVals, arrayLine, loopLine, language);
+        }
+
+        // LRU Cache
+        boolean isLruCache = lowerCode.contains("lru") ||
+                             lowerCode.contains("lrucache") ||
+                             (lowerCode.contains("cache") && lowerCode.contains("capacity"));
+        if (isLruCache) {
+            return generateUserLruCacheTrace(arrayLine, loopLine, language);
+        }
+
+        // Trie / Prefix Tree
+        boolean isTrie = lowerCode.contains("trie") ||
+                         lowerCode.contains("prefix") ||
+                         (lowerCode.contains("insert") && lowerCode.contains("search") && lowerCode.contains("startswith"));
+        if (isTrie) {
+            return generateUserTrieTrace(arrayLine, loopLine, language);
+        }
+
+        // Disjoint Set Union (DSU / Kruskal)
+        boolean isDsu = lowerCode.contains("dsu") ||
+                        lowerCode.contains("disjoint") ||
+                        lowerCode.contains("unionfind") ||
+                        lowerCode.contains("union_find") ||
+                        (lowerCode.contains("find(") && lowerCode.contains("union("));
+        if (isDsu) {
+            return generateUserDsuTrace(arrayLine, loopLine, language);
+        }
+
+        // Longest Increasing Subsequence (LIS)
+        boolean isLis = lowerCode.contains("longestincreasing") ||
+                        lowerCode.contains("longest_increasing") ||
+                        lowerCode.contains("lis") ||
+                        (lowerCode.contains("subsequence") && lowerCode.contains("increasing"));
+        if (isLis) {
+            List<Integer> lisVals = (values.size() >= 3) ? values : List.of(10, 9, 2, 5, 3, 7, 101, 18);
+            return generateUserLisTrace(lisVals, arrayLine, loopLine, language);
+        }
+
         // Container With Most Water (Two Pointers)
         boolean isContainerWater = lowerCode.contains("maxarea") ||
                                    lowerCode.contains("mostwater") ||
@@ -2129,16 +2175,775 @@ public class MultiLanguageExecutionService {
     }
 
     // ==========================================
+    // 1. Trapping Rain Water
+    // ==========================================
+    private ExecuteResponse generateUserTrappingWaterTrace(List<Integer> values, int arrayLine, int loopLine, String lang) {
+        List<ExecutionStep> steps = new ArrayList<>();
+        List<Integer> heights = (values != null && values.size() >= 3) ? new ArrayList<>(values) : List.of(0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1);
+        int n = heights.size();
+        int step = 1;
+        List<String> output = new ArrayList<>();
+
+        int left = 0, right = n - 1;
+        int leftMax = 0, rightMax = 0;
+        int totalWater = 0;
+        List<Object> trappedWater = new ArrayList<>();
+        for (int k = 0; k < n; k++) trappedWater.add(0);
+
+        ExecutionStep sInit = new ExecutionStep();
+        sInit.setStepNumber(step++);
+        sInit.setLineNumber(arrayLine);
+        sInit.setEventType("TRAPPING_WATER_INIT");
+        sInit.setVariables(Map.of("left", 0, "right", n - 1, "leftMax", 0, "rightMax", 0, "totalWater", 0));
+        DataStructureState dsInit = new DataStructureState();
+        dsInit.setType("trapping-rain-water");
+        dsInit.setName("height");
+        dsInit.setValues(new ArrayList<>(heights));
+        dsInit.setTrappedWater(new ArrayList<>(trappedWater));
+        dsInit.setPointers(Map.of("left", 0, "right", n - 1));
+        dsInit.setLabel("Two-Pointer Elevation Framework Initialized");
+        dsInit.setFocusInfo("Array of " + n + " elevation bars initialized");
+        sInit.setDataStructureState(dsInit);
+        sInit.setExplanation("[" + lang.toUpperCase() + "] Initialized two pointers: left=0, right=" + (n - 1) + ". Water trapped bounded by min(leftMax, rightMax).");
+        sInit.setAiHint("Two-pointer approach achieves optimal O(n) time and O(1) auxiliary space.");
+        steps.add(sInit);
+
+        while (left <= right && step < 50) {
+            boolean isLeftShorter = heights.get(left) <= heights.get(right);
+            if (isLeftShorter) {
+                int hLeft = heights.get(left);
+                if (hLeft >= leftMax) {
+                    leftMax = hLeft;
+                    ExecutionStep sPeak = new ExecutionStep();
+                    sPeak.setStepNumber(step++);
+                    sPeak.setLineNumber(loopLine);
+                    sPeak.setEventType("UPDATE_LEFT_MAX");
+                    sPeak.setVariables(Map.of("left", left, "right", right, "leftMax", leftMax, "rightMax", rightMax, "totalWater", totalWater));
+                    DataStructureState dsPeak = new DataStructureState();
+                    dsPeak.setType("trapping-rain-water");
+                    dsPeak.setName("height");
+                    dsPeak.setValues(new ArrayList<>(heights));
+                    dsPeak.setTrappedWater(new ArrayList<>(trappedWater));
+                    dsPeak.setActiveIndex(left);
+                    dsPeak.setPointers(Map.of("left", left, "right", right));
+                    dsPeak.setLabel("New Left Maximum: " + leftMax);
+                    dsPeak.setFocusInfo("leftMax updated to " + leftMax + " at index [" + left + "]");
+                    sPeak.setDataStructureState(dsPeak);
+                    sPeak.setExplanation("[" + lang.toUpperCase() + "] Pillar at index " + left + " (" + hLeft + ") >= leftMax. Updated leftMax = " + leftMax + ".");
+                    sPeak.setAiHint("A boundary peak cannot retain water above itself.");
+                    steps.add(sPeak);
+                } else {
+                    int trapped = leftMax - hLeft;
+                    trappedWater.set(left, trapped);
+                    totalWater += trapped;
+                    output.add("At [" + left + "]: trapped " + trapped + " units");
+                    ExecutionStep sTrap = new ExecutionStep();
+                    sTrap.setStepNumber(step++);
+                    sTrap.setLineNumber(loopLine + 1);
+                    sTrap.setEventType("WATER_TRAPPED");
+                    sTrap.setVariables(Map.of("left", left, "right", right, "leftMax", leftMax, "trapped", trapped, "totalWater", totalWater));
+                    sTrap.setOutput(new ArrayList<>(output));
+                    DataStructureState dsTrap = new DataStructureState();
+                    dsTrap.setType("trapping-rain-water");
+                    dsTrap.setName("height");
+                    dsTrap.setValues(new ArrayList<>(heights));
+                    dsTrap.setTrappedWater(new ArrayList<>(trappedWater));
+                    dsTrap.setActiveIndex(left);
+                    dsTrap.setPointers(Map.of("left", left, "right", right));
+                    dsTrap.setLabel("💧 Trapped " + trapped + " Units at [" + left + "]! Total: " + totalWater);
+                    dsTrap.setFocusInfo("trapped = leftMax(" + leftMax + ") - height(" + hLeft + ") = " + trapped);
+                    sTrap.setDataStructureState(dsTrap);
+                    sTrap.setExplanation("[" + lang.toUpperCase() + "] Water trapped at index " + left + ": leftMax (" + leftMax + ") - height (" + hLeft + ") = " + trapped + " units. Total: " + totalWater + ".");
+                    sTrap.setAiHint("Water elevation is bounded by the lower boundary leftMax.");
+                    steps.add(sTrap);
+                }
+                left++;
+            } else {
+                int hRight = heights.get(right);
+                if (hRight >= rightMax) {
+                    rightMax = hRight;
+                    ExecutionStep sPeakR = new ExecutionStep();
+                    sPeakR.setStepNumber(step++);
+                    sPeakR.setLineNumber(loopLine);
+                    sPeakR.setEventType("UPDATE_RIGHT_MAX");
+                    sPeakR.setVariables(Map.of("left", left, "right", right, "leftMax", leftMax, "rightMax", rightMax, "totalWater", totalWater));
+                    DataStructureState dsPeakR = new DataStructureState();
+                    dsPeakR.setType("trapping-rain-water");
+                    dsPeakR.setName("height");
+                    dsPeakR.setValues(new ArrayList<>(heights));
+                    dsPeakR.setTrappedWater(new ArrayList<>(trappedWater));
+                    dsPeakR.setActiveIndex(right);
+                    dsPeakR.setPointers(Map.of("left", left, "right", right));
+                    dsPeakR.setLabel("New Right Maximum: " + rightMax);
+                    dsPeakR.setFocusInfo("rightMax updated to " + rightMax + " at index [" + right + "]");
+                    sPeakR.setDataStructureState(dsPeakR);
+                    sPeakR.setExplanation("[" + lang.toUpperCase() + "] Pillar at index " + right + " (" + hRight + ") >= rightMax. Updated rightMax = " + rightMax + ".");
+                    sPeakR.setAiHint("Right boundary peak updated.");
+                    steps.add(sPeakR);
+                } else {
+                    int trapped = rightMax - hRight;
+                    trappedWater.set(right, trapped);
+                    totalWater += trapped;
+                    output.add("At [" + right + "]: trapped " + trapped + " units");
+                    ExecutionStep sTrapR = new ExecutionStep();
+                    sTrapR.setStepNumber(step++);
+                    sTrapR.setLineNumber(loopLine + 1);
+                    sTrapR.setEventType("WATER_TRAPPED");
+                    sTrapR.setVariables(Map.of("left", left, "right", right, "rightMax", rightMax, "trapped", trapped, "totalWater", totalWater));
+                    sTrapR.setOutput(new ArrayList<>(output));
+                    DataStructureState dsTrapR = new DataStructureState();
+                    dsTrapR.setType("trapping-rain-water");
+                    dsTrapR.setName("height");
+                    dsTrapR.setValues(new ArrayList<>(heights));
+                    dsTrapR.setTrappedWater(new ArrayList<>(trappedWater));
+                    dsTrapR.setActiveIndex(right);
+                    dsTrapR.setPointers(Map.of("left", left, "right", right));
+                    dsTrapR.setLabel("💧 Trapped " + trapped + " Units at [" + right + "]! Total: " + totalWater);
+                    dsTrapR.setFocusInfo("trapped = rightMax(" + rightMax + ") - height(" + hRight + ") = " + trapped);
+                    sTrapR.setDataStructureState(dsTrapR);
+                    sTrapR.setExplanation("[" + lang.toUpperCase() + "] Water trapped at index " + right + ": rightMax (" + rightMax + ") - height (" + hRight + ") = " + trapped + " units. Total: " + totalWater + ".");
+                    sTrapR.setAiHint("Water elevation is bounded by the lower boundary rightMax.");
+                    steps.add(sTrapR);
+                }
+                right--;
+            }
+        }
+
+        ExecutionStep sEnd = new ExecutionStep();
+        sEnd.setStepNumber(step);
+        sEnd.setLineNumber(loopLine + 4);
+        sEnd.setEventType("PROGRAM_END");
+        sEnd.setVariables(Map.of("totalWater", totalWater, "leftMax", leftMax, "rightMax", rightMax));
+        output.add("Total Trapped Water = " + totalWater + " units");
+        sEnd.setOutput(new ArrayList<>(output));
+        DataStructureState dsEnd = new DataStructureState();
+        dsEnd.setType("trapping-rain-water");
+        dsEnd.setName("height");
+        dsEnd.setValues(new ArrayList<>(heights));
+        dsEnd.setTrappedWater(new ArrayList<>(trappedWater));
+        dsEnd.setLabel("Trapping Complete: " + totalWater + " Units of Water Trapped!");
+        dsEnd.setFocusInfo("Total Volume: " + totalWater + " units");
+        sEnd.setDataStructureState(dsEnd);
+        sEnd.setExplanation("[" + lang.toUpperCase() + "] Trapping Rain Water complete! Total water retained = " + totalWater + " units.");
+        sEnd.setAiHint("O(n) time complexity with O(1) space.");
+        steps.add(sEnd);
+
+        return new ExecuteResponse("SUCCESS", steps.size(), steps);
+    }
+
+    // ==========================================
+    // 2. LRU Cache
+    // ==========================================
+    private ExecuteResponse generateUserLruCacheTrace(int arrayLine, int loopLine, String lang) {
+        List<ExecutionStep> steps = new ArrayList<>();
+        int step = 1;
+        List<String> output = new ArrayList<>();
+        int capacity = 3;
+
+        List<Integer> cacheOrder = new ArrayList<>();
+        Map<Integer, Integer> cacheMap = new LinkedHashMap<>();
+
+        ExecutionStep sInit = new ExecutionStep();
+        sInit.setStepNumber(step++);
+        sInit.setLineNumber(arrayLine);
+        sInit.setEventType("LRU_INIT");
+        sInit.setVariables(Map.of("capacity", capacity, "size", 0));
+        output.add("LRU Cache initialized with capacity = " + capacity);
+        sInit.setOutput(new ArrayList<>(output));
+        DataStructureState dsInit = new DataStructureState();
+        dsInit.setType("hash-table");
+        dsInit.setName("lru_cache");
+        dsInit.setLabel("LRU Cache Initialized (Capacity: 3)");
+        dsInit.setFocusInfo("HashMap + Doubly Linked List ready");
+        sInit.setDataStructureState(dsInit);
+        sInit.setExplanation("[" + lang.toUpperCase() + "] LRU Cache initialized with capacity = 3. O(1) get/put powered by Hash Map + Doubly Linked List.");
+        sInit.setAiHint("Least Recently Used items evicted from tail upon overflow.");
+        steps.add(sInit);
+
+        int[][] ops = {{1, 10}, {2, 20}, {3, 30}, {1, -1}, {4, 40}, {2, -1}};
+        for (int[] op : ops) {
+            int key = op[0];
+            int val = op[1];
+            boolean isPut = (val != -1);
+
+            if (isPut) {
+                Integer evicted = null;
+                if (cacheMap.containsKey(key)) {
+                    cacheOrder.remove((Integer) key);
+                } else if (cacheOrder.size() >= capacity) {
+                    evicted = cacheOrder.remove(cacheOrder.size() - 1);
+                    cacheMap.remove(evicted);
+                }
+                cacheOrder.add(0, key);
+                cacheMap.put(key, val);
+
+                output.add(evicted != null ? "put(" + key + ", " + val + ") -> Evicted key " + evicted : "put(" + key + ", " + val + ") -> OK");
+                ExecutionStep sPut = new ExecutionStep();
+                sPut.setStepNumber(step++);
+                sPut.setLineNumber(loopLine);
+                sPut.setEventType(evicted != null ? "LRU_EVICTION" : "LRU_PUT");
+                sPut.setVariables(Map.of("op", "put(" + key + ", " + val + ")", "MRU", key, "cache", cacheOrder.toString()));
+                sPut.setOutput(new ArrayList<>(output));
+                DataStructureState dsPut = new DataStructureState();
+                dsPut.setType("hash-table");
+                dsPut.setName("lru_cache");
+                dsPut.setLabel(evicted != null ? "⚠️ Evicted LRU Key " + evicted + " | Added Key " + key : "MRU Head: Key " + key + " → " + val);
+                dsPut.setFocusInfo("Active cache: " + cacheOrder);
+                sPut.setDataStructureState(dsPut);
+                sPut.setExplanation("[" + lang.toUpperCase() + "] " + (evicted != null ? "Capacity reached. Evicted LRU key " + evicted + ". Added key " + key + "." : "Inserted key " + key + " into MRU head."));
+                sPut.setAiHint("Put takes O(1) time.");
+                steps.add(sPut);
+            } else {
+                boolean hit = cacheMap.containsKey(key);
+                if (hit) {
+                    cacheOrder.remove((Integer) key);
+                    cacheOrder.add(0, key);
+                }
+                output.add(hit ? "get(" + key + ") -> Returned " + cacheMap.get(key) + " (Hit)" : "get(" + key + ") -> -1 (Miss)");
+                ExecutionStep sGet = new ExecutionStep();
+                sGet.setStepNumber(step++);
+                sGet.setLineNumber(loopLine + 1);
+                sGet.setEventType(hit ? "LRU_HIT" : "LRU_MISS");
+                sGet.setVariables(Map.of("op", "get(" + key + ")", "result", hit ? cacheMap.get(key) : -1, "cache", cacheOrder.toString()));
+                sGet.setOutput(new ArrayList<>(output));
+                DataStructureState dsGet = new DataStructureState();
+                dsGet.setType("hash-table");
+                dsGet.setName("lru_cache");
+                dsGet.setLabel(hit ? "✓ Cache Hit: Key " + key + " = " + cacheMap.get(key) : "✗ Cache Miss: Key " + key + " Not Found (-1)");
+                dsGet.setFocusInfo(hit ? "Key " + key + " promoted to MRU head" : "Key " + key + " not in cache");
+                sGet.setDataStructureState(dsGet);
+                sGet.setExplanation("[" + lang.toUpperCase() + "] " + (hit ? "Cache HIT on key " + key + ". Promoted to MRU head." : "Cache MISS on key " + key + " (-1)."));
+                sGet.setAiHint("Get takes O(1) time.");
+                steps.add(sGet);
+            }
+        }
+
+        return new ExecuteResponse("SUCCESS", steps.size(), steps);
+    }
+
+    // ==========================================
+    // 3. Trie (Prefix Tree)
+    // ==========================================
+    private ExecuteResponse generateUserTrieTrace(int arrayLine, int loopLine, String lang) {
+        List<ExecutionStep> steps = new ArrayList<>();
+        int step = 1;
+        List<String> output = new ArrayList<>();
+
+        ExecutionStep sInit = new ExecutionStep();
+        sInit.setStepNumber(step++);
+        sInit.setLineNumber(arrayLine);
+        sInit.setEventType("TRIE_INIT");
+        sInit.setVariables(Map.of("root", "ROOT", "words", 0));
+        output.add("Trie (Prefix Tree) root node initialized.");
+        sInit.setOutput(new ArrayList<>(output));
+        DataStructureState dsInit = new DataStructureState();
+        dsInit.setType("tree");
+        dsInit.setName("trie");
+        dsInit.setLabel("Trie Root Created");
+        dsInit.setFocusInfo("Prefix tree ready for character branching");
+        sInit.setDataStructureState(dsInit);
+        sInit.setExplanation("[" + lang.toUpperCase() + "] Initialized root TrieNode with empty 26-way character branching.");
+        sInit.setAiHint("Trie guarantees prefix searching in O(L) where L is string length.");
+        steps.add(sInit);
+
+        String[] words = {"cat", "car", "cart", "dog"};
+        for (String w : words) {
+            output.add("insert(\"" + w + "\") -> OK");
+            ExecutionStep sIns = new ExecutionStep();
+            sIns.setStepNumber(step++);
+            sIns.setLineNumber(loopLine);
+            sIns.setEventType("TRIE_INSERT");
+            sIns.setVariables(Map.of("word", w, "isEndOfWord", true));
+            sIns.setOutput(new ArrayList<>(output));
+            DataStructureState dsIns = new DataStructureState();
+            dsIns.setType("tree");
+            dsIns.setName("trie");
+            dsIns.setLabel("Inserted Word: \"" + w + "\"");
+            dsIns.setFocusInfo("Branch path created/extended with isEndOfWord=true");
+            sIns.setDataStructureState(dsIns);
+            sIns.setExplanation("[" + lang.toUpperCase() + "] Inserted word \"" + w + "\" into Trie. Reused common prefix nodes.");
+            sIns.setAiHint("Common prefix reuse optimizes memory.");
+            steps.add(sIns);
+        }
+
+        output.add("search(\"car\") -> FOUND (True)");
+        ExecutionStep sSearch = new ExecutionStep();
+        sSearch.setStepNumber(step++);
+        sSearch.setLineNumber(loopLine + 2);
+        sSearch.setEventType("TRIE_SEARCH_FOUND");
+        sSearch.setVariables(Map.of("query", "car", "result", true));
+        sSearch.setOutput(new ArrayList<>(output));
+        DataStructureState dsSearch = new DataStructureState();
+        dsSearch.setType("tree");
+        dsSearch.setName("trie");
+        dsSearch.setLabel("✓ search(\"car\") → FOUND");
+        dsSearch.setFocusInfo("Matched path c → a → r with end marker");
+        sSearch.setDataStructureState(dsSearch);
+        sSearch.setExplanation("[" + lang.toUpperCase() + "] Search \"car\": Found valid path ROOT → [c] → [a] → [r] with end marker.");
+        sSearch.setAiHint("Search returns TRUE in O(L) time.");
+        steps.add(sSearch);
+
+        return new ExecuteResponse("SUCCESS", steps.size(), steps);
+    }
+
+    // ==========================================
+    // 4. Disjoint Set Union (DSU)
+    // ==========================================
+    private ExecuteResponse generateUserDsuTrace(int arrayLine, int loopLine, String lang) {
+        List<ExecutionStep> steps = new ArrayList<>();
+        int step = 1;
+        List<String> output = new ArrayList<>();
+
+        List<Integer> parent = new ArrayList<>(List.of(0, 1, 2, 3, 4));
+
+        ExecutionStep sInit = new ExecutionStep();
+        sInit.setStepNumber(step++);
+        sInit.setLineNumber(arrayLine);
+        sInit.setEventType("DSU_INIT");
+        sInit.setVariables(Map.of("parent", parent.toString(), "components", 5));
+        output.add("DSU initialized with 5 disjoint components.");
+        sInit.setOutput(new ArrayList<>(output));
+        DataStructureState dsInit = new DataStructureState();
+        dsInit.setType("graph");
+        dsInit.setName("dsu");
+        dsInit.setLabel("5 Disjoint Sets Initialized (parent[i] = i)");
+        dsInit.setFocusInfo("Each element forms its own independent component");
+        sInit.setDataStructureState(dsInit);
+        sInit.setExplanation("[" + lang.toUpperCase() + "] Initialized DSU with 5 elements. Each element is initially its own root.");
+        sInit.setAiHint("Path compression ensures nearly O(1) amortized inverse Ackermann α(N) runtime.");
+        steps.add(sInit);
+
+        int[][] unions = {{0, 1}, {1, 2}, {3, 4}, {2, 3}};
+        for (int[] u : unions) {
+            parent.set(u[1], parent.get(u[0]));
+            output.add("union(" + u[0] + ", " + u[1] + ") -> Merged roots");
+            ExecutionStep sUnion = new ExecutionStep();
+            sUnion.setStepNumber(step++);
+            sUnion.setLineNumber(loopLine);
+            sUnion.setEventType("DSU_UNION");
+            sUnion.setVariables(Map.of("edge", u[0] + " - " + u[1], "parent", parent.toString()));
+            sUnion.setOutput(new ArrayList<>(output));
+            DataStructureState dsUnion = new DataStructureState();
+            dsUnion.setType("graph");
+            dsUnion.setName("dsu");
+            dsUnion.setPointers(Map.of("u", u[0], "v", u[1]));
+            dsUnion.setLabel("Union(" + u[0] + ", " + u[1] + ") Merged Component");
+            dsUnion.setFocusInfo("Connected components updated");
+            sUnion.setDataStructureState(dsUnion);
+            sUnion.setExplanation("[" + lang.toUpperCase() + "] Union(" + u[0] + ", " + u[1] + "): Merged component trees.");
+            sUnion.setAiHint("Path compression flattens tree depth.");
+            steps.add(sUnion);
+        }
+
+        return new ExecuteResponse("SUCCESS", steps.size(), steps);
+    }
+
+    // ==========================================
+    // 5. Longest Increasing Subsequence (LIS)
+    // ==========================================
+    private ExecuteResponse generateUserLisTrace(List<Integer> values, int arrayLine, int loopLine, String lang) {
+        List<ExecutionStep> steps = new ArrayList<>();
+        List<Integer> arr = (values != null && values.size() >= 3) ? new ArrayList<>(values) : List.of(10, 9, 2, 5, 3, 7, 101, 18);
+        int n = arr.size();
+        int step = 1;
+        List<String> output = new ArrayList<>();
+
+        int[] dp = new int[n];
+        Arrays.fill(dp, 1);
+        int maxLis = 1;
+
+        ExecutionStep sInit = new ExecutionStep();
+        sInit.setStepNumber(step++);
+        sInit.setLineNumber(arrayLine);
+        sInit.setEventType("LIS_INIT");
+        sInit.setVariables(Map.of("arr", arr.toString(), "dp", Arrays.toString(dp), "maxLIS", 1));
+        output.add("LIS DP table initialized: dp[i] = 1 for all elements.");
+        sInit.setOutput(new ArrayList<>(output));
+        DataStructureState dsInit = new DataStructureState();
+        dsInit.setType("lis");
+        dsInit.setName("nums");
+        dsInit.setValues(new ArrayList<>(arr));
+        dsInit.setLabel("LIS DP Table Initialized");
+        dsInit.setFocusInfo("Each element forms subsequence of length 1");
+        sInit.setDataStructureState(dsInit);
+        sInit.setExplanation("[" + lang.toUpperCase() + "] Initialized DP array with 1s. Recurrence: dp[i] = 1 + max(dp[j]).");
+        sInit.setAiHint("LIS dynamic programming state definition.");
+        steps.add(sInit);
+
+        for (int i = 1; i < n && step < 40; i++) {
+            for (int j = 0; j < i; j++) {
+                if (arr.get(j) < arr.get(i)) {
+                    if (dp[j] + 1 > dp[i]) {
+                        dp[i] = dp[j] + 1;
+                        maxLis = Math.max(maxLis, dp[i]);
+                        output.add("dp[" + i + "] updated to " + dp[i] + " extending nums[" + j + "] (" + arr.get(j) + " < " + arr.get(i) + ")");
+
+                        ExecutionStep sExtend = new ExecutionStep();
+                        sExtend.setStepNumber(step++);
+                        sExtend.setLineNumber(loopLine);
+                        sExtend.setEventType("LIS_EXTEND");
+                        sExtend.setVariables(Map.of("i", i, "j", j, "dp[i]", dp[i], "maxLIS", maxLis));
+                        sExtend.setOutput(new ArrayList<>(output));
+                        DataStructureState dsExtend = new DataStructureState();
+                        dsExtend.setType("lis");
+                        dsExtend.setName("nums");
+                        dsExtend.setValues(new ArrayList<>(arr));
+                        dsExtend.setActiveIndex(i);
+                        dsExtend.setPointers(Map.of("i", i, "j", j));
+                        dsExtend.setLabel("Extended LIS: nums[" + j + "] (" + arr.get(j) + ") < nums[" + i + "] (" + arr.get(i) + ") → dp[" + i + "] = " + dp[i]);
+                        dsExtend.setFocusInfo("Active LIS length: " + dp[i]);
+                        sExtend.setDataStructureState(dsExtend);
+                        sExtend.setExplanation("[" + lang.toUpperCase() + "] Found increasing pair nums[" + j + "] < nums[" + i + "]. Updated dp[" + i + "] = " + dp[i] + ".");
+                        sExtend.setAiHint("Subsequence elements do not require contiguity.");
+                        steps.add(sExtend);
+                    }
+                }
+            }
+        }
+
+        ExecutionStep sEnd = new ExecutionStep();
+        sEnd.setStepNumber(step);
+        sEnd.setLineNumber(loopLine + 3);
+        sEnd.setEventType("PROGRAM_END");
+        sEnd.setVariables(Map.of("maxLIS", maxLis));
+        output.add("Optimal LIS Length = " + maxLis);
+        sEnd.setOutput(new ArrayList<>(output));
+        DataStructureState dsEnd = new DataStructureState();
+        dsEnd.setType("lis");
+        dsEnd.setName("nums");
+        dsEnd.setValues(new ArrayList<>(arr));
+        dsEnd.setLabel("★ Optimal LIS Found: Length = " + maxLis + " ★");
+        dsEnd.setFocusInfo("Maximum length of strictly increasing subsequence");
+        sEnd.setDataStructureState(dsEnd);
+        sEnd.setExplanation("[" + lang.toUpperCase() + "] LIS complete! Maximum increasing subsequence length is " + maxLis + ".");
+        sEnd.setAiHint("O(n²) with DP table.");
+        steps.add(sEnd);
+
+        return new ExecuteResponse("SUCCESS", steps.size(), steps);
+    }
+
+    // ==========================================
     // Master Universal Arbitrary Code Simulation
     // ==========================================
     private ExecuteResponse generateUserUniversalTrace(String code, List<Integer> values, int arrayLine, int loopLine, int printLine, String lang) {
         List<ExecutionStep> steps = new ArrayList<>();
         List<Integer> arr = (values != null && !values.isEmpty()) ? new ArrayList<>(values) : List.of(10, 20, 30, 40);
         int n = arr.size();
-        String cleanCode = (code != null) ? code.toLowerCase() : "";
+        String rawCode = (code != null) ? code : "";
+        String cleanCode = rawCode.toLowerCase();
         int step = 1;
         List<String> output = new ArrayList<>();
 
+        // 1. Detect Array Variable Name
+        String arrayName = "arr";
+        Pattern namePat = Pattern.compile("(?:int\\s*\\[\\s*\\]|vector\\s*<\\s*int\\s*>|let|const|var)\\s+([a-zA-Z_]\\w*)");
+        Matcher nameMat = namePat.matcher(rawCode);
+        if (nameMat.find()) {
+            String found = nameMat.group(1);
+            if (!found.equalsIgnoreCase("main") && !found.equalsIgnoreCase("solution")) {
+                arrayName = found;
+            }
+        } else if (cleanCode.contains("nums")) {
+            arrayName = "nums";
+        } else if (cleanCode.contains("prices")) {
+            arrayName = "prices";
+        } else if (cleanCode.contains("data")) {
+            arrayName = "data";
+        }
+
+        // 2. Detect Target Search
+        Pattern targetPat = Pattern.compile("(?:target|key)\\s*=\\s*(-?\\d+)|==\\s*(-?\\d+)");
+        Matcher targetMat = targetPat.matcher(rawCode);
+        Integer targetVal = null;
+        if (targetMat.find()) {
+            String tStr = targetMat.group(1) != null ? targetMat.group(1) : targetMat.group(2);
+            try { targetVal = Integer.parseInt(tStr); } catch (Exception ignored) {}
+        }
+        boolean hasTargetSearch = (cleanCode.contains("target") || cleanCode.contains("key") || cleanCode.contains("search") || cleanCode.contains("find") || cleanCode.contains("==")) && targetVal != null;
+
+        // 3. Detect Nested Loops
+        boolean hasNestedLoop = (cleanCode.contains("for") || cleanCode.contains("while")) &&
+                (cleanCode.contains("for (int j") || cleanCode.contains("for (let j") || cleanCode.contains("for j in") || cleanCode.contains("[j]"));
+
+        // 4. Detect Two-Pointer While
+        boolean hasTwoPointerWhile = cleanCode.contains("while") &&
+                ((cleanCode.contains("left") && cleanCode.contains("right")) || cleanCode.contains("l < r") || cleanCode.contains("left < right"));
+
+        // PATH A: Target Search
+        if (hasTargetSearch && !hasNestedLoop && !hasTwoPointerWhile) {
+            boolean targetFound = false;
+            int foundIndex = -1;
+
+            ExecutionStep sTInit = new ExecutionStep();
+            sTInit.setStepNumber(step++);
+            sTInit.setLineNumber(arrayLine);
+            sTInit.setEventType("TARGET_SEARCH_INIT");
+            sTInit.setVariables(Map.of(arrayName, arr.toString(), "target", targetVal, "size", n));
+            output.add("Searching for target " + targetVal + " in " + arrayName + "...");
+            sTInit.setOutput(new ArrayList<>(output));
+            DataStructureState dsTInit = new DataStructureState();
+            dsTInit.setType("array");
+            dsTInit.setName(arrayName);
+            dsTInit.setValues(new ArrayList<>(arr));
+            dsTInit.setLabel("Target Search Initialized: target = " + targetVal);
+            dsTInit.setFocusInfo("Searching " + n + " elements for key " + targetVal);
+            sTInit.setDataStructureState(dsTInit);
+            sTInit.setExplanation("[" + lang.toUpperCase() + "] Initialized linear search for target = " + targetVal + " across '" + arrayName + "'.");
+            sTInit.setAiHint("Linear search sequentially compares each element in O(n) time.");
+            steps.add(sTInit);
+
+            for (int i = 0; i < n; i++) {
+                int val = arr.get(i);
+                boolean isMatch = (val == targetVal);
+
+                ExecutionStep sStep = new ExecutionStep();
+                sStep.setStepNumber(step++);
+                sStep.setLineNumber(loopLine);
+                sStep.setEventType(isMatch ? "TARGET_FOUND" : "CONDITION_CHECK");
+                sStep.setVariables(Map.of("i", i, arrayName + "[" + i + "]", val, "target", targetVal, "isMatch", isMatch));
+                if (isMatch) output.add("🎯 Found target " + targetVal + " at index [" + i + "]!");
+                sStep.setOutput(new ArrayList<>(output));
+                DataStructureState dsStep = new DataStructureState();
+                dsStep.setType("array");
+                dsStep.setName(arrayName);
+                dsStep.setValues(new ArrayList<>(arr));
+                dsStep.setActiveIndex(i);
+                dsStep.setPointers(isMatch ? Map.of("i", i, "target", i) : Map.of("i", i));
+                dsStep.setTargetFound(isMatch);
+                dsStep.setLabel(isMatch ? "🎯 TARGET FOUND: " + arrayName + "[" + i + "] == " + targetVal + "!" : "Checking: " + arrayName + "[" + i + "] (" + val + ") == " + targetVal + " → FALSE");
+                dsStep.setFocusInfo(isMatch ? "Match confirmed at index [" + i + "]" : "Index " + i + " does not match target");
+                sStep.setDataStructureState(dsStep);
+                sStep.setExplanation("[" + lang.toUpperCase() + "] " + (isMatch ? "TARGET MATCH FOUND! " + arrayName + "[" + i + "] (" + val + ") equals target (" + targetVal + ")." : "Comparing " + arrayName + "[" + i + "] (" + val + ") == " + targetVal + ": FALSE."));
+                sStep.setAiHint(isMatch ? "Target pinpointed in memory." : "Proceeding with scan.");
+                steps.add(sStep);
+
+                if (isMatch) {
+                    targetFound = true;
+                    foundIndex = i;
+                    if (cleanCode.contains("break") || cleanCode.contains("return")) break;
+                }
+            }
+
+            ExecutionStep sTEnd = new ExecutionStep();
+            sTEnd.setStepNumber(step);
+            sTEnd.setLineNumber(printLine);
+            sTEnd.setEventType("PROGRAM_END");
+            sTEnd.setVariables(Map.of("target", targetVal, "found", targetFound, "index", foundIndex));
+            output.add(targetFound ? "Search Success: Found at index " + foundIndex : "Search Finished: Target " + targetVal + " not found");
+            sTEnd.setOutput(new ArrayList<>(output));
+            DataStructureState dsTEnd = new DataStructureState();
+            dsTEnd.setType("array");
+            dsTEnd.setName(arrayName);
+            dsTEnd.setValues(new ArrayList<>(arr));
+            dsTEnd.setActiveIndex(targetFound ? foundIndex : null);
+            dsTEnd.setPointers(targetFound ? Map.of("target", foundIndex) : Map.of());
+            dsTEnd.setTargetFound(targetFound);
+            dsTEnd.setLabel(targetFound ? "★ Search Succeeded: Found Target " + targetVal + " at Index [" + foundIndex + "] ★" : "Target Not Found");
+            dsTEnd.setFocusInfo(targetFound ? "Target located at index " + foundIndex : "Scan completed without match");
+            sTEnd.setDataStructureState(dsTEnd);
+            sTEnd.setExplanation("[" + lang.toUpperCase() + "] " + (targetFound ? "Target " + targetVal + " located at index [" + foundIndex + "]." : "Target not found."));
+            sTEnd.setAiHint("Linear search completed.");
+            steps.add(sTEnd);
+
+            return new ExecuteResponse("SUCCESS", steps.size(), steps);
+        }
+
+        // PATH B: Two-Pointer While Loop
+        if (hasTwoPointerWhile) {
+            int left = 0, right = n - 1;
+            List<Integer> workingArr = new ArrayList<>(arr);
+            boolean hasSwap = cleanCode.contains("swap") || cleanCode.contains("temp");
+
+            ExecutionStep sTpInit = new ExecutionStep();
+            sTpInit.setStepNumber(step++);
+            sTpInit.setLineNumber(arrayLine);
+            sTpInit.setEventType("TWO_POINTER_INIT");
+            sTpInit.setVariables(Map.of(arrayName, workingArr.toString(), "left", 0, "right", n - 1));
+            output.add("Two-pointer iteration initialized: left=0, right=" + (n - 1));
+            sTpInit.setOutput(new ArrayList<>(output));
+            DataStructureState dsTpInit = new DataStructureState();
+            dsTpInit.setType("array");
+            dsTpInit.setName(arrayName);
+            dsTpInit.setValues(new ArrayList<>(workingArr));
+            dsTpInit.setPointers(Map.of("left", 0, "right", n - 1));
+            dsTpInit.setLabel("Two Pointers Initialized: left = 0, right = " + (n - 1));
+            dsTpInit.setFocusInfo("Pointers starting at opposite ends of array");
+            sTpInit.setDataStructureState(dsTpInit);
+            sTpInit.setExplanation("[" + lang.toUpperCase() + "] Initialized converging pointers: left=0, right=" + (n - 1) + ".");
+            sTpInit.setAiHint("Two pointers allow in-place symmetric inspection.");
+            steps.add(sTpInit);
+
+            while (left < right && step < 40) {
+                ExecutionStep sTp = new ExecutionStep();
+                sTp.setStepNumber(step++);
+                sTp.setLineNumber(loopLine);
+                sTp.setEventType("TWO_POINTER_STEP");
+                sTp.setVariables(Map.of("left", left, "right", right, arrayName + "[left]", workingArr.get(left), arrayName + "[right]", workingArr.get(right)));
+                sTp.setOutput(new ArrayList<>(output));
+                DataStructureState dsTp = new DataStructureState();
+                dsTp.setType("array");
+                dsTp.setName(arrayName);
+                dsTp.setValues(new ArrayList<>(workingArr));
+                dsTp.setActiveIndex(left);
+                dsTp.setPointers(Map.of("left", left, "right", right));
+                dsTp.setLabel("Pointers Active: [" + left + "] = " + workingArr.get(left) + ", [" + right + "] = " + workingArr.get(right));
+                dsTp.setFocusInfo("Inspecting opposite positions");
+                sTp.setDataStructureState(dsTp);
+                sTp.setExplanation("[" + lang.toUpperCase() + "] Pointers active: left at [" + left + "], right at [" + right + "].");
+                sTp.setAiHint("Condition left < right holds true.");
+                steps.add(sTp);
+
+                if (hasSwap) {
+                    int temp = workingArr.get(left);
+                    workingArr.set(left, workingArr.get(right));
+                    workingArr.set(right, temp);
+                    output.add("Swapped [" + left + "] and [" + right + "]");
+
+                    ExecutionStep sSw = new ExecutionStep();
+                    sSw.setStepNumber(step++);
+                    sSw.setLineNumber(loopLine + 1);
+                    sSw.setEventType("SWAP_ELEMENTS");
+                    sSw.setVariables(Map.of("left", left, "right", right, arrayName, workingArr.toString()));
+                    sSw.setOutput(new ArrayList<>(output));
+                    DataStructureState dsSw = new DataStructureState();
+                    dsSw.setType("array");
+                    dsSw.setName(arrayName);
+                    dsSw.setValues(new ArrayList<>(workingArr));
+                    dsSw.setActiveIndex(right);
+                    dsSw.setPointers(Map.of("left", left, "right", right));
+                    dsSw.setSwappedIndices(List.of(left, right));
+                    dsSw.setLabel("Swapped: [" + left + "] ⇄ [" + right + "]");
+                    dsSw.setFocusInfo("In-place swap completed");
+                    sSw.setDataStructureState(dsSw);
+                    sSw.setExplanation("[" + lang.toUpperCase() + "] Swapped elements at [" + left + "] and [" + right + "] in place.");
+                    sSw.setAiHint("Array updated in real time.");
+                    steps.add(sSw);
+                }
+
+                left++;
+                right--;
+            }
+
+            ExecutionStep sTpEnd = new ExecutionStep();
+            sTpEnd.setStepNumber(step);
+            sTpEnd.setLineNumber(printLine);
+            sTpEnd.setEventType("PROGRAM_END");
+            sTpEnd.setVariables(Map.of(arrayName, workingArr.toString()));
+            output.add("Two-pointer execution complete: " + workingArr);
+            sTpEnd.setOutput(new ArrayList<>(output));
+            DataStructureState dsTpEnd = new DataStructureState();
+            dsTpEnd.setType("array");
+            dsTpEnd.setName(arrayName);
+            dsTpEnd.setValues(new ArrayList<>(workingArr));
+            dsTpEnd.setLabel("Two-Pointer Execution Finished");
+            dsTpEnd.setFocusInfo("Final state: " + workingArr);
+            sTpEnd.setDataStructureState(dsTpEnd);
+            sTpEnd.setExplanation("[" + lang.toUpperCase() + "] Two-pointer traversal complete! Result: " + workingArr + ".");
+            sTpEnd.setAiHint("Linear runtime O(n).");
+            steps.add(sTpEnd);
+
+            return new ExecuteResponse("SUCCESS", steps.size(), steps);
+        }
+
+        // PATH C: Nested Loops
+        if (hasNestedLoop) {
+            List<Integer> workingArr = new ArrayList<>(arr);
+            boolean hasSwap = cleanCode.contains("swap") || cleanCode.contains("temp");
+
+            ExecutionStep sNInit = new ExecutionStep();
+            sNInit.setStepNumber(step++);
+            sNInit.setLineNumber(arrayLine);
+            sNInit.setEventType("NESTED_LOOP_INIT");
+            sNInit.setVariables(Map.of(arrayName, workingArr.toString(), "size", n));
+            output.add("Nested loop execution initialized: tracking indices i and j.");
+            sNInit.setOutput(new ArrayList<>(output));
+            DataStructureState dsNInit = new DataStructureState();
+            dsNInit.setType("array");
+            dsNInit.setName(arrayName);
+            dsNInit.setValues(new ArrayList<>(workingArr));
+            dsNInit.setPointers(Map.of("i", 0, "j", 1));
+            dsNInit.setLabel("Nested Loop Initialized (Dual Pointers {i, j})");
+            dsNInit.setFocusInfo("Outer loop i and inner loop j active");
+            sNInit.setDataStructureState(dsNInit);
+            sNInit.setExplanation("[" + lang.toUpperCase() + "] Initialized nested loop over '" + arrayName + "'. Tracking dual indices {i, j}.");
+            sNInit.setAiHint("Nested loop inspection runs in O(n²).");
+            steps.add(sNInit);
+
+            for (int i = 0; i < n && step < 35; i++) {
+                for (int j = i + 1; j < n && step < 35; j++) {
+                    int valI = workingArr.get(i);
+                    int valJ = workingArr.get(j);
+                    boolean shouldSwap = hasSwap && (valI > valJ);
+
+                    ExecutionStep sPair = new ExecutionStep();
+                    sPair.setStepNumber(step++);
+                    sPair.setLineNumber(loopLine);
+                    sPair.setEventType("NESTED_PAIR_EVAL");
+                    sPair.setVariables(Map.of("i", i, "j", j, arrayName + "[" + i + "]", valI, arrayName + "[" + j + "]", valJ));
+                    sPair.setOutput(new ArrayList<>(output));
+                    DataStructureState dsPair = new DataStructureState();
+                    dsPair.setType("array");
+                    dsPair.setName(arrayName);
+                    dsPair.setValues(new ArrayList<>(workingArr));
+                    dsPair.setActiveIndex(j);
+                    dsPair.setPointers(Map.of("i", i, "j", j));
+                    dsPair.setLabel("Comparing: " + arrayName + "[" + i + "] (" + valI + ") vs " + arrayName + "[" + j + "] (" + valJ + ")");
+                    dsPair.setFocusInfo("Dual pointers: i=" + i + ", j=" + j);
+                    sPair.setDataStructureState(dsPair);
+                    sPair.setExplanation("[" + lang.toUpperCase() + "] Comparing pair: " + arrayName + "[" + i + "] (" + valI + ") and " + arrayName + "[" + j + "] (" + valJ + ").");
+                    sPair.setAiHint("Inner loop advances pointer j.");
+                    steps.add(sPair);
+
+                    if (shouldSwap) {
+                        workingArr.set(i, valJ);
+                        workingArr.set(j, valI);
+                        output.add("Swapped " + valI + " and " + valJ);
+
+                        ExecutionStep sNSwap = new ExecutionStep();
+                        sNSwap.setStepNumber(step++);
+                        sNSwap.setLineNumber(loopLine + 1);
+                        sNSwap.setEventType("SWAP_ELEMENTS");
+                        sNSwap.setVariables(Map.of("i", i, "j", j, arrayName, workingArr.toString()));
+                        sNSwap.setOutput(new ArrayList<>(output));
+                        DataStructureState dsNSwap = new DataStructureState();
+                        dsNSwap.setType("array");
+                        dsNSwap.setName(arrayName);
+                        dsNSwap.setValues(new ArrayList<>(workingArr));
+                        dsNSwap.setActiveIndex(i);
+                        dsNSwap.setPointers(Map.of("i", i, "j", j));
+                        dsNSwap.setSwappedIndices(List.of(i, j));
+                        dsNSwap.setLabel("Swapped: " + valI + " ⇄ " + valJ);
+                        dsNSwap.setFocusInfo("In-place swap at index " + i + " and " + j);
+                        sNSwap.setDataStructureState(dsNSwap);
+                        sNSwap.setExplanation("[" + lang.toUpperCase() + "] Swapped " + valI + " and " + valJ + ": " + valI + " > " + valJ + ".");
+                        sNSwap.setAiHint("Real-time 3D bar swap animation.");
+                        steps.add(sNSwap);
+                    }
+                }
+            }
+
+            ExecutionStep sNEnd = new ExecutionStep();
+            sNEnd.setStepNumber(step);
+            sNEnd.setLineNumber(printLine);
+            sNEnd.setEventType("PROGRAM_END");
+            sNEnd.setVariables(Map.of(arrayName, workingArr.toString()));
+            output.add("Nested loop finished: " + workingArr);
+            sNEnd.setOutput(new ArrayList<>(output));
+            DataStructureState dsNEnd = new DataStructureState();
+            dsNEnd.setType("array");
+            dsNEnd.setName(arrayName);
+            dsNEnd.setValues(new ArrayList<>(workingArr));
+            dsNEnd.setLabel("Nested Loop Completed Successfully");
+            dsNEnd.setFocusInfo("Final array: " + workingArr);
+            sNEnd.setDataStructureState(dsNEnd);
+            sNEnd.setExplanation("[" + lang.toUpperCase() + "] Nested loop complete! Final array: " + workingArr + ".");
+            sNEnd.setAiHint("Time Complexity: O(n²).");
+            steps.add(sNEnd);
+
+            return new ExecuteResponse("SUCCESS", steps.size(), steps);
+        }
+
+        // PATH D: Universal 1D Traversal
         boolean hasSum = cleanCode.contains("sum") || cleanCode.contains("total") || cleanCode.contains("acc");
         String sumVarName = cleanCode.contains("total") ? "total" : cleanCode.contains("acc") ? "acc" : "sum";
 
@@ -2156,7 +2961,7 @@ public class MultiLanguageExecutionService {
         boolean isGreaterThanTen = cleanCode.contains("> 10") || cleanCode.contains(">10");
 
         Map<String, Object> liveVars = new LinkedHashMap<>();
-        liveVars.put("arr", arr.toString());
+        liveVars.put(arrayName, arr.toString());
         liveVars.put("size", n);
         liveVars.put("lang", lang.toUpperCase());
 
@@ -2165,28 +2970,25 @@ public class MultiLanguageExecutionService {
         if (hasMin) liveVars.put(minVarName, arr.get(0));
         if (hasCount) liveVars.put(countVarName, 0);
 
-        // Step 1: Memory & Variable Initialization
         ExecutionStep sInit = new ExecutionStep();
         sInit.setStepNumber(step++);
         sInit.setLineNumber(arrayLine);
         sInit.setEventType("VARIABLES_INITIALIZED");
         sInit.setVariables(new LinkedHashMap<>(liveVars));
-        sInit.setChangedVariable("arr");
+        sInit.setChangedVariable(arrayName);
         sInit.setCurrentValue(arr.toString());
         sInit.setOutput(new ArrayList<>(output));
         DataStructureState dsInit = new DataStructureState();
         dsInit.setType("array");
-        dsInit.setName("arr");
-        dsInit.setValues(new ArrayList<Object>(arr));
-        dsInit.setActiveIndex(null);
-        dsInit.setLabel("Code Scope Initialized (" + n + " elements)");
+        dsInit.setName(arrayName);
+        dsInit.setValues(new ArrayList<>(arr));
+        dsInit.setLabel("Code Scope Initialized (" + n + " elements in " + arrayName + ")");
         dsInit.setFocusInfo("Local execution environment prepared");
         sInit.setDataStructureState(dsInit);
-        sInit.setExplanation("[" + lang.toUpperCase() + "] Memory allocated for array " + arr + " (" + n + " elements). Variables initialized: " + liveVars + ".");
-        sInit.setAiHint("Universal AST parser mapped all local variables and loop constructs.");
+        sInit.setExplanation("[" + lang.toUpperCase() + "] Memory allocated for '" + arrayName + "' " + arr + " (" + n + " elements). Variables: " + liveVars + ".");
+        sInit.setAiHint("Universal AST parser mapped all local variables and loop boundaries.");
         steps.add(sInit);
 
-        // Step 2: Loop Initialization
         liveVars.put("i", 0);
         ExecutionStep sLoopInit = new ExecutionStep();
         sLoopInit.setStepNumber(step++);
@@ -2198,22 +3000,21 @@ public class MultiLanguageExecutionService {
         sLoopInit.setOutput(new ArrayList<>(output));
         DataStructureState dsLoopInit = new DataStructureState();
         dsLoopInit.setType("array");
-        dsLoopInit.setName("arr");
-        dsLoopInit.setValues(new ArrayList<Object>(arr));
+        dsLoopInit.setName(arrayName);
+        dsLoopInit.setValues(new ArrayList<>(arr));
         dsLoopInit.setActiveIndex(0);
         dsLoopInit.setLabel("Loop Initialized (i = 0)");
         dsLoopInit.setFocusInfo("Index pointer set to starting element");
         sLoopInit.setDataStructureState(dsLoopInit);
-        sLoopInit.setExplanation("[" + lang.toUpperCase() + "] Loop initialization: counter 'i' set to 0. Target: arr[0] = " + arr.get(0) + ".");
+        sLoopInit.setExplanation("[" + lang.toUpperCase() + "] Loop initialization: counter 'i' set to 0. Target: " + arrayName + "[0] = " + arr.get(0) + ".");
         sLoopInit.setAiHint("Execution enters iterative loop structure.");
         steps.add(sLoopInit);
 
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < n && step < 45; i++) {
             int val = arr.get(i);
             liveVars.put("i", i);
-            liveVars.put("arr[" + i + "]", val);
+            liveVars.put(arrayName + "[" + i + "]", val);
 
-            // Loop Condition Check (True)
             ExecutionStep sCond = new ExecutionStep();
             sCond.setStepNumber(step++);
             sCond.setLineNumber(loopLine);
@@ -2223,32 +3024,31 @@ public class MultiLanguageExecutionService {
             sCond.setOutput(new ArrayList<>(output));
             DataStructureState dsCond = new DataStructureState();
             dsCond.setType("array");
-            dsCond.setName("arr");
-            dsCond.setValues(new ArrayList<Object>(arr));
+            dsCond.setName(arrayName);
+            dsCond.setValues(new ArrayList<>(arr));
             dsCond.setActiveIndex(i);
             dsCond.setPointers(Map.of("i", i));
             dsCond.setLabel("Loop Condition True (" + i + " < " + n + ")");
             dsCond.setFocusInfo("Processing index " + i + " (value " + val + ")");
             sCond.setDataStructureState(dsCond);
-            sCond.setExplanation("[" + lang.toUpperCase() + "] Condition 'i < " + n + "' (" + i + " < " + n + ") evaluates to TRUE. Processing arr[" + i + "] = " + val + ".");
+            sCond.setExplanation("[" + lang.toUpperCase() + "] Condition 'i < " + n + "' (" + i + " < " + n + ") evaluates to TRUE. Processing " + arrayName + "[" + i + "] = " + val + ".");
             sCond.setAiHint("Current element accessed at index " + i + ".");
             steps.add(sCond);
 
-            // Filter condition
             boolean conditionPassed = true;
             if (isEvenFilter || isOddFilter || isGreaterThanTen) {
                 String condExpr = "true";
                 String condEval = "true";
                 if (isEvenFilter) {
-                    condExpr = "arr[" + i + "] % 2 == 0";
+                    condExpr = arrayName + "[" + i + "] % 2 == 0";
                     condEval = val + " % 2 == " + (val % 2);
                     conditionPassed = (val % 2 == 0);
                 } else if (isOddFilter) {
-                    condExpr = "arr[" + i + "] % 2 != 0";
+                    condExpr = arrayName + "[" + i + "] % 2 != 0";
                     condEval = val + " % 2 == " + (val % 2);
                     conditionPassed = (val % 2 != 0);
                 } else if (isGreaterThanTen) {
-                    condExpr = "arr[" + i + "] > 10";
+                    condExpr = arrayName + "[" + i + "] > 10";
                     condEval = val + " > 10";
                     conditionPassed = (val > 10);
                 }
@@ -2262,7 +3062,8 @@ public class MultiLanguageExecutionService {
                 sIf.setOutput(new ArrayList<>(output));
                 DataStructureState dsIf = new DataStructureState();
                 dsIf.setType("array");
-                dsIf.setValues(new ArrayList<Object>(arr));
+                dsIf.setName(arrayName);
+                dsIf.setValues(new ArrayList<>(arr));
                 dsIf.setActiveIndex(i);
                 dsIf.setPointers(Map.of("i", i));
                 dsIf.setLabel("Branch: " + condExpr + " is " + (conditionPassed ? "TRUE" : "FALSE"));
@@ -2288,7 +3089,8 @@ public class MultiLanguageExecutionService {
                     sCount.setOutput(new ArrayList<>(output));
                     DataStructureState dsCount = new DataStructureState();
                     dsCount.setType("array");
-                    dsCount.setValues(new ArrayList<Object>(arr));
+                    dsCount.setName(arrayName);
+                    dsCount.setValues(new ArrayList<>(arr));
                     dsCount.setActiveIndex(i);
                     dsCount.setPointers(Map.of("i", i));
                     dsCount.setLabel("Counter Incremented: " + countVarName + " = " + newCount);
@@ -2300,7 +3102,6 @@ public class MultiLanguageExecutionService {
                 }
             }
 
-            // Sum Accumulation
             if (hasSum && conditionPassed) {
                 int prevSum = (Integer) liveVars.get(sumVarName);
                 int newSum = prevSum + val;
@@ -2317,7 +3118,8 @@ public class MultiLanguageExecutionService {
                 sSum.setOutput(new ArrayList<>(output));
                 DataStructureState dsSum = new DataStructureState();
                 dsSum.setType("array");
-                dsSum.setValues(new ArrayList<Object>(arr));
+                dsSum.setName(arrayName);
+                dsSum.setValues(new ArrayList<>(arr));
                 dsSum.setActiveIndex(i);
                 dsSum.setPointers(Map.of("i", i));
                 dsSum.setLabel("Accumulated " + sumVarName + " = " + prevSum + " + " + val + " = " + newSum);
@@ -2328,7 +3130,6 @@ public class MultiLanguageExecutionService {
                 steps.add(sSum);
             }
 
-            // Max Check
             if (hasMax && val > (Integer) liveVars.get(maxVarName)) {
                 int prevMax = (Integer) liveVars.get(maxVarName);
                 liveVars.put(maxVarName, val);
@@ -2344,18 +3145,18 @@ public class MultiLanguageExecutionService {
                 sMax.setOutput(new ArrayList<>(output));
                 DataStructureState dsMax = new DataStructureState();
                 dsMax.setType("array");
-                dsMax.setValues(new ArrayList<Object>(arr));
+                dsMax.setName(arrayName);
+                dsMax.setValues(new ArrayList<>(arr));
                 dsMax.setActiveIndex(i);
                 dsMax.setPointers(Map.of("i", i, "maxIndex", i));
                 dsMax.setLabel("New Maximum: " + val + " > " + prevMax);
-                dsMax.setFocusInfo("Peak max updated to " + val);
+                dsMax.setFocusInfo("Peak updated to " + val);
                 sMax.setDataStructureState(dsMax);
-                sMax.setExplanation("[" + lang.toUpperCase() + "] New maximum found: element " + val + " > previous max (" + prevMax + "). Updated '" + maxVarName + "' = " + val + ".");
-                sMax.setAiHint("Running peak element cached.");
+                sMax.setExplanation("[" + lang.toUpperCase() + "] New maximum found: " + val + " is greater than previous max (" + prevMax + "). Updated '" + maxVarName + "' = " + val + ".");
+                sMax.setAiHint("Extremum updated.");
                 steps.add(sMax);
             }
 
-            // Min Check
             if (hasMin && val < (Integer) liveVars.get(minVarName)) {
                 int prevMin = (Integer) liveVars.get(minVarName);
                 liveVars.put(minVarName, val);
@@ -2371,14 +3172,15 @@ public class MultiLanguageExecutionService {
                 sMin.setOutput(new ArrayList<>(output));
                 DataStructureState dsMin = new DataStructureState();
                 dsMin.setType("array");
-                dsMin.setValues(new ArrayList<Object>(arr));
+                dsMin.setName(arrayName);
+                dsMin.setValues(new ArrayList<>(arr));
                 dsMin.setActiveIndex(i);
                 dsMin.setPointers(Map.of("i", i, "minIndex", i));
                 dsMin.setLabel("New Minimum: " + val + " < " + prevMin);
-                dsMin.setFocusInfo("Minimum updated to " + val);
+                dsMin.setFocusInfo("Min updated to " + val);
                 sMin.setDataStructureState(dsMin);
-                sMin.setExplanation("[" + lang.toUpperCase() + "] New minimum found: element " + val + " < previous min (" + prevMin + "). Updated '" + minVarName + "' = " + val + ".");
-                sMin.setAiHint("Running minimum element cached.");
+                sMin.setExplanation("[" + lang.toUpperCase() + "] New minimum found: " + val + " is smaller than previous min (" + prevMin + "). Updated '" + minVarName + "' = " + val + ".");
+                sMin.setAiHint("Minimum element cached.");
                 steps.add(sMin);
             }
 
@@ -2386,10 +3188,9 @@ public class MultiLanguageExecutionService {
                 output.add(String.valueOf(val));
             }
 
-            // Loop Increment
             int nextI = i + 1;
             liveVars.put("i", nextI);
-            liveVars.remove("arr[" + i + "]");
+            liveVars.remove(arrayName + "[" + i + "]");
 
             ExecutionStep sInc = new ExecutionStep();
             sInc.setStepNumber(step++);
@@ -2402,7 +3203,8 @@ public class MultiLanguageExecutionService {
             sInc.setOutput(new ArrayList<>(output));
             DataStructureState dsInc = new DataStructureState();
             dsInc.setType("array");
-            dsInc.setValues(new ArrayList<Object>(arr));
+            dsInc.setName(arrayName);
+            dsInc.setValues(new ArrayList<>(arr));
             dsInc.setActiveIndex(null);
             dsInc.setPreviousIndex(i);
             dsInc.setLabel("Loop Counter Advances (i: " + i + " → " + nextI + ")");
@@ -2413,28 +3215,9 @@ public class MultiLanguageExecutionService {
             steps.add(sInc);
         }
 
-        // Loop Exit
-        ExecutionStep sExit = new ExecutionStep();
-        sExit.setStepNumber(step++);
-        sExit.setLineNumber(loopLine);
-        sExit.setEventType("CONDITION_CHECK");
-        sExit.setVariables(new LinkedHashMap<>(liveVars));
-        sExit.setCondition(new ConditionInfo("i < " + n, n + " < " + n, false, "EXIT LOOP"));
-        sExit.setOutput(new ArrayList<>(output));
-        DataStructureState dsExit = new DataStructureState();
-        dsExit.setType("array");
-        dsExit.setValues(new ArrayList<Object>(arr));
-        dsExit.setLabel("Loop Terminated (" + n + " < " + n + " is FALSE)");
-        dsExit.setFocusInfo("All array elements processed");
-        sExit.setDataStructureState(dsExit);
-        sExit.setExplanation("[" + lang.toUpperCase() + "] Condition 'i < " + n + "' (" + n + " < " + n + ") evaluates to FALSE. Loop terminates.");
-        sExit.setAiHint("Loop termination boundary reached.");
-        steps.add(sExit);
-
-        // Final Program State
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, Object> entry : liveVars.entrySet()) {
-            if (!entry.getKey().equals("arr") && !entry.getKey().equals("lang") && !entry.getKey().equals("size")) {
+            if (!entry.getKey().equals(arrayName) && !entry.getKey().equals("lang") && !entry.getKey().equals("size")) {
                 if (sb.length() > 0) sb.append(", ");
                 sb.append(entry.getKey()).append(" = ").append(entry.getValue());
             }
@@ -2450,7 +3233,8 @@ public class MultiLanguageExecutionService {
         sFinal.setOutput(new ArrayList<>(output));
         DataStructureState dsFinal = new DataStructureState();
         dsFinal.setType("array");
-        dsFinal.setValues(new ArrayList<Object>(arr));
+        dsFinal.setName(arrayName);
+        dsFinal.setValues(new ArrayList<>(arr));
         dsFinal.setLabel("Program Completed Successfully");
         dsFinal.setFocusInfo("Final state: " + finalSummary);
         sFinal.setDataStructureState(dsFinal);

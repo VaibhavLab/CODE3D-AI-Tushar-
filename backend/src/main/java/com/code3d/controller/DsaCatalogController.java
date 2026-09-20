@@ -786,6 +786,134 @@ public class DsaCatalogController {
                             System.out.println("Min coins for $" + amount + " = " + dp[amount]);
                         }
                     }
+                    """),
+
+            new DsaConcept("trapping-rain-water", "Trapping Rain Water (Two-Pointer Elevation)", "Arrays & Matrices",
+                    "Calculate total volume of water retained between elevation bars using converging boundaries.",
+                    "Hard", "O(n)", "O(1)",
+                    """
+                    public class Main {
+                        public static void main(String[] args) {
+                            int[] height = {0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1};
+                            int left = 0, right = height.length - 1;
+                            int leftMax = 0, rightMax = 0;
+                            int totalWater = 0;
+
+                            while (left <= right) {
+                                if (height[left] <= height[right]) {
+                                    if (height[left] >= leftMax) leftMax = height[left];
+                                    else totalWater += leftMax - height[left];
+                                    left++;
+                                } else {
+                                    if (height[right] >= rightMax) rightMax = height[right];
+                                    else totalWater += rightMax - height[right];
+                                    right--;
+                                }
+                            }
+                            System.out.println("Total Trapped Water = " + totalWater + " units");
+                        }
+                    }
+                    """),
+
+            new DsaConcept("lru-cache", "LRU Cache (Least Recently Used)", "Searching & Hashing",
+                    "Evict least recently used items on overflow using fast HashMap + Doubly Linked List in O(1).",
+                    "Hard", "O(1)", "O(Capacity)",
+                    """
+                    import java.util.*;
+
+                    public class Main {
+                        public static void main(String[] args) {
+                            LinkedHashMap<Integer, Integer> lru = new LinkedHashMap<>(3, 0.75f, true) {
+                                protected boolean removeEldestEntry(Map.Entry<Integer, Integer> eldest) {
+                                    return size() > 3;
+                                }
+                            };
+                            lru.put(1, 10);
+                            lru.put(2, 20);
+                            lru.put(3, 30);
+                            lru.get(1);     // Promotes key 1 to MRU
+                            lru.put(4, 40); // Evicts key 2
+                            System.out.println("Cache Contents: " + lru);
+                        }
+                    }
+                    """),
+
+            new DsaConcept("trie-prefix-tree", "Trie (Prefix Tree) Insert & Search", "Trees & Tries",
+                    "Prefix tree enabling fast O(L) prefix searching, word insertion, and auto-complete.",
+                    "Intermediate", "O(L)", "O(N × L)",
+                    """
+                    class TrieNode {
+                        TrieNode[] children = new TrieNode[26];
+                        boolean isEndOfWord = false;
+                    }
+
+                    public class Main {
+                        public static void main(String[] args) {
+                            TrieNode root = new TrieNode();
+                            String[] words = {"cat", "car", "cart", "dog"};
+                            for (String w : words) {
+                                TrieNode curr = root;
+                                for (char c : w.toCharArray()) {
+                                    int idx = c - 'a';
+                                    if (curr.children[idx] == null) curr.children[idx] = new TrieNode();
+                                    curr = curr.children[idx];
+                                }
+                                curr.isEndOfWord = true;
+                            }
+                            System.out.println("Trie built with words: " + String.join(", ", words));
+                        }
+                    }
+                    """),
+
+            new DsaConcept("disjoint-set-union", "Disjoint Set Union (DSU / Kruskal's MST)", "Graphs",
+                    "Near O(1) set operations with path compression and union by rank on connected components.",
+                    "Hard", "O(α(N))", "O(N)",
+                    """
+                    public class Main {
+                        static int[] parent = {0, 1, 2, 3, 4};
+                        static int find(int i) {
+                            if (parent[i] == i) return i;
+                            return parent[i] = find(parent[i]);
+                        }
+                        static void union(int i, int j) {
+                            int rI = find(i), rJ = find(j);
+                            if (rI != rJ) parent[rJ] = rI;
+                        }
+                        public static void main(String[] args) {
+                            union(0, 1);
+                            union(1, 2);
+                            union(3, 4);
+                            System.out.println("0 and 2 connected: " + (find(0) == find(2)));
+                            System.out.println("0 and 3 connected: " + (find(0) == find(3)));
+                        }
+                    }
+                    """),
+
+            new DsaConcept("longest-increasing-subsequence", "Longest Increasing Subsequence (LIS)", "Dynamic Programming & Recursion",
+                    "Find length of longest strictly increasing subsequence using 1D dynamic programming.",
+                    "Intermediate", "O(n²)", "O(n)",
+                    """
+                    import java.util.Arrays;
+
+                    public class Main {
+                        public static void main(String[] args) {
+                            int[] nums = {10, 9, 2, 5, 3, 7, 101, 18};
+                            int n = nums.length;
+                            int[] dp = new int[n];
+                            Arrays.fill(dp, 1);
+                            int maxLIS = 1;
+
+                            for (int i = 1; i < n; i++) {
+                                for (int j = 0; j < i; j++) {
+                                    if (nums[j] < nums[i]) {
+                                        dp[i] = Math.max(dp[i], dp[j] + 1);
+                                    }
+                                }
+                                maxLIS = Math.max(maxLIS, dp[i]);
+                            }
+                            System.out.println("Length of LIS = " + maxLIS);
+                        }
+                    }
                     """)
     );
 

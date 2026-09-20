@@ -52,6 +52,8 @@ export default function CodeEditor({
   onReset,
   isAtStart,
   isAtEnd,
+  isCodeDirty = false,
+  onRunCode,
 }) {
   const editorRef = useRef(null);
   const monacoRef = useRef(null);
@@ -64,7 +66,7 @@ export default function CodeEditor({
     editorRef.current = editor;
     monacoRef.current = monaco;
 
-    // Dark Theme definition
+    // Dark Theme definition - Deep obsidian palette harmonized with 3D canvas
     monaco.editor.defineTheme('code3dDark', {
       base: 'vs-dark',
       inherit: true,
@@ -76,8 +78,8 @@ export default function CodeEditor({
         { token: 'comment', foreground: '64748b', fontStyle: 'italic' },
       ],
       colors: {
-        'editor.background': '#0b0f19',
-        'editor.lineHighlightBackground': '#1e293b55',
+        'editor.background': '#070b14',
+        'editor.lineHighlightBackground': '#1e293b44',
         'editorLineNumber.foreground': '#475569',
         'editorLineNumber.activeForeground': '#00f2fe',
       },
@@ -103,6 +105,15 @@ export default function CodeEditor({
     });
 
     monaco.editor.setTheme(isBright ? 'code3dLight' : 'code3dDark');
+
+    // Register Ctrl+Enter / Cmd+Enter shortcut directly inside Monaco
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
+      if (onRunCode) {
+        onRunCode();
+      } else if (onPlay) {
+        onPlay();
+      }
+    });
   };
 
   // Switch editor theme whenever bright mode changes
@@ -151,6 +162,13 @@ export default function CodeEditor({
           <span className={`text-xs font-mono font-medium ${isBright ? 'text-slate-800' : 'text-slate-200'}`}>
             {currentLangConfig.fileName}
           </span>
+
+          {isCodeDirty && (
+            <span className="flex items-center gap-1 text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 animate-pulse">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+              <span>Modified (Ctrl+Enter)</span>
+            </span>
+          )}
           
           {/* Language Selector Dropdown */}
           <select
@@ -269,16 +287,18 @@ export default function CodeEditor({
             </button>
           ) : (
             <button
-              onClick={onPlay}
+              onClick={isCodeDirty ? onRunCode || onPlay : onPlay}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold transition shadow-sm ${
-                isBright
-                  ? 'bg-cyan-600 text-white hover:bg-cyan-500 shadow-cyan-600/20'
-                  : 'bg-cyan-500 text-slate-950 hover:bg-cyan-400 shadow-cyan-500/20'
+                isCodeDirty
+                  ? 'bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-950 font-bold ring-2 ring-cyan-400 shadow-lg shadow-cyan-500/40 animate-pulse'
+                  : isBright
+                    ? 'bg-cyan-600 text-white hover:bg-cyan-500 shadow-cyan-600/20'
+                    : 'bg-cyan-500 text-slate-950 hover:bg-cyan-400 shadow-cyan-500/20'
               }`}
-              title="Run / Play Simulation"
+              title="Run / Play Simulation (Ctrl+Enter)"
             >
               <Play size={13} className="fill-current" />
-              <span>{isAtEnd ? 'Replay' : isAtStart ? 'Run' : 'Resume'}</span>
+              <span>{isCodeDirty ? 'Run ⚡' : isAtEnd ? 'Replay' : isAtStart ? 'Run' : 'Resume'}</span>
             </button>
           )}
 

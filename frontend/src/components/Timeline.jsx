@@ -24,6 +24,7 @@ export default function Timeline({
   onGoToStep,
   isAtStart,
   isAtEnd,
+  isCodeDirty = false,
 }) {
   const { isBright } = useTheme();
   const speeds = [0.5, 1, 1.5, 2];
@@ -32,7 +33,7 @@ export default function Timeline({
     <div className={`border-t px-4 py-2.5 select-none flex flex-col gap-2 transition-colors ${
       isBright
         ? 'bg-white border-slate-200 text-slate-800 shadow-sm'
-        : 'bg-slate-900/95 border-slate-800/90 text-slate-200'
+        : 'bg-[#070b14]/95 border-slate-800/90 text-slate-200'
     }`}>
       {/* Top Bar: Controls & Status */}
       <div className="flex items-center justify-between gap-3 overflow-x-auto no-scrollbar">
@@ -84,14 +85,16 @@ export default function Timeline({
             <button
               onClick={onPlay}
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition shadow-md ${
-                isBright
-                  ? 'bg-cyan-600 text-white hover:bg-cyan-500 shadow-cyan-600/30'
-                  : 'bg-cyan-500 text-slate-950 hover:bg-cyan-400 shadow-cyan-500/20'
+                isCodeDirty
+                  ? 'bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-950 ring-2 ring-cyan-400 shadow-lg shadow-cyan-500/40 animate-pulse'
+                  : isBright
+                    ? 'bg-cyan-600 text-white hover:bg-cyan-500 shadow-cyan-600/30'
+                    : 'bg-cyan-500 text-slate-950 hover:bg-cyan-400 shadow-cyan-500/20'
               }`}
-              title="Play Simulation"
+              title={isCodeDirty ? 'Execute newly modified code in 3D (Ctrl+Enter)' : 'Play Simulation'}
             >
               <Play size={14} className="fill-current" />
-              <span>{isAtEnd ? 'Replay' : 'Play'}</span>
+              <span>{isCodeDirty ? 'Run ⚡' : isAtEnd ? 'Replay' : 'Play'}</span>
             </button>
           )}
 

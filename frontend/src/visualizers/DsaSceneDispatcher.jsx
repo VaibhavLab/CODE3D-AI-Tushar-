@@ -29,6 +29,8 @@ export default function DsaSceneDispatcher({ dataStructureState }) {
     case 'hashing':
     case 'two-sum':
     case 'map':
+    case 'lru':
+    case 'lru-cache':
       return <HashTableVisualizer3D dataStructureState={dataStructureState} />;
     case 'graph':
     case 'graphs':
@@ -38,6 +40,10 @@ export default function DsaSceneDispatcher({ dataStructureState }) {
     case 'topological-sort':
     case 'topological':
     case 'kahn':
+    case 'dsu':
+    case 'disjoint-set':
+    case 'disjoint-set-union':
+    case 'union-find':
       return <GraphVisualizer3D dataStructureState={dataStructureState} />;
     case 'matrix':
     case '2d-array':
@@ -64,6 +70,8 @@ export default function DsaSceneDispatcher({ dataStructureState }) {
     case 'avl':
     case 'avl-tree':
     case 'trie':
+    case 'prefix-tree':
+    case 'trie-prefix-tree':
       return <TreeVisualizer3D dataStructureState={dataStructureState} />;
     case 'sorting':
     case 'searching':
@@ -78,6 +86,10 @@ export default function DsaSceneDispatcher({ dataStructureState }) {
     case 'call-stack':
     case 'factorial':
       return <RecursionVisualizer3D dataStructureState={dataStructureState} />;
+    case 'trapping-water':
+    case 'trapping-rain-water':
+    case 'lis':
+    case 'longest-increasing-subsequence':
     case 'container-water':
     case 'most-water':
     case 'kadane':

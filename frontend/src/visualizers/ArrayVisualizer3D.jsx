@@ -108,14 +108,31 @@ function WaterVolumeMesh({ startX, spacing, leftIdx, rightIdx, leftHeight, right
 /**
  * Single 3D Array Cell Box with negative value styling, custom height for container pillars, and smooth elevation
  */
-function ArrayCell({ value, index, isActive, isPrevious, isInWindow, positionX, pointerNames = [], customHeight = null }) {
+/**
+ * Single 3D Array Cell Box with negative value styling, custom height for container pillars,
+ * trapped water rendering, target found laser beacon, and smooth elevation
+ */
+function ArrayCell({
+  value,
+  index,
+  isActive,
+  isPrevious,
+  isInWindow,
+  positionX,
+  pointerNames = [],
+  customHeight = null,
+  trappedWaterHeight = null,
+  isTargetFound = false,
+  isLisActive = false,
+  dpValue = null,
+}) {
   const meshRef = useRef();
   const isNegative = typeof value === 'number' && value < 0;
 
-  // If customHeight is provided (e.g. for Container With Most Water), scale box height
-  const baseHeight = customHeight ? Math.max(0.8, Math.min(customHeight * 0.4, 4.5)) : 1.4;
-  const targetY = isActive ? 0.75 : isInWindow ? 0.25 : 0;
-  const targetScale = isActive ? 1.08 : isInWindow ? 1.02 : 1.0;
+  // If customHeight is provided (e.g. for Container With Most Water or Trapping Rain Water), scale box height
+  const baseHeight = customHeight ? Math.max(0.6, Math.min(customHeight * 0.45, 4.5)) : 1.4;
+  const targetY = isTargetFound ? 1.0 : isActive ? 0.75 : isInWindow ? 0.25 : 0;
+  const targetScale = isTargetFound ? 1.15 : isActive ? 1.08 : isInWindow ? 1.02 : 1.0;
 
   useFrame((_, delta) => {
     if (meshRef.current) {
@@ -124,12 +141,20 @@ function ArrayCell({ value, index, isActive, isPrevious, isInWindow, positionX, 
     }
   });
 
-  // Dynamic colors based on active, negative, or subarray state
+  // Dynamic colors based on active, target found, LIS, negative, or subarray state
   let boxColor = '#1e293b';
   let emissiveColor = '#0f172a';
   let wireColor = '#334155';
 
-  if (isActive) {
+  if (isTargetFound) {
+    boxColor = '#eab308';
+    emissiveColor = '#ca8a04';
+    wireColor = '#fef08a';
+  } else if (isLisActive) {
+    boxColor = '#d97706';
+    emissiveColor = '#b45309';
+    wireColor = '#fde68a';
+  } else if (isActive) {
     boxColor = isNegative ? '#9f1239' : '#06b6d4';
     emissiveColor = isNegative ? '#e11d48' : '#0891b2';
     wireColor = isNegative ? '#fda4af' : '#67e8f9';
@@ -158,7 +183,7 @@ function ArrayCell({ value, index, isActive, isPrevious, isInWindow, positionX, 
             metalness={0.4}
             roughness={0.25}
             emissive={emissiveColor}
-            emissiveIntensity={isActive ? 0.95 : isInWindow ? 0.5 : 0.2}
+            emissiveIntensity={isTargetFound ? 1.4 : isActive ? 0.95 : isInWindow ? 0.5 : 0.2}
           />
         </mesh>
 
@@ -169,7 +194,70 @@ function ArrayCell({ value, index, isActive, isPrevious, isInWindow, positionX, 
         </lineSegments>
 
         {/* Active Holo Ring around active cell */}
-        {isActive && <CellHoloRing color={isNegative ? '#f43f5e' : '#00f2fe'} />}
+        {isActive && !isTargetFound && <CellHoloRing color={isNegative ? '#f43f5e' : '#00f2fe'} />}
+
+        {/* Target Found Laser Beacon and Golden Ring */}
+        {isTargetFound && (
+          <group position={[0, baseHeight / 2, 0]}>
+            <mesh position={[0, 1.9, 0]}>
+              <cylinderGeometry args={[0.07, 0.07, 3.8, 16]} />
+              <meshStandardMaterial
+                color="#fbbf24"
+                emissive="#f59e0b"
+                emissiveIntensity={2.8}
+                transparent
+                opacity={0.85}
+              />
+            </mesh>
+            <mesh position={[0, 0.05, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+              <torusGeometry args={[0.95, 0.05, 16, 32]} />
+              <meshBasicMaterial color="#fbbf24" />
+            </mesh>
+            <Float speed={5} floatIntensity={0.2}>
+              <Text
+                position={[0, 4.0, 0]}
+                fontSize={0.3}
+                color="#fbbf24"
+                fontWeight="bold"
+              >
+                🎯 TARGET MATCH!
+              </Text>
+            </Float>
+          </group>
+        )}
+
+        {/* Trapped Rain Water Block atop elevation pillar */}
+        {trappedWaterHeight > 0 && (
+          <group position={[0, baseHeight / 2 + (trappedWaterHeight * 0.45) / 2, 0]}>
+            <mesh castShadow>
+              <boxGeometry args={[1.44, trappedWaterHeight * 0.45, 1.44]} />
+              <meshStandardMaterial
+                color="#00f2fe"
+                emissive="#0284c7"
+                emissiveIntensity={0.8}
+                transparent
+                opacity={0.65}
+                roughness={0.1}
+                metalness={0.2}
+              />
+            </mesh>
+            {/* Glowing water surface line */}
+            <mesh position={[0, (trappedWaterHeight * 0.45) / 2, 0]}>
+              <boxGeometry args={[1.45, 0.04, 1.45]} />
+              <meshBasicMaterial color="#67e8f9" />
+            </mesh>
+            <Float speed={3} floatIntensity={0.15}>
+              <Text
+                position={[0, (trappedWaterHeight * 0.45) / 2 + 0.35, 0]}
+                fontSize={0.24}
+                color="#22d3ee"
+                fontWeight="bold"
+              >
+                {`+${trappedWaterHeight}💧`}
+              </Text>
+            </Float>
+          </group>
+        )}
 
         {/* 3D Value Text */}
         <Text
@@ -191,8 +279,22 @@ function ArrayCell({ value, index, isActive, isPrevious, isInWindow, positionX, 
           </mesh>
         )}
 
+        {/* LIS Badge */}
+        {isLisActive && (
+          <Float speed={3} floatIntensity={0.15}>
+            <Text
+              position={[0, baseHeight / 2 + 0.5, 0]}
+              fontSize={0.26}
+              color="#facc15"
+              fontWeight="bold"
+            >
+              ★ LIS
+            </Text>
+          </Float>
+        )}
+
         {/* Floating Multi-Pointer Tags above cell */}
-        {pointerNames.length > 0 && (
+        {pointerNames.length > 0 && !isTargetFound && (
           <group position={[0, baseHeight / 2 + 0.7, 0]}>
             <Float speed={4} rotationIntensity={0.1} floatIntensity={0.25}>
               <mesh position={[0, 0, 0]} rotation={[Math.PI, 0, 0]}>
@@ -238,6 +340,18 @@ function ArrayCell({ value, index, isActive, isPrevious, isInWindow, positionX, 
         >
           INDEX
         </Text>
+        {dpValue !== null && (
+          <Text
+            position={[0, -0.68, 0]}
+            fontSize={0.22}
+            color="#10b981"
+            fontWeight="bold"
+            anchorX="center"
+            anchorY="middle"
+          >
+            {`DP: ${dpValue}`}
+          </Text>
+        )}
       </group>
     </group>
   );
@@ -257,7 +371,6 @@ function SubarrayBoundingFrame({ startX, spacing, startIdx, endIdx, isMaxWindow 
 
   return (
     <group position={[centerX, 0.8, 0]}>
-      {/* Surrounding Holographic Frame Rails */}
       <mesh position={[0, -0.72, 0]}>
         <boxGeometry args={[width, 0.08, 1.8]} />
         <meshStandardMaterial
@@ -269,7 +382,6 @@ function SubarrayBoundingFrame({ startX, spacing, startIdx, endIdx, isMaxWindow 
         />
       </mesh>
 
-      {/* Floating Subarray Title HUD */}
       <Float speed={3} floatIntensity={0.15}>
         <Text
           position={[0, 1.6, 0]}
@@ -285,7 +397,8 @@ function SubarrayBoundingFrame({ startX, spacing, startIdx, endIdx, isMaxWindow 
 }
 
 /**
- * ArrayVisualizer3D renders linear, subarray, and Container With Most Water structures in 3D WebGL space.
+ * ArrayVisualizer3D renders linear, subarray, Container With Most Water, Trapping Rain Water,
+ * and Longest Increasing Subsequence structures in 3D WebGL space.
  */
 export default function ArrayVisualizer3D({ dataStructureState }) {
   const {
@@ -296,9 +409,14 @@ export default function ArrayVisualizer3D({ dataStructureState }) {
     window = null,
     type = 'array',
     waterVolume = null,
+    trappedWater = [],
+    dpValues = [],
+    lisIndices = [],
+    targetFound = false,
   } = dataStructureState || {};
 
-  const isContainerWater = type === 'container-water' || type === 'most-water' || !!waterVolume;
+  const isTrappingRainWater = type === 'trapping-rain-water' || (trappedWater && trappedWater.length > 0);
+  const isContainerWater = type === 'container-water' || type === 'most-water' || (waterVolume !== null && !isTrappingRainWater);
   const spacing = 2.1;
   const totalWidth = (values.length - 1) * spacing;
   const startX = -totalWidth / 2;
@@ -342,8 +460,25 @@ export default function ArrayVisualizer3D({ dataStructureState }) {
         </mesh>
       )}
 
+      {/* Floating HUD for Trapping Rain Water */}
+      {isTrappingRainWater && (
+        <Float speed={2} floatIntensity={0.15}>
+          <group position={[0, 3.8, 0]}>
+            <Text
+              fontSize={0.34}
+              color="#22d3ee"
+              anchorX="center"
+              anchorY="middle"
+              fontWeight="bold"
+            >
+              {`💧 Total Water Retained: ${typeof waterVolume === 'number' ? waterVolume : (trappedWater.reduce((acc, v) => acc + (typeof v === 'number' ? v : 0), 0))} Units`}
+            </Text>
+          </group>
+        </Float>
+      )}
+
       {/* Subarray Window Highlights */}
-      {!isContainerWater && windowStart !== null && windowEnd !== null && (
+      {!isContainerWater && !isTrappingRainWater && windowStart !== null && windowEnd !== null && (
         <SubarrayBoundingFrame
           startX={startX}
           spacing={spacing}
@@ -352,7 +487,7 @@ export default function ArrayVisualizer3D({ dataStructureState }) {
           isMaxWindow={false}
         />
       )}
-      {!isContainerWater && maxStart !== null && maxEnd !== null && (
+      {!isContainerWater && !isTrappingRainWater && maxStart !== null && maxEnd !== null && (
         <SubarrayBoundingFrame
           startX={startX}
           spacing={spacing}
@@ -383,6 +518,10 @@ export default function ArrayVisualizer3D({ dataStructureState }) {
         const isPrevious = previousIndex === idx;
         const isInWindow = windowStart !== null && windowEnd !== null && idx >= windowStart && idx <= windowEnd;
         const cellPointers = pointersByIndex[idx] || [];
+        const isCellTargetFound = targetFound && (pointers?.target === idx || activeIndex === idx);
+        const isCellLisActive = lisIndices && lisIndices.includes(idx);
+        const cellTrappedWater = isTrappingRainWater && trappedWater ? (trappedWater[idx] || 0) : null;
+        const cellDpValue = dpValues && dpValues[idx] !== undefined ? dpValues[idx] : null;
 
         return (
           <ArrayCell
@@ -394,7 +533,11 @@ export default function ArrayVisualizer3D({ dataStructureState }) {
             isInWindow={isInWindow}
             positionX={posX}
             pointerNames={cellPointers}
-            customHeight={isContainerWater ? val : null}
+            customHeight={(isContainerWater || isTrappingRainWater) ? val : null}
+            trappedWaterHeight={cellTrappedWater}
+            isTargetFound={isCellTargetFound}
+            isLisActive={isCellLisActive}
+            dpValue={cellDpValue}
           />
         );
       })}
