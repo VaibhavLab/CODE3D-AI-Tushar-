@@ -1,11 +1,40 @@
 import React from 'react';
-import { Text } from '@react-three/drei';
+import { Text, Float } from '@react-three/drei';
+import * as THREE from 'three';
+
+/**
+ * 3D Laser Arch connecting two compared pillars
+ */
+function ComparisonLaserArch({ startX, startHeight, endX, endHeight }) {
+  const p1 = new THREE.Vector3(startX, startHeight + 0.4, 0);
+  const p2 = new THREE.Vector3(endX, endHeight + 0.4, 0);
+  const mid = new THREE.Vector3().addVectors(p1, p2).multiplyScalar(0.5);
+  mid.y += 0.6; // arch apex
+
+  const curve = new THREE.QuadraticBezierCurve3(p1, mid, p2);
+  const points = curve.getPoints(24);
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+  return (
+    <group>
+      <line geometry={geometry}>
+        <lineBasicMaterial color="#f59e0b" linewidth={3} />
+      </line>
+      <Float speed={4} floatIntensity={0.2}>
+        <Text position={[mid.x, mid.y + 0.35, mid.z]} fontSize={0.26} color="#facc15" fontWeight="bold">
+          COMPARING
+        </Text>
+      </Float>
+    </group>
+  );
+}
 
 export default function SortingVisualizer3D({ dataStructureState }) {
   const {
     values = [],
     comparedIndices = [],
     swappedIndices = [],
+    sortedIndices = [],
     activeIndex = null,
     pointers = {},
   } = dataStructureState || {};
@@ -16,64 +45,122 @@ export default function SortingVisualizer3D({ dataStructureState }) {
   const low = pointers?.low;
   const mid = pointers?.mid;
   const high = pointers?.high;
+  const pivot = pointers?.pivot;
+
+  // Find heights of compared indices for laser arch
+  let comparedArch = null;
+  if (comparedIndices && comparedIndices.length >= 2) {
+    const idxA = comparedIndices[0];
+    const idxB = comparedIndices[1];
+    if (idxA < values.length && idxB < values.length) {
+      const hA = Math.max(0.6, (values[idxA] / 50) * 3.5);
+      const hB = Math.max(0.6, (values[idxB] / 50) * 3.5);
+      comparedArch = {
+        startX: startX + idxA * spacing,
+        startHeight: hA,
+        endX: startX + idxB * spacing,
+        endHeight: hB,
+      };
+    }
+  }
 
   return (
     <group position={[0, -1, 0]}>
-      {/* Ground Foundation */}
-      <mesh position={[0, -0.1, 0]}>
-        <boxGeometry args={[values.length * spacing + 2, 0.15, 2]} />
-        <meshStandardMaterial color="#0f172a" />
+      {/* Ground Foundation Pedestal */}
+      <mesh position={[0, -0.12, 0]} receiveShadow>
+        <boxGeometry args={[values.length * spacing + 2.5, 0.16, 2.4]} />
+        <meshStandardMaterial color="#090d16" metalness={0.7} roughness={0.3} />
       </mesh>
 
-      {/* 3D Value Bars */}
+      {/* Laser Arch between compared pillars */}
+      {comparedArch && (
+        <ComparisonLaserArch
+          startX={comparedArch.startX}
+          startHeight={comparedArch.startHeight}
+          endX={comparedArch.endX}
+          endHeight={comparedArch.endHeight}
+        />
+      )}
+
+      {/* 3D Value Bars / Pillars */}
       {values.map((val, idx) => {
         const height = Math.max(0.6, (val / 50) * 3.5);
         const posX = startX + idx * spacing;
         const isCompared = comparedIndices && comparedIndices.includes(idx);
         const isSwapped = swappedIndices && swappedIndices.includes(idx);
+        const isSorted = sortedIndices && sortedIndices.includes(idx);
         const isActive = activeIndex === idx || mid === idx;
+        const isPivot = pivot === idx;
 
         let color = '#1e293b';
         let emissive = '#0f172a';
+        let wireColor = '#334155';
 
         if (isSwapped) {
           color = '#10b981';
           emissive = '#059669';
+          wireColor = '#6ee7b7';
         } else if (isCompared) {
           color = '#f59e0b';
           emissive = '#d97706';
+          wireColor = '#fde68a';
+        } else if (isPivot) {
+          color = '#8b5cf6';
+          emissive = '#7c3aed';
+          wireColor = '#c4b5fd';
         } else if (isActive) {
           color = '#06b6d4';
           emissive = '#0891b2';
+          wireColor = '#67e8f9';
+        } else if (isSorted) {
+          color = '#047857';
+          emissive = '#059669';
+          wireColor = '#34d399';
         }
 
         return (
           <group key={`sort-${idx}`} position={[posX, height / 2, 0]}>
+            {/* 3D Pillar Box */}
             <mesh castShadow receiveShadow>
               <boxGeometry args={[1.3, height, 1.2]} />
               <meshStandardMaterial
                 color={color}
                 emissive={emissive}
-                emissiveIntensity={isCompared || isSwapped || isActive ? 0.8 : 0.2}
-                metalness={0.2}
-                roughness={0.3}
+                emissiveIntensity={isCompared || isSwapped || isActive || isPivot ? 0.9 : 0.25}
+                metalness={0.4}
+                roughness={0.2}
               />
             </mesh>
 
+            {/* Glowing Wireframe Border */}
+            <lineSegments>
+              <edgesGeometry args={[new THREE.BoxGeometry(1.31, height + 0.01, 1.21)]} />
+              <lineBasicMaterial color={wireColor} linewidth={2} />
+            </lineSegments>
+
             {/* Value above bar */}
             <Text
-              position={[0, height / 2 + 0.35, 0]}
-              fontSize={0.35}
+              position={[0, height / 2 + 0.38, 0]}
+              fontSize={0.34}
               color="#ffffff"
               fontWeight="bold"
             >
               {String(val)}
             </Text>
 
-            {/* Binary Search Pointers */}
+            {/* Pointer Badges */}
+            {isPivot && (
+              <Float speed={5} floatIntensity={0.2}>
+                <group position={[0, height / 2 + 0.8, 0]}>
+                  <Text fontSize={0.24} color="#c4b5fd" fontWeight="bold">
+                    PIVOT
+                  </Text>
+                </group>
+              </Float>
+            )}
             {mid === idx && (
               <group position={[0, height / 2 + 0.8, 0]}>
-                <Text fontSize={0.25} color="#22d3ee" fontWeight="bold">
+                <Text fontSize={0.24} color="#22d3ee" fontWeight="bold">
                   MID
                 </Text>
               </group>
@@ -96,7 +183,7 @@ export default function SortingVisualizer3D({ dataStructureState }) {
             {/* Index label underneath */}
             <Text
               position={[0, -height / 2 - 0.35, 0]}
-              fontSize={0.25}
+              fontSize={0.24}
               color="#64748b"
             >
               {`[${idx}]`}

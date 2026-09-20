@@ -18,10 +18,22 @@ public class DataStructureState {
     private Integer comparisons;
     private Integer swaps;
     private Map<String, Object> pointers;
+    private Map<String, Object> window;
+    private Map<String, Object> hashTable;
+    private Object target;
     private String label;
     private String focusInfo;
 
     public DataStructureState() {}
+
+    public Map<String, Object> getWindow() { return window; }
+    public void setWindow(Map<String, Object> window) { this.window = window; }
+
+    public Map<String, Object> getHashTable() { return hashTable; }
+    public void setHashTable(Map<String, Object> hashTable) { this.hashTable = hashTable; }
+
+    public Object getTarget() { return target; }
+    public void setTarget(Object target) { this.target = target; }
 
     // Getters and Setters
     public String getType() { return type; }

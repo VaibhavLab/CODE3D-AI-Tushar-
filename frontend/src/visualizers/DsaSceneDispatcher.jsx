@@ -8,6 +8,7 @@ import TreeVisualizer3D from './TreeVisualizer3D';
 import SortingVisualizer3D from './SortingVisualizer3D';
 import RecursionVisualizer3D from './RecursionVisualizer3D';
 import GraphVisualizer3D from './GraphVisualizer3D';
+import HashTableVisualizer3D from './HashTableVisualizer3D';
 
 export default function DsaSceneDispatcher({ dataStructureState }) {
   if (!dataStructureState) return null;
@@ -15,6 +16,13 @@ export default function DsaSceneDispatcher({ dataStructureState }) {
   const type = dataStructureState.type ? dataStructureState.type.toLowerCase() : 'array';
 
   switch (type) {
+    case 'hash-table':
+    case 'hashtable':
+    case 'hashmap':
+    case 'hashing':
+    case 'two-sum':
+    case 'map':
+      return <HashTableVisualizer3D dataStructureState={dataStructureState} />;
     case 'graph':
     case 'graphs':
     case 'graph-bfs':
@@ -58,6 +66,8 @@ export default function DsaSceneDispatcher({ dataStructureState }) {
     case 'call-stack':
     case 'factorial':
       return <RecursionVisualizer3D dataStructureState={dataStructureState} />;
+    case 'kadane':
+    case 'subarray':
     case 'array':
     case 'sliding-window':
     case 'two-pointer':

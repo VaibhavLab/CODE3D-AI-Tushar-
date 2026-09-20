@@ -106,6 +106,19 @@ export default function TreeVisualizer3D({ dataStructureState }) {
 
   return (
     <group position={[0, 0.1, 0]}>
+      {/* Floating Hierarchical Level Indicators */}
+      <group position={[-5.8, 0, 0]}>
+        <Text position={[0, 2.6, 0]} fontSize={0.24} color="#64748b" fontWeight="bold" anchorX="right">
+          Level 0 (Root) ──
+        </Text>
+        <Text position={[0, 1.1, 0]} fontSize={0.24} color="#64748b" fontWeight="bold" anchorX="right">
+          Level 1 ──
+        </Text>
+        <Text position={[0, -0.6, 0]} fontSize={0.24} color="#64748b" fontWeight="bold" anchorX="right">
+          Level 2 ──
+        </Text>
+      </group>
+
       {/* Laser Branches between Parent and Child */}
       {resolvedNodes.map((node) => {
         if (!node.parentPos) return null;

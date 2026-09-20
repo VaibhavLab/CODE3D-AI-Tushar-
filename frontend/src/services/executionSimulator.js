@@ -1147,6 +1147,504 @@ export function generateDynamicBinarySearchTrace(values = [10, 20, 30, 40, 50, 6
 }
 
 /**
+ * Dynamic 3D Kadane's Algorithm Trace Generator (Maximum Subarray Sum)
+ */
+export function generateDynamicKadaneTrace(values = [-2, 1, -3, 4, -1, 2, 1, -5, 4], language = 'java') {
+  const arr = values.length >= 3 ? values : [-2, 1, -3, 4, -1, 2, 1, -5, 4];
+  const steps = [];
+  let step = 1;
+
+  let maxSoFar = arr[0];
+  let currentMax = arr[0];
+  let start = 0;
+  let end = 0;
+  let tempStart = 0;
+
+  // Step 1: Init
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 3,
+    eventType: 'KADANE_INIT',
+    variables: { arr: `[${arr.join(', ')}]`, currentMax, maxSoFar, i: 0 },
+    output: [],
+    dataStructureState: {
+      type: 'array',
+      values: [...arr],
+      activeIndex: 0,
+      pointers: { i: 0, currMax: currentMax, maxSoFar: maxSoFar },
+      window: { start: 0, end: 0 },
+      label: `Kadane Initialized: maxSoFar = ${maxSoFar}`,
+      focusInfo: `Base element arr[0] = ${arr[0]}`
+    },
+    explanation: `Kadane's algorithm initialized: currentMax = arr[0] (${currentMax}), maxSoFar = ${maxSoFar}.`,
+    aiHint: 'Kadane tracks running local maximum vs global maximum in O(n) linear time.'
+  });
+
+  for (let i = 1; i < arr.length; i++) {
+    const x = arr[i];
+    const resets = x > currentMax + x;
+
+    if (resets) {
+      currentMax = x;
+      tempStart = i;
+    } else {
+      currentMax = currentMax + x;
+    }
+
+    const newGlobal = currentMax > maxSoFar;
+    if (newGlobal) {
+      maxSoFar = currentMax;
+      start = tempStart;
+      end = i;
+    }
+
+    steps.push({
+      stepNumber: step++,
+      lineNumber: 5,
+      eventType: newGlobal ? 'KADANE_NEW_MAX' : resets ? 'KADANE_RESET' : 'KADANE_EXTEND',
+      variables: {
+        i,
+        'nums[i]': x,
+        currentMax,
+        maxSoFar,
+        window: `[${tempStart}..${i}]`
+      },
+      output: [],
+      dataStructureState: {
+        type: 'array',
+        values: [...arr],
+        activeIndex: i,
+        pointers: { i, start: tempStart, end: i },
+        window: { start: tempStart, end: i, maxStart: start, maxEnd: end },
+        label: `arr[${i}]=${x} | currMax=${currentMax} | maxSoFar=${maxSoFar}`,
+        focusInfo: resets
+          ? `Sum dropped below element; reset subarray start to index ${i}`
+          : `Extended running subarray to sum ${currentMax}${newGlobal ? ' (NEW GLOBAL MAX!)' : ''}`
+      },
+      explanation: `Index ${i} (${x}): currentMax is now ${currentMax}, maxSoFar is ${maxSoFar}.`,
+      aiHint: newGlobal
+        ? `New peak maximum found! Subarray spans [${start}..${end}] with sum ${maxSoFar}.`
+        : 'Running sum maintained across current window.'
+    });
+  }
+
+  // Final Step
+  steps.push({
+    stepNumber: step,
+    lineNumber: 8,
+    eventType: 'PROGRAM_END',
+    variables: { maxSubArraySum: maxSoFar, bestSubarray: `[${arr.slice(start, end + 1).join(', ')}]` },
+    output: [`Max Subarray Sum: ${maxSoFar} for [${arr.slice(start, end + 1).join(', ')}]`],
+    dataStructureState: {
+      type: 'array',
+      values: [...arr],
+      window: { start, end },
+      pointers: { maxStart: start, maxEnd: end },
+      label: `Max Subarray Found! Sum = ${maxSoFar}`,
+      focusInfo: `Optimal Subarray: [${arr.slice(start, end + 1).join(', ')}]`
+    },
+    explanation: `Maximum subarray found with total sum ${maxSoFar} across indices [${start}..${end}].`,
+    aiHint: 'Solved in a single O(n) pass using O(1) auxiliary space.'
+  });
+
+  return steps;
+}
+
+/**
+ * Dynamic 3D Two-Sum / HashMap Trace Generator
+ */
+export function generateDynamicTwoSumTrace(values = [2, 7, 11, 15], target = 9, language = 'java') {
+  const arr = values.length >= 2 ? values : [2, 7, 11, 15];
+  const steps = [];
+  let step = 1;
+  const mapState = {};
+
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 2,
+    eventType: 'HASH_INIT',
+    variables: { target, arr: `[${arr.join(', ')}]` },
+    output: [],
+    dataStructureState: {
+      type: 'hash-table',
+      values: [...arr],
+      target,
+      hashTable: { ...mapState },
+      label: `Two-Sum Initialized (Target = ${target})`,
+      focusInfo: 'Hash table memory allocated for O(1) complement lookup'
+    },
+    explanation: `Initialized Two-Sum solver for target ${target} using Hash Table.`,
+    aiHint: 'Checking target - num in a hash map solves Two-Sum in O(n) time instead of O(n²).'
+  });
+
+  for (let i = 0; i < arr.length; i++) {
+    const num = arr[i];
+    const complement = target - num;
+    const compKey = String(complement);
+
+    if (mapState[compKey] !== undefined) {
+      const complementIdx = mapState[compKey];
+      steps.push({
+        stepNumber: step++,
+        lineNumber: 5,
+        eventType: 'TARGET_FOUND',
+        variables: {
+          i,
+          num,
+          complement,
+          pairIndices: `[${complementIdx}, ${i}]`
+        },
+        output: [`Found Pair: arr[${complementIdx}] (${complement}) + arr[${i}] (${num}) = ${target}`],
+        dataStructureState: {
+          type: 'hash-table',
+          values: [...arr],
+          activeIndex: i,
+          comparedIndices: [complementIdx, i],
+          pointers: { i, complementIdx },
+          target,
+          hashTable: { ...mapState },
+          label: `PAIR FOUND! ${complement} + ${num} = ${target}`,
+          focusInfo: `Result Indices: [${complementIdx}, ${i}]`
+        },
+        explanation: `Target complement ${complement} found at index ${complementIdx}! arr[${complementIdx}] + arr[${i}] = ${target}.`,
+        aiHint: 'Two-Sum solved in O(n) one-pass time!'
+      });
+      break;
+    } else {
+      mapState[String(num)] = i;
+      steps.push({
+        stepNumber: step++,
+        lineNumber: 6,
+        eventType: 'HASH_INSERT',
+        variables: {
+          i,
+          num,
+          complementNeeded: complement,
+          stored: `${num} -> ${i}`
+        },
+        output: [],
+        dataStructureState: {
+          type: 'hash-table',
+          values: [...arr],
+          activeIndex: i,
+          pointers: { i },
+          target,
+          hashTable: { ...mapState },
+          label: `Stored (${num} -> Index ${i}) in Hash Table`,
+          focusInfo: `Complement ${complement} not yet encountered`
+        },
+        explanation: `Complement ${complement} not yet in map. Stored (${num} -> ${i}) in hash table.`,
+        aiHint: 'Map saves previously scanned numbers for upcoming complement lookups.'
+      });
+    }
+  }
+
+  return steps;
+}
+
+/**
+ * Dynamic 3D Merge Sort Trace Generator
+ */
+export function generateDynamicMergeSortTrace(values = [38, 27, 43, 3, 9, 82, 10], language = 'java') {
+  const arr = [...values];
+  const steps = [];
+  let step = 1;
+
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 2,
+    eventType: 'DIVIDE',
+    variables: { arr: `[${arr.join(', ')}]`, size: arr.length },
+    output: [],
+    dataStructureState: {
+      type: 'sorting',
+      values: [...arr],
+      label: `Merge Sort: Divide Array of Size ${arr.length}`,
+      focusInfo: 'Divide & conquer split into subproblems'
+    },
+    explanation: `Merge Sort begins: Recursively dividing array of size ${arr.length} into halves.`,
+    aiHint: 'Merge Sort guarantees O(n log n) time in all cases.'
+  });
+
+  const mid = Math.floor(arr.length / 2);
+  const leftSorted = [...arr.slice(0, mid)].sort((a, b) => a - b);
+  const midState = [...leftSorted, ...arr.slice(mid)];
+
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 5,
+    eventType: 'MERGE_SUBARRAY',
+    variables: { leftSubarray: `[${leftSorted.join(', ')}]` },
+    output: [],
+    dataStructureState: {
+      type: 'sorting',
+      values: [...midState],
+      comparedIndices: [0, Math.max(0, mid - 1)],
+      label: `Merged Left Subarray: [${leftSorted.join(', ')}]`,
+      focusInfo: `Left partition [0..${mid - 1}] sorted`
+    },
+    explanation: `Merged left partition into sorted sequence: [${leftSorted.join(', ')}].`,
+    aiHint: 'Two-way merge combines sorted halves in linear time.'
+  });
+
+  const rightSorted = [...arr.slice(mid)].sort((a, b) => a - b);
+  const finalMerged = [...leftSorted, ...rightSorted];
+
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 7,
+    eventType: 'MERGE_SUBARRAY',
+    variables: { rightSubarray: `[${rightSorted.join(', ')}]` },
+    output: [],
+    dataStructureState: {
+      type: 'sorting',
+      values: [...finalMerged],
+      comparedIndices: [mid, arr.length - 1],
+      label: `Merged Right Subarray: [${rightSorted.join(', ')}]`,
+      focusInfo: `Right partition [${mid}..${arr.length - 1}] sorted`
+    },
+    explanation: `Merged right partition into sorted sequence: [${rightSorted.join(', ')}].`,
+    aiHint: 'Both halves now sorted, preparing final combine step.'
+  });
+
+  const fullySorted = [...arr].sort((a, b) => a - b);
+  steps.push({
+    stepNumber: step,
+    lineNumber: 9,
+    eventType: 'PROGRAM_END',
+    variables: { sorted: `[${fullySorted.join(', ')}]` },
+    output: [`Merge Sort Complete: [${fullySorted.join(', ')}]`],
+    dataStructureState: {
+      type: 'sorting',
+      values: [...fullySorted],
+      sortedIndices: fullySorted.map((_, i) => i),
+      label: `Merge Sort Complete: [${fullySorted.join(', ')}]`,
+      focusInfo: 'Array fully sorted in O(n log n) time'
+    },
+    explanation: `Final merge complete. Array is completely sorted: [${fullySorted.join(', ')}].`,
+    aiHint: 'Merge sort is stable and optimal for large datasets.'
+  });
+
+  return steps;
+}
+
+/**
+ * Dynamic 3D Quick Sort Trace Generator
+ */
+export function generateDynamicQuickSortTrace(values = [10, 80, 30, 90, 40, 50, 70], language = 'java') {
+  const arr = [...values];
+  const steps = [];
+  let step = 1;
+  const n = arr.length;
+  const pivotIdx = n - 1;
+  const pivotVal = arr[pivotIdx];
+
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 3,
+    eventType: 'PIVOT_SELECT',
+    variables: { pivot: pivotVal, index: pivotIdx },
+    output: [],
+    dataStructureState: {
+      type: 'sorting',
+      values: [...arr],
+      activeIndex: pivotIdx,
+      pointers: { pivot: pivotIdx },
+      label: `Pivot Selected: ${pivotVal} at index ${pivotIdx}`,
+      focusInfo: `Partitioning elements relative to ${pivotVal}`
+    },
+    explanation: `Lomuto partition: Selected pivot ${pivotVal} at end index ${pivotIdx}.`,
+    aiHint: 'Elements smaller than pivot move left; larger move right.'
+  });
+
+  let pIndex = 0;
+  for (let i = 0; i < n - 1; i++) {
+    const curr = arr[i];
+    const shouldSwap = curr < pivotVal;
+
+    steps.push({
+      stepNumber: step++,
+      lineNumber: 5,
+      eventType: 'PARTITION_COMPARE',
+      variables: { 'arr[i]': curr, pivot: pivotVal, pIndex },
+      output: [],
+      dataStructureState: {
+        type: 'sorting',
+        values: [...arr],
+        comparedIndices: [i, pivotIdx],
+        pointers: { i, pIndex, pivot: pivotIdx },
+        label: `Compare arr[${i}] (${curr}) with pivot (${pivotVal})`,
+        focusInfo: shouldSwap ? `${curr} < ${pivotVal} -> Swap to left partition` : `${curr} >= ${pivotVal}`
+      },
+      explanation: `Comparing arr[${i}] (${curr}) against pivot ${pivotVal}.`,
+      aiHint: shouldSwap ? 'Swap moves smaller element to left boundary.' : 'Skip to next element.'
+    });
+
+    if (shouldSwap) {
+      if (i !== pIndex) {
+        const temp = arr[i];
+        arr[i] = arr[pIndex];
+        arr[pIndex] = temp;
+
+        steps.push({
+          stepNumber: step++,
+          lineNumber: 6,
+          eventType: 'PARTITION_SWAP',
+          variables: { swapped: `${temp} <-> ${arr[i]}`, pIndex },
+          output: [],
+          dataStructureState: {
+            type: 'sorting',
+            values: [...arr],
+            swappedIndices: [pIndex, i],
+            pointers: { pIndex, pivot: pivotIdx },
+            label: `Swapped ${temp} into left partition slot ${pIndex}`,
+            focusInfo: `Current array: [${arr.join(', ')}]`
+          },
+          explanation: `Swapped ${temp} into partition slot ${pIndex}.`,
+          aiHint: 'pIndex boundary advances rightward.'
+        });
+      }
+      pIndex++;
+    }
+  }
+
+  // Lock pivot
+  const temp = arr[pivotIdx];
+  arr[pivotIdx] = arr[pIndex];
+  arr[pIndex] = temp;
+
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 8,
+    eventType: 'PIVOT_PLACED',
+    variables: { pivotPlacedAt: pIndex, arr: `[${arr.join(', ')}]` },
+    output: [],
+    dataStructureState: {
+      type: 'sorting',
+      values: [...arr],
+      activeIndex: pIndex,
+      swappedIndices: [pIndex, pivotIdx],
+      label: `Pivot ${pivotVal} Locked at Index ${pIndex}!`,
+      focusInfo: `All elements left <= ${pivotVal}, all right >= ${pivotVal}`
+    },
+    explanation: `Pivot ${pivotVal} placed into final sorted position at index ${pIndex}.`,
+    aiHint: 'Array is cleanly partitioned into two subproblems.'
+  });
+
+  const fullySorted = [...arr].sort((a, b) => a - b);
+  steps.push({
+    stepNumber: step,
+    lineNumber: 10,
+    eventType: 'PROGRAM_END',
+    variables: { sorted: `[${fullySorted.join(', ')}]` },
+    output: [`Quick Sort Complete: [${fullySorted.join(', ')}]`],
+    dataStructureState: {
+      type: 'sorting',
+      values: [...fullySorted],
+      sortedIndices: fullySorted.map((_, i) => i),
+      label: `Quick Sort Complete: [${fullySorted.join(', ')}]`,
+      focusInfo: 'Average Time Complexity: O(n log n)'
+    },
+    explanation: `Quick Sort partition finished: [${fullySorted.join(', ')}].`,
+    aiHint: 'In-place sorting with O(log n) stack memory.'
+  });
+
+  return steps;
+}
+
+/**
+ * Dynamic 3D Floyd's Cycle Detection Trace Generator
+ */
+export function generateDynamicCycleTrace(values = [10, 20, 30, 40, 50], language = 'java') {
+  const arr = values.length >= 3 ? values : [10, 20, 30, 40, 50];
+  const steps = [];
+  const n = arr.length;
+  const slowMoves = [0, 1, 2, 3];
+  const fastMoves = [0, 2, 4, 3]; // fast loops back to index 3, meeting slow
+
+  slowMoves.forEach((sIdx, i) => {
+    const fIdx = fastMoves[i];
+    const collided = i === slowMoves.length - 1;
+
+    steps.push({
+      stepNumber: i + 1,
+      lineNumber: 5,
+      eventType: collided ? 'CYCLE_DETECTED' : 'POINTERS_ADVANCE',
+      variables: { slowVal: arr[sIdx], fastVal: arr[fIdx], iteration: i + 1 },
+      output: collided ? [`Cycle Collision at Node ${arr[sIdx]}!`] : [],
+      dataStructureState: {
+        type: 'linked-list',
+        values: [...arr],
+        activeIndex: sIdx,
+        pointers: { SLOW: sIdx, FAST: fIdx },
+        comparedIndices: [sIdx, fIdx],
+        label: collided ? `CYCLE DETECTED! Slow == Fast at Node ${arr[sIdx]}` : `Iteration ${i + 1}: Slow at ${arr[sIdx]}, Fast at ${arr[fIdx]}`,
+        focusInfo: collided ? `Collision confirmed at index ${sIdx}` : 'Slow moves 1 hop, Fast moves 2 hops'
+      },
+      explanation: collided
+        ? `Slow and Fast pointers collided at node ${arr[sIdx]}! Cycle confirmed.`
+        : `Iteration ${i + 1}: Slow at ${arr[sIdx]}, Fast at ${arr[fIdx]}.`,
+      aiHint: 'Floyd Tortoise & Hare detects loops with O(1) auxiliary space.'
+    });
+  });
+
+  return steps;
+}
+
+/**
+ * Dynamic 3D DP Array Trace Generator
+ */
+export function generateDynamicDpTrace(values = [1, 2, 3, 5, 8], language = 'java') {
+  const n = Math.max(5, Math.min(values.length, 7));
+  const dp = [1, 2];
+  const steps = [];
+  let step = 1;
+
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 2,
+    eventType: 'DP_BASE_CASE',
+    variables: { 'dp[0]': 1, 'dp[1]': 2 },
+    output: [],
+    dataStructureState: {
+      type: 'array',
+      values: [...dp],
+      activeIndex: 1,
+      label: 'DP Base Cases: dp[0]=1, dp[1]=2',
+      focusInfo: 'Subproblems cached in O(1)'
+    },
+    explanation: 'Initialized base DP states: dp[0]=1, dp[1]=2.',
+    aiHint: 'Base subproblems eliminate redundant calculation.'
+  });
+
+  for (let i = 2; i < n; i++) {
+    const val = dp[i - 1] + dp[i - 2];
+    dp.push(val);
+
+    steps.push({
+      stepNumber: step++,
+      lineNumber: 5,
+      eventType: 'DP_TRANSITION',
+      variables: { i, 'dp[i-1]': dp[i - 1], 'dp[i-2]': dp[i - 2], 'dp[i]': val },
+      output: [],
+      dataStructureState: {
+        type: 'array',
+        values: [...dp],
+        activeIndex: i,
+        comparedIndices: [i - 2, i - 1],
+        pointers: { i, prev1: i - 1, prev2: i - 2 },
+        label: `dp[${i}] = dp[${i - 1}] + dp[${i - 2}] = ${val}`,
+        focusInfo: `State computed from cached solutions`
+      },
+      explanation: `Computed optimal state dp[${i}] = ${val} from previous states.`,
+      aiHint: 'Dynamic programming eliminates exponential tree recursion into linear time.'
+    });
+  }
+
+  return steps;
+}
+
+/**
  * Dynamically synthesizes an execution trace for ANY custom user code or program ID.
  * Parses user numbers, detects algorithms & data structures, and provides real 3D steps.
  */
@@ -1158,52 +1656,113 @@ export function getExecutionTrace(code, language = 'java') {
   const cleanCode = code.toLowerCase();
   const values = extractNumbersFromCode(code);
 
-  // 1. Linked List
+  // 1. Kadane's Algorithm (Maximum Subarray Sum)
+  const isKadane = cleanCode.includes('maxsubarray') ||
+    cleanCode.includes('kadane') ||
+    (cleanCode.includes('max') && cleanCode.includes('sum') && (cleanCode.includes('cur') || cleanCode.includes('curr') || cleanCode.includes('sofar')));
+  if (isKadane) {
+    const kadaneVals = values.length >= 3 ? values : [-2, 1, -3, 4, -1, 2, 1, -5, 4];
+    return generateDynamicKadaneTrace(kadaneVals, language);
+  }
+
+  // 2. Two-Sum / HashMap Key-Value Lookup
+  const isTwoSum = cleanCode.includes('twosum') ||
+    cleanCode.includes('two_sum') ||
+    (cleanCode.includes('map') && cleanCode.includes('target')) ||
+    (cleanCode.includes('target') && cleanCode.includes('diff')) ||
+    cleanCode.includes('hashmap') ||
+    cleanCode.includes('unordered_map');
+  if (isTwoSum) {
+    const twoSumVals = values.length >= 2 ? values : [2, 7, 11, 15];
+    const targetMatch = cleanCode.match(/target\s*=\s*(-?\d+)/);
+    const target = targetMatch ? parseInt(targetMatch[1], 10) : 9;
+    return generateDynamicTwoSumTrace(twoSumVals, target, language);
+  }
+
+  // 3. Merge Sort
+  const isMergeSort = cleanCode.includes('mergesort') ||
+    cleanCode.includes('merge_sort') ||
+    (cleanCode.includes('merge') && cleanCode.includes('mid'));
+  if (isMergeSort) {
+    const mergeVals = values.length >= 3 ? values : [38, 27, 43, 3, 9, 82, 10];
+    return generateDynamicMergeSortTrace(mergeVals, language);
+  }
+
+  // 4. Quick Sort
+  const isQuickSort = cleanCode.includes('quicksort') ||
+    cleanCode.includes('quick_sort') ||
+    (cleanCode.includes('partition') && cleanCode.includes('pivot'));
+  if (isQuickSort) {
+    const quickVals = values.length >= 3 ? values : [10, 80, 30, 90, 40, 50, 70];
+    return generateDynamicQuickSortTrace(quickVals, language);
+  }
+
+  // 5. Floyd Cycle Detection
+  const isCycle = cleanCode.includes('hascycle') ||
+    (cleanCode.includes('cycle') && (cleanCode.includes('slow') || cleanCode.includes('fast')));
+  if (isCycle) {
+    const cycleVals = values.length >= 3 ? values : [10, 20, 30, 40, 50];
+    return generateDynamicCycleTrace(cycleVals, language);
+  }
+
+  // 6. Dynamic Programming
+  const isDp = cleanCode.includes('dp[') ||
+    cleanCode.includes('memo[') ||
+    cleanCode.includes('knapsack') ||
+    cleanCode.includes('coinchange') ||
+    cleanCode.includes('climbstairs') ||
+    cleanCode.includes('rob');
+  if (isDp) {
+    const dpVals = values.length >= 3 ? values : [1, 2, 3, 5, 8];
+    return generateDynamicDpTrace(dpVals, language);
+  }
+
+  // 7. Linked List
   if (cleanCode.includes('node') || cleanCode.includes('head') || cleanCode.includes('next') || cleanCode.includes('linkedlist')) {
     return generateDynamicLinkedListTrace(values, language);
   }
 
-  // 2. Stack
+  // 8. Stack
   if (cleanCode.includes('stack') || (cleanCode.includes('push') && cleanCode.includes('pop'))) {
     return generateDynamicStackTrace(values, language);
   }
 
-  // 3. Queue / Deque
+  // 9. Queue / Deque
   if (cleanCode.includes('queue') || cleanCode.includes('deque') || cleanCode.includes('poll') || cleanCode.includes('enqueue')) {
     return generateDynamicQueueTrace(values, language);
   }
 
-  // 4. Tree / BST
+  // 10. Tree / BST
   if (cleanCode.includes('tree') || cleanCode.includes('root') || (cleanCode.includes('left') && cleanCode.includes('right'))) {
     return generateDynamicTreeTrace(values, language);
   }
 
-  // 5. 2D Matrix
+  // 11. 2D Matrix
   if (cleanCode.includes('[][]') || cleanCode.includes('matrix') || cleanCode.includes('grid') || (cleanCode.includes('row') && cleanCode.includes('col'))) {
     return generateDynamicMatrixTrace(values, language);
   }
 
-  // 6. Recursion / Call Stack
+  // 12. Recursion / Call Stack
   if (cleanCode.includes('factorial') || cleanCode.includes('fib') || cleanCode.includes('recur')) {
     return generateDynamicRecursionTrace(values, language);
   }
 
-  // 7. Graph BFS / DFS / Dijkstra
+  // 13. Graph BFS / DFS / Dijkstra
   if (cleanCode.includes('graph') || cleanCode.includes('dfs') || cleanCode.includes('bfs') || cleanCode.includes('dijkstra')) {
     return generateDynamicGraphTrace(values, language);
   }
 
-  // 8. Two-Pointer Reverse
+  // 14. Two-Pointer Reverse
   if (cleanCode.includes('reverse') || (cleanCode.includes('left') && cleanCode.includes('right')) || (cleanCode.includes('start') && cleanCode.includes('end'))) {
     return generateDynamicReverseTrace(values, language);
   }
 
-  // 9. Binary Search
+  // 15. Binary Search
   if (cleanCode.includes('binary') || (cleanCode.includes('mid') && cleanCode.includes('high'))) {
     return generateDynamicBinarySearchTrace(values, language);
   }
 
-  // 10. Sorting
+  // 16. Sorting
   const isSort = cleanCode.includes('sort') ||
     cleanCode.includes('swap') ||
     (cleanCode.includes('>') && cleanCode.includes('temp')) ||
@@ -1213,7 +1772,7 @@ export function getExecutionTrace(code, language = 'java') {
     return generateDynamicSortTrace(values, language);
   }
 
-  // 11. Default Dynamic Linear Array Traversal
+  // 17. Default Dynamic Linear Array Traversal
   return generateDynamicArrayTrace(values, language);
 }
 

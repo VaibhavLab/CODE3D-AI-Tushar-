@@ -88,11 +88,24 @@ public class CodeCorrectionService {
             }
 
             // Bug E: Missing main method / class structure in Java
-            if ("java".equals(language) && !correctedCode.contains("class ") && !correctedCode.contains("static void main")) {
-                errorsFound.add("Missing class and main method wrapper. Structured into executable 'public class Main'.");
-                correctedCode = "public class Main {\n    public static void main(String[] args) {\n        " +
-                        correctedCode.replace("\n", "\n        ") +
-                        "\n    }\n}";
+            if ("java".equals(language)) {
+                if (!correctedCode.contains("class ") && !correctedCode.contains("static void main")) {
+                    errorsFound.add("Missing class and main method wrapper. Structured into executable 'public class Main'.");
+                    correctedCode = "public class Main {\n    public static void main(String[] args) {\n        " +
+                            correctedCode.replace("\n", "\n        ") +
+                            "\n    }\n}";
+                } else if (correctedCode.contains("class ") && !correctedCode.contains("static void main")) {
+                    errorsFound.add("LeetCode class detected without main driver. Injected executable static main test driver.");
+                    int lastBrace = correctedCode.lastIndexOf("}");
+                    if (lastBrace != -1) {
+                        String driver = """
+    public static void main(String[] args) {
+        System.out.println("Executing 3D Solution Trace...");
+    }
+}""";
+                        correctedCode = correctedCode.substring(0, lastBrace) + "\n" + driver;
+                    }
+                }
             }
 
             // Bug F: Missing semicolons on declarations in Java, C, C++, JavaScript

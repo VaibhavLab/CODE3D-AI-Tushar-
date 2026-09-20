@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Center, Grid } from '@react-three/drei';
+import { OrbitControls, Center, Grid, Sparkles, ContactShadows } from '@react-three/drei';
 import { Compass, RotateCw, ZoomIn } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 
@@ -59,6 +59,26 @@ export default function SceneContainer({ children, statusLabel, activeDetails })
           <Center top>
             {children}
           </Center>
+
+          {/* Cinematic Ambient Particle Sparkles */}
+          <Sparkles
+            count={45}
+            scale={14}
+            size={2.5}
+            speed={0.35}
+            opacity={isBright ? 0.35 : 0.55}
+            color={isBright ? '#0284c7' : '#38bdf8'}
+          />
+
+          {/* Soft Grounding Contact Shadows */}
+          <ContactShadows
+            position={[0, -0.02, 0]}
+            opacity={isBright ? 0.45 : 0.75}
+            scale={24}
+            blur={2.4}
+            far={4.5}
+            color={isBright ? '#64748b' : '#000000'}
+          />
 
           {/* Floor Grid for depth perception */}
           <Grid
