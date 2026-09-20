@@ -1,7 +1,10 @@
 import React from 'react';
 import { Variable, CheckCircle2, XCircle, Sparkles, Layers, Cpu, ArrowRight } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 export default function StatePanel({ currentStep, totalSteps }) {
+  const { isBright } = useTheme();
+
   if (!currentStep) return null;
 
   const {
@@ -17,18 +20,26 @@ export default function StatePanel({ currentStep, totalSteps }) {
   } = currentStep;
 
   return (
-    <div className="flex flex-col h-full bg-[#0d121f] text-slate-200 border-l border-slate-800/80 overflow-y-auto">
+    <div className={`flex flex-col h-full border-l overflow-y-auto transition-colors duration-200 ${
+      isBright
+        ? 'bg-white text-slate-800 border-slate-200'
+        : 'bg-[#0b101d] text-slate-200 border-slate-800/80'
+    }`}>
       {/* State Panel Header */}
-      <div className="h-10 bg-slate-900/90 border-b border-slate-800/80 px-3.5 flex items-center justify-between sticky top-0 z-10">
+      <div className={`h-10 border-b px-3.5 flex items-center justify-between sticky top-0 z-10 transition-colors ${
+        isBright
+          ? 'bg-slate-50/95 border-slate-200 text-slate-800'
+          : 'bg-slate-900/90 border-slate-800/80 text-slate-200'
+      }`}>
         <div className="flex items-center gap-2">
-          <Cpu size={14} className="text-cyan-400" />
-          <span className="text-xs font-semibold uppercase tracking-wider text-slate-300">
+          <Cpu size={14} className={isBright ? 'text-cyan-600' : 'text-cyan-400'} />
+          <span className={`text-xs font-semibold uppercase tracking-wider ${isBright ? 'text-slate-700' : 'text-slate-300'}`}>
             Program State
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[11px] font-mono text-slate-400">
-            Step <strong className="text-cyan-400 font-bold">{stepNumber}</strong> of {totalSteps}
+          <span className={`text-[11px] font-mono ${isBright ? 'text-slate-500' : 'text-slate-400'}`}>
+            Step <strong className={`font-bold ${isBright ? 'text-cyan-700' : 'text-cyan-400'}`}>{stepNumber}</strong> of {totalSteps}
           </span>
         </div>
       </div>
@@ -36,33 +47,60 @@ export default function StatePanel({ currentStep, totalSteps }) {
       <div className="p-3.5 space-y-3.5 flex-1 text-xs">
         {/* Step & Line Metric Cards */}
         <div className="grid grid-cols-2 gap-2">
-          <div className="bg-slate-900/70 border border-slate-800 rounded-lg p-2.5">
-            <span className="text-[10px] uppercase text-slate-500 font-medium">Current Line</span>
-            <div className="text-base font-mono font-bold text-cyan-400 mt-0.5 flex items-center gap-1.5">
+          <div className={`border rounded-lg p-2.5 transition-colors ${
+            isBright
+              ? 'bg-slate-50/90 border-slate-200'
+              : 'bg-slate-900/70 border-slate-800'
+          }`}>
+            <span className={`text-[10px] uppercase font-medium ${isBright ? 'text-slate-500' : 'text-slate-400'}`}>
+              Current Line
+            </span>
+            <div className={`text-base font-mono font-bold mt-0.5 flex items-center gap-1.5 ${
+              isBright ? 'text-cyan-700' : 'text-cyan-400'
+            }`}>
               <span>Line {lineNumber}</span>
             </div>
           </div>
-          <div className="bg-slate-900/70 border border-slate-800 rounded-lg p-2.5">
-            <span className="text-[10px] uppercase text-slate-500 font-medium">Event Type</span>
-            <div className="text-[11px] font-mono font-semibold text-slate-300 mt-1 truncate">
+
+          <div className={`border rounded-lg p-2.5 transition-colors ${
+            isBright
+              ? 'bg-slate-50/90 border-slate-200'
+              : 'bg-slate-900/70 border-slate-800'
+          }`}>
+            <span className={`text-[10px] uppercase font-medium ${isBright ? 'text-slate-500' : 'text-slate-400'}`}>
+              Event Type
+            </span>
+            <div className={`text-[11px] font-mono font-semibold mt-1 truncate ${
+              isBright ? 'text-slate-800' : 'text-slate-300'
+            }`}>
               {currentStep.eventType || 'EXECUTION'}
             </div>
           </div>
         </div>
 
         {/* Variables Section */}
-        <div className="bg-slate-900/60 border border-slate-800/80 rounded-lg p-3">
+        <div className={`border rounded-lg p-3 transition-colors ${
+          isBright
+            ? 'bg-slate-50/80 border-slate-200'
+            : 'bg-slate-900/60 border-slate-800/80'
+        }`}>
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-1.5">
-              <Variable size={13} className="text-cyan-400" />
-              <span className="font-semibold text-slate-300 text-xs">Variable Memory</span>
+              <Variable size={13} className={isBright ? 'text-cyan-600' : 'text-cyan-400'} />
+              <span className={`font-semibold text-xs ${isBright ? 'text-slate-800' : 'text-slate-300'}`}>
+                Variable Memory
+              </span>
             </div>
-            <span className="text-[10px] font-mono text-slate-500">Stack Frame: main</span>
+            <span className={`text-[10px] font-mono ${isBright ? 'text-slate-500' : 'text-slate-400'}`}>
+              Scope: active
+            </span>
           </div>
 
           <div className="space-y-1.5 font-mono">
             {Object.keys(variables).length === 0 ? (
-              <p className="text-slate-500 italic text-[11px]">No local variables in scope.</p>
+              <p className={`italic text-[11px] ${isBright ? 'text-slate-400' : 'text-slate-500'}`}>
+                No local variables in scope.
+              </p>
             ) : (
               Object.entries(variables).map(([name, val]) => {
                 const isRecentlyChanged = changedVariable === name;
@@ -72,23 +110,39 @@ export default function StatePanel({ currentStep, totalSteps }) {
                     key={name}
                     className={`flex items-center justify-between p-2 rounded transition-all border ${
                       isRecentlyChanged
-                        ? 'bg-cyan-950/40 border-cyan-500/50 text-cyan-200'
+                        ? isBright
+                          ? 'bg-cyan-50/90 border-cyan-400 text-cyan-950 font-semibold'
+                          : 'bg-cyan-950/40 border-cyan-500/50 text-cyan-200'
+                        : isBright
+                        ? 'bg-white border-slate-200 text-slate-700 shadow-2xs'
                         : 'bg-slate-950/50 border-slate-800/60 text-slate-300'
                     }`}
                   >
-                    <span className="text-slate-400 font-medium">{name}</span>
+                    <span className={isBright ? 'text-slate-600 font-medium' : 'text-slate-400 font-medium'}>
+                      {name}
+                    </span>
                     <div className="flex items-center gap-2">
                       {isRecentlyChanged && previousValue !== null && (
-                        <div className="flex items-center gap-1 text-[10px] text-slate-500 line-through">
+                        <div className={`flex items-center gap-1 text-[10px] line-through ${
+                          isBright ? 'text-slate-400' : 'text-slate-500'
+                        }`}>
                           <span>{String(previousValue)}</span>
-                          <ArrowRight size={10} className="text-slate-600 no-underline" />
+                          <ArrowRight size={10} className="text-slate-400 no-underline" />
                         </div>
                       )}
-                      <span className={`font-bold ${isRecentlyChanged ? 'text-cyan-300' : 'text-slate-100'}`}>
+                      <span className={`font-bold ${
+                        isRecentlyChanged
+                          ? isBright ? 'text-cyan-700' : 'text-cyan-300'
+                          : isBright ? 'text-slate-900' : 'text-slate-100'
+                      }`}>
                         {String(val)}
                       </span>
                       {isRecentlyChanged && (
-                        <span className="text-[9px] px-1 py-0.2 rounded bg-cyan-900/80 text-cyan-300 font-sans uppercase">
+                        <span className={`text-[9px] px-1 py-0.2 rounded font-sans uppercase font-bold ${
+                          isBright
+                            ? 'bg-cyan-100 text-cyan-800'
+                            : 'bg-cyan-900/80 text-cyan-300'
+                        }`}>
                           Updated
                         </span>
                       )}
@@ -102,59 +156,105 @@ export default function StatePanel({ currentStep, totalSteps }) {
 
         {/* Condition Evaluation Card */}
         {condition ? (
-          <div className="bg-slate-900/60 border border-slate-800/80 rounded-lg p-3">
+          <div className={`border rounded-lg p-3 transition-colors ${
+            isBright
+              ? 'bg-slate-50/80 border-slate-200'
+              : 'bg-slate-900/60 border-slate-800/80'
+          }`}>
             <div className="flex items-center justify-between mb-2">
-              <span className="font-semibold text-slate-300 text-xs">Condition Evaluation</span>
+              <span className={`font-semibold text-xs ${isBright ? 'text-slate-800' : 'text-slate-300'}`}>
+                Condition Evaluation
+              </span>
               {condition.result ? (
-                <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-800/50 px-1.5 py-0.5 rounded">
+                <span className={`flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded border ${
+                  isBright
+                    ? 'text-emerald-800 bg-emerald-100 border-emerald-300'
+                    : 'text-emerald-400 bg-emerald-950/60 border-emerald-800/50'
+                }`}>
                   <CheckCircle2 size={11} /> TRUE
                 </span>
               ) : (
-                <span className="flex items-center gap-1 text-[10px] font-bold text-rose-400 bg-rose-950/60 border border-rose-800/50 px-1.5 py-0.5 rounded">
+                <span className={`flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded border ${
+                  isBright
+                    ? 'text-rose-800 bg-rose-100 border-rose-300'
+                    : 'text-rose-400 bg-rose-950/60 border-rose-800/50'
+                }`}>
                   <XCircle size={11} /> FALSE
                 </span>
               )}
             </div>
 
-            <div className="space-y-1 bg-slate-950/70 border border-slate-800 rounded p-2 font-mono text-[11px]">
-              <div className="text-slate-400">
-                Expression: <span className="text-slate-200">{condition.expression}</span>
+            <div className={`space-y-1 rounded p-2 font-mono text-[11px] border ${
+              isBright
+                ? 'bg-white border-slate-200 text-slate-800'
+                : 'bg-slate-950/70 border-slate-800 text-slate-300'
+            }`}>
+              <div className={isBright ? 'text-slate-600' : 'text-slate-400'}>
+                Expression: <span className={`font-medium ${isBright ? 'text-slate-900' : 'text-slate-200'}`}>{condition.expression}</span>
               </div>
-              <div className="text-slate-400">
-                Values: <span className="text-cyan-300 font-semibold">{condition.evaluation}</span>
+              <div className={isBright ? 'text-slate-600' : 'text-slate-400'}>
+                Evaluation: <span className={`font-semibold ${isBright ? 'text-cyan-700' : 'text-cyan-300'}`}>{condition.evaluation}</span>
               </div>
-              <div className="text-slate-500 text-[10px] mt-1 pt-1 border-t border-slate-800/60">
-                Branch: <span className="text-slate-300">{condition.branch}</span>
+              <div className={`text-[10px] mt-1 pt-1 border-t ${
+                isBright ? 'border-slate-100 text-slate-500' : 'border-slate-800/60 text-slate-500'
+              }`}>
+                Branch: <span className={isBright ? 'text-slate-800 font-semibold' : 'text-slate-300'}>{condition.branch}</span>
               </div>
             </div>
           </div>
         ) : null}
 
         {/* Call Stack */}
-        <div className="bg-slate-900/60 border border-slate-800/80 rounded-lg p-3">
+        <div className={`border rounded-lg p-3 transition-colors ${
+          isBright
+            ? 'bg-slate-50/80 border-slate-200'
+            : 'bg-slate-900/60 border-slate-800/80'
+        }`}>
           <div className="flex items-center gap-1.5 mb-2">
-            <Layers size={13} className="text-cyan-400" />
-            <span className="font-semibold text-slate-300 text-xs">Call Stack</span>
+            <Layers size={13} className={isBright ? 'text-cyan-600' : 'text-cyan-400'} />
+            <span className={`font-semibold text-xs ${isBright ? 'text-slate-800' : 'text-slate-300'}`}>
+              Call Stack
+            </span>
           </div>
-          <div className="bg-slate-950/50 border border-slate-800 rounded p-2 font-mono text-[11px] text-slate-300 flex items-center justify-between">
-            <span className="text-cyan-400">Main.main(args)</span>
-            <span className="text-[10px] text-slate-500">line {lineNumber}</span>
+          <div className={`border rounded p-2 font-mono text-[11px] flex items-center justify-between ${
+            isBright
+              ? 'bg-white border-slate-200 text-slate-700'
+              : 'bg-slate-950/50 border-slate-800 text-slate-300'
+          }`}>
+            <span className={isBright ? 'text-cyan-700 font-semibold' : 'text-cyan-400'}>
+              Main.execute()
+            </span>
+            <span className={`text-[10px] ${isBright ? 'text-slate-500' : 'text-slate-500'}`}>
+              line {lineNumber}
+            </span>
           </div>
         </div>
 
         {/* AI Pedagogical Explanation */}
-        <div className="bg-gradient-to-br from-cyan-950/20 to-slate-900/60 border border-cyan-800/30 rounded-lg p-3">
-          <div className="flex items-center gap-1.5 mb-1.5 text-cyan-400 font-semibold text-xs">
+        <div className={`border rounded-lg p-3 transition-colors ${
+          isBright
+            ? 'bg-gradient-to-br from-cyan-50 via-sky-50 to-indigo-50 border-cyan-200 shadow-2xs'
+            : 'bg-gradient-to-br from-cyan-950/30 to-slate-900/60 border-cyan-800/30'
+        }`}>
+          <div className={`flex items-center gap-1.5 mb-1.5 font-semibold text-xs ${
+            isBright ? 'text-cyan-800' : 'text-cyan-400'
+          }`}>
             <Sparkles size={13} />
             <span>Execution Insight</span>
           </div>
-          <p className="text-slate-300 text-[11.5px] leading-relaxed font-sans">
+          <p className={`text-[11.5px] leading-relaxed font-sans ${
+            isBright ? 'text-slate-700' : 'text-slate-300'
+          }`}>
             {explanation}
           </p>
 
           {aiHint && (
-            <div className="mt-2 pt-2 border-t border-cyan-900/30 text-[11px] text-slate-400 flex items-start gap-1.5">
-              <span className="text-cyan-400 font-bold">Hint:</span>
+            <div className={`mt-2 pt-2 border-t text-[11px] flex items-start gap-1.5 ${
+              isBright
+                ? 'border-cyan-200 text-slate-600'
+                : 'border-cyan-900/30 text-slate-400'
+            }`}>
+              <span className={`font-bold ${isBright ? 'text-cyan-700' : 'text-cyan-400'}`}>Hint:</span>
               <span>{aiHint}</span>
             </div>
           )}

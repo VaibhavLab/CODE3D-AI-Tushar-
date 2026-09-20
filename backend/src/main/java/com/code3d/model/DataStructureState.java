@@ -20,11 +20,23 @@ public class DataStructureState {
     private Map<String, Object> pointers;
     private Map<String, Object> window;
     private Map<String, Object> hashTable;
+    private Map<String, Object> waterVolume;
+    private Integer parentIndex;
+    private String heapType;
     private Object target;
     private String label;
     private String focusInfo;
 
     public DataStructureState() {}
+
+    public Map<String, Object> getWaterVolume() { return waterVolume; }
+    public void setWaterVolume(Map<String, Object> waterVolume) { this.waterVolume = waterVolume; }
+
+    public Integer getParentIndex() { return parentIndex; }
+    public void setParentIndex(Integer parentIndex) { this.parentIndex = parentIndex; }
+
+    public String getHeapType() { return heapType; }
+    public void setHeapType(String heapType) { this.heapType = heapType; }
 
     public Map<String, Object> getWindow() { return window; }
     public void setWindow(Map<String, Object> window) { this.window = window; }

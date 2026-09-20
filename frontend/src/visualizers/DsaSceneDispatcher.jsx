@@ -9,6 +9,7 @@ import SortingVisualizer3D from './SortingVisualizer3D';
 import RecursionVisualizer3D from './RecursionVisualizer3D';
 import GraphVisualizer3D from './GraphVisualizer3D';
 import HashTableVisualizer3D from './HashTableVisualizer3D';
+import HeapVisualizer3D from './HeapVisualizer3D';
 
 export default function DsaSceneDispatcher({ dataStructureState }) {
   if (!dataStructureState) return null;
@@ -16,6 +17,12 @@ export default function DsaSceneDispatcher({ dataStructureState }) {
   const type = dataStructureState.type ? dataStructureState.type.toLowerCase() : 'array';
 
   switch (type) {
+    case 'heap':
+    case 'priority-queue':
+    case 'min-heap':
+    case 'max-heap':
+    case 'binary-heap':
+      return <HeapVisualizer3D dataStructureState={dataStructureState} />;
     case 'hash-table':
     case 'hashtable':
     case 'hashmap':
@@ -28,6 +35,9 @@ export default function DsaSceneDispatcher({ dataStructureState }) {
     case 'graph-bfs':
     case 'graph-dfs':
     case 'dijkstra':
+    case 'topological-sort':
+    case 'topological':
+    case 'kahn':
       return <GraphVisualizer3D dataStructureState={dataStructureState} />;
     case 'matrix':
     case '2d-array':
@@ -42,6 +52,8 @@ export default function DsaSceneDispatcher({ dataStructureState }) {
       return <LinkedListVisualizer3D dataStructureState={dataStructureState} />;
     case 'stack':
     case 'parentheses-stack':
+    case 'monotonic-stack':
+    case 'next-greater':
       return <StackVisualizer3D dataStructureState={dataStructureState} />;
     case 'queue':
     case 'circular-queue':
@@ -66,6 +78,8 @@ export default function DsaSceneDispatcher({ dataStructureState }) {
     case 'call-stack':
     case 'factorial':
       return <RecursionVisualizer3D dataStructureState={dataStructureState} />;
+    case 'container-water':
+    case 'most-water':
     case 'kadane':
     case 'subarray':
     case 'array':

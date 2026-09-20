@@ -661,6 +661,131 @@ public class DsaCatalogController {
                             System.out.println("LCS Length: " + dp[m][n]);
                         }
                     }
+                    """),
+
+            new DsaConcept("container-most-water", "Container With Most Water", "Arrays & Matrices",
+                    "Find two vertical lines that together with x-axis form container holding maximum water capacity.",
+                    "Intermediate", "O(n)", "O(1)",
+                    """
+                    public class Main {
+                        public static void main(String[] args) {
+                            int[] height = {1, 8, 6, 2, 5, 4, 8, 3, 7};
+                            int left = 0, right = height.length - 1;
+                            int maxArea = 0;
+
+                            while (left < right) {
+                                int currentArea = Math.min(height[left], height[right]) * (right - left);
+                                maxArea = Math.max(maxArea, currentArea);
+
+                                if (height[left] < height[right]) {
+                                    left++;
+                                } else {
+                                    right--;
+                                }
+                            }
+                            System.out.println("Max Water Capacity = " + maxArea);
+                        }
+                    }
+                    """),
+
+            new DsaConcept("monotonic-stack", "Monotonic Stack (Next Greater Element)", "Stacks & Queues",
+                    "Maintain elements in monotonic decreasing order to resolve nearest greater element in O(1) amortized.",
+                    "Intermediate", "O(n)", "O(n)",
+                    """
+                    import java.util.Stack;
+                    import java.util.Arrays;
+
+                    public class Main {
+                        public static void main(String[] args) {
+                            int[] arr = {4, 5, 2, 25, 7, 8};
+                            int n = arr.length;
+                            int[] nge = new int[n];
+                            Arrays.fill(nge, -1);
+                            Stack<Integer> stack = new Stack<>();
+
+                            for (int i = 0; i < n; i++) {
+                                while (!stack.isEmpty() && arr[stack.peek()] < arr[i]) {
+                                    nge[stack.pop()] = arr[i];
+                                }
+                                stack.push(i);
+                            }
+                            System.out.println("Next Greater Elements: " + Arrays.toString(nge));
+                        }
+                    }
+                    """),
+
+            new DsaConcept("heap-priority-queue", "Binary Min-Heap (Priority Queue)", "Trees & Tries",
+                    "Insert element into complete binary tree and bubble-up to restore min-heap invariance.",
+                    "Intermediate", "O(log n)", "O(n)",
+                    """
+                    import java.util.PriorityQueue;
+
+                    public class Main {
+                        public static void main(String[] args) {
+                            PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+                            int[] elements = {10, 15, 20, 17, 25, 30};
+
+                            for (int val : elements) {
+                                minHeap.add(val);
+                            }
+                            // Insert new element triggering bubble-up
+                            minHeap.add(8);
+
+                            System.out.println("Root Minimum Key = " + minHeap.peek());
+                        }
+                    }
+                    """),
+
+            new DsaConcept("topological-sort-dag", "Topological Sort (Kahn's DAG Algorithm)", "Graphs",
+                    "Order vertices linearly using in-degree queue resolution on Directed Acyclic Graph (DAG).",
+                    "Advanced", "O(V + E)", "O(V)",
+                    """
+                    import java.util.*;
+
+                    public class Main {
+                        public static void main(String[] args) {
+                            int numNodes = 5;
+                            int[] inDegree = {0, 1, 1, 2, 1};
+                            Queue<Integer> queue = new LinkedList<>();
+
+                            for (int i = 0; i < numNodes; i++) {
+                                if (inDegree[i] == 0) queue.add(i);
+                            }
+
+                            List<Integer> topoOrder = new ArrayList<>();
+                            while (!queue.isEmpty()) {
+                                int node = queue.poll();
+                                topoOrder.add(node);
+                            }
+                            System.out.println("Topological Order = " + topoOrder);
+                        }
+                    }
+                    """),
+
+            new DsaConcept("coin-change-dp", "Coin Change Problem (Dynamic Programming)", "Dynamic Programming & Recursion",
+                    "Find minimum number of coins needed to make given amount using bottom-up 1D DP table.",
+                    "Intermediate", "O(Amount × Coins)", "O(Amount)",
+                    """
+                    import java.util.Arrays;
+
+                    public class Main {
+                        public static void main(String[] args) {
+                            int[] coins = {1, 2, 5};
+                            int amount = 7;
+                            int[] dp = new int[amount + 1];
+                            Arrays.fill(dp, amount + 1);
+                            dp[0] = 0;
+
+                            for (int i = 1; i <= amount; i++) {
+                                for (int coin : coins) {
+                                    if (i >= coin) {
+                                        dp[i] = Math.min(dp[i], dp[i - coin] + 1);
+                                    }
+                                }
+                            }
+                            System.out.println("Min coins for $" + amount + " = " + dp[amount]);
+                        }
+                    }
                     """)
     );
 

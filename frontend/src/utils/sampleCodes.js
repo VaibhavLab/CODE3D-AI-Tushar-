@@ -806,6 +806,147 @@ public class Main {
         System.out.println("Length of LCS = " + dp[m][n]);
     }
 }`,
+  },
+  {
+    id: 'container-most-water',
+    title: '31. Container With Most Water',
+    category: 'Arrays & Matrices',
+    description: 'Find two vertical lines that together with x-axis form container holding maximum water capacity.',
+    difficulty: 'Intermediate',
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(1)',
+    code: `public class Main {
+    public static void main(String[] args) {
+        int[] height = {1, 8, 6, 2, 5, 4, 8, 3, 7};
+        int left = 0, right = height.length - 1;
+        int maxArea = 0;
+
+        while (left < right) {
+            int currentArea = Math.min(height[left], height[right]) * (right - left);
+            maxArea = Math.max(maxArea, currentArea);
+
+            if (height[left] < height[right]) {
+                left++;
+            } else {
+                right--;
+            }
+        }
+        System.out.println("Max Water Capacity = " + maxArea);
+    }
+}`,
+  },
+  {
+    id: 'monotonic-stack',
+    title: '32. Monotonic Stack (Next Greater Element)',
+    category: 'Stacks & Queues',
+    description: 'Maintain elements in monotonic decreasing order to resolve nearest greater element in O(1) amortized.',
+    difficulty: 'Intermediate',
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(n)',
+    code: `import java.util.Stack;
+import java.util.Arrays;
+
+public class Main {
+    public static void main(String[] args) {
+        int[] arr = {4, 5, 2, 25, 7, 8};
+        int n = arr.length;
+        int[] nge = new int[n];
+        Arrays.fill(nge, -1);
+        Stack<Integer> stack = new Stack<>();
+
+        for (int i = 0; i < n; i++) {
+            while (!stack.isEmpty() && arr[stack.peek()] < arr[i]) {
+                nge[stack.pop()] = arr[i];
+            }
+            stack.push(i);
+        }
+        System.out.println("Next Greater Elements: " + Arrays.toString(nge));
+    }
+}`,
+  },
+  {
+    id: 'heap-priority-queue',
+    title: '33. Min-Heap (Priority Queue Bubble-Up)',
+    category: 'Trees & Tries',
+    description: 'Insert element into complete binary tree and bubble-up to restore min-heap invariance.',
+    difficulty: 'Intermediate',
+    timeComplexity: 'O(log n)',
+    spaceComplexity: 'O(n)',
+    code: `import java.util.PriorityQueue;
+
+public class Main {
+    public static void main(String[] args) {
+        PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+        int[] elements = {10, 15, 20, 17, 25, 30};
+
+        for (int val : elements) {
+            minHeap.add(val);
+        }
+        // Insert new element triggering bubble-up
+        minHeap.add(8);
+
+        System.out.println("Root Minimum Key = " + minHeap.peek());
+    }
+}`,
+  },
+  {
+    id: 'topological-sort-dag',
+    title: "34. Topological Sort (Kahn's Algorithm)",
+    category: 'Graphs',
+    description: 'Order vertices linearly using in-degree queue resolution on Directed Acyclic Graph (DAG).',
+    difficulty: 'Advanced',
+    timeComplexity: 'O(V + E)',
+    spaceComplexity: 'O(V)',
+    code: `import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        // Kahn's DAG Algorithm: in-degrees of nodes A, B, C, D, E
+        int numNodes = 5;
+        int[] inDegree = {0, 1, 1, 2, 1};
+        Queue<Integer> queue = new LinkedList<>();
+
+        for (int i = 0; i < numNodes; i++) {
+            if (inDegree[i] == 0) queue.add(i);
+        }
+
+        List<Integer> topoOrder = new ArrayList<>();
+        while (!queue.isEmpty()) {
+            int node = queue.poll();
+            topoOrder.add(node);
+        }
+        System.out.println("Topological Order = " + topoOrder);
+    }
+}`,
+  },
+  {
+    id: 'coin-change-dp',
+    title: '35. Coin Change (Dynamic Programming)',
+    category: 'Dynamic Programming & Recursion',
+    description: 'Find minimum number of coins needed to make given amount using bottom-up 1D DP table.',
+    difficulty: 'Intermediate',
+    timeComplexity: 'O(Amount × Coins)',
+    spaceComplexity: 'O(Amount)',
+    code: `import java.util.Arrays;
+
+public class Main {
+    public static void main(String[] args) {
+        int[] coins = {1, 2, 5};
+        int amount = 7;
+        int[] dp = new int[amount + 1];
+        Arrays.fill(dp, amount + 1);
+        dp[0] = 0;
+
+        for (int i = 1; i <= amount; i++) {
+            for (int coin : coins) {
+                if (i >= coin) {
+                    dp[i] = Math.min(dp[i], dp[i - coin] + 1);
+                }
+            }
+        }
+        System.out.println("Min coins for $" + amount + " = " + dp[amount]);
+    }
+}`,
   }
 ];
 
