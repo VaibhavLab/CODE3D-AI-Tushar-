@@ -1,4 +1,5 @@
-import { Box, Layers, HelpCircle, History, Settings, Play, Home, Code2, Stethoscope, User, LogOut, Sparkles, ChevronDown, Sun, Moon, BookOpen } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Box, Layers, HelpCircle, History, Settings, Play, Home, Code2, Stethoscope, User, LogOut, Sparkles, ChevronDown, Sun, Moon, BookOpen, Github } from 'lucide-react';
 import { checkBackendHealth } from '../services/apiService';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -129,6 +130,22 @@ export default function Navbar({ activeTab, setActiveTab, onOpenCodeDoctor }) {
             <span className="hidden sm:inline">AI Code Doctor</span>
           </button>
         )}
+
+        {/* GitHub Repository Link */}
+        <a
+          href="https://github.com/himanshu70784231/CODE3D-AI"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition border ${
+            isBright
+              ? 'bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300'
+              : 'bg-slate-800/80 hover:bg-slate-700 text-slate-200 border-slate-700 shadow-sm'
+          }`}
+          title="Open CODE3D-AI repository on GitHub"
+        >
+          <Github size={14} className={isBright ? 'text-slate-800' : 'text-slate-200'} />
+          <span className="hidden sm:inline">GitHub</span>
+        </a>
 
         {/* Backend Online status badge */}
         <div className={`hidden xl:flex items-center gap-1.5 border rounded-full px-2.5 py-1 text-xs ${
