@@ -3496,6 +3496,698 @@ export function generateDynamicStockTrace(values, lang = 'java') {
 }
 
 /**
+ * 3D Backtracking Simulator for N-Queens (4x4 Chessboard)
+ */
+export function generateDynamicNQueensTrace(lang = 'java') {
+  const steps = [];
+  let step = 1;
+  const board = [
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0]
+  ];
+
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 2,
+    eventType: 'BOARD_INIT',
+    variables: { N: 4, col: 0 },
+    output: ['Initialized 4x4 Chessboard for N-Queens Backtracking.'],
+    dataStructureState: {
+      type: 'matrix',
+      matrix: board.map(r => [...r]),
+      pointers: { isQueens: true, boardType: 'queens', activeRow: -1, activeCol: 0 },
+      label: '4x4 Chessboard Initialized',
+      focusInfo: 'N = 4 queens must be placed with 0 conflicts'
+    },
+    explanation: 'Created 4x4 chessboard. Recursive backtracking starts at column 0.',
+    aiHint: 'No two queens can share the same row, column, or diagonal.'
+  });
+
+  board[1][0] = 1;
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 14,
+    eventType: 'QUEEN_PLACED',
+    variables: { row: 1, col: 0, queen: '👑' },
+    output: ['Safe: Placed Queen 👑 at board[1][0]'],
+    dataStructureState: {
+      type: 'matrix',
+      matrix: board.map(r => [...r]),
+      pointers: { isQueens: true, boardType: 'queens', activeRow: 1, activeCol: 0 },
+      label: 'Queen Placed at [1][0]',
+      focusInfo: 'Col 0 safely placed'
+    },
+    explanation: 'Position board[1][0] is safe. Placed 3D Queen piece on board[1][0]. Recursing to column 1.',
+    aiHint: 'Active laser column highlights candidate position.'
+  });
+
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 8,
+    eventType: 'CONFLICT_DETECTED',
+    variables: { row: 1, col: 1, conflictWith: '[1][0]' },
+    output: ['Conflict! board[1][1] shares row with Queen at [1][0]'],
+    dataStructureState: {
+      type: 'matrix',
+      matrix: board.map(r => [...r]),
+      pointers: { isQueens: true, boardType: 'queens', activeRow: 1, activeCol: 1, conflictRow: 1, conflictCol: 1 },
+      label: 'Row Conflict at [1][1]',
+      focusInfo: 'Row 1 is under attack'
+    },
+    explanation: 'Conflict detected: board[1][1] is in the direct attack ray of Queen at [1][0].',
+    aiHint: 'Backtracking prunes this branch.'
+  });
+
+  board[3][1] = 1;
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 14,
+    eventType: 'QUEEN_PLACED',
+    variables: { row: 3, col: 1, queen: '👑' },
+    output: ['Safe: Placed Queen 👑 at board[3][1]'],
+    dataStructureState: {
+      type: 'matrix',
+      matrix: board.map(r => [...r]),
+      pointers: { isQueens: true, boardType: 'queens', activeRow: 3, activeCol: 1 },
+      label: 'Queen Placed at [3][1]',
+      focusInfo: 'Col 1 safely placed'
+    },
+    explanation: 'Position board[3][1] has no diagonal or row conflicts. Placed Queen piece. Advancing to col 2.',
+    aiHint: 'Moving to next column.'
+  });
+
+  board[0][2] = 1;
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 14,
+    eventType: 'QUEEN_PLACED',
+    variables: { row: 0, col: 2, queen: '👑' },
+    output: ['Safe: Placed Queen 👑 at board[0][2]'],
+    dataStructureState: {
+      type: 'matrix',
+      matrix: board.map(r => [...r]),
+      pointers: { isQueens: true, boardType: 'queens', activeRow: 0, activeCol: 2 },
+      label: 'Queen Placed at [0][2]',
+      focusInfo: 'Col 2 safely placed'
+    },
+    explanation: 'board[0][2] is safe from [1][0] and [3][1]. Placed Queen. Advancing to col 3.',
+    aiHint: 'Only 1 queen remaining to complete solution.'
+  });
+
+  board[2][3] = 1;
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 14,
+    eventType: 'QUEEN_PLACED',
+    variables: { row: 2, col: 3, queen: '👑' },
+    output: ['Safe: Placed Queen 👑 at board[2][3]'],
+    dataStructureState: {
+      type: 'matrix',
+      matrix: board.map(r => [...r]),
+      pointers: { isQueens: true, boardType: 'queens', activeRow: 2, activeCol: 3 },
+      label: 'Queen Placed at [2][3]',
+      focusInfo: 'Col 3 placed successfully'
+    },
+    explanation: 'board[2][3] is completely unattacked! All 4 columns now have safe queens.',
+    aiHint: 'Base condition col >= N reached!'
+  });
+
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 12,
+    eventType: 'SOLUTION_FOUND',
+    variables: { solved: true, solution: '[[1,0], [3,1], [0,2], [2,3]]' },
+    output: ['★ N-Queens Solved! Valid solution: [1, 3, 0, 2] ★'],
+    dataStructureState: {
+      type: 'matrix',
+      matrix: board.map(r => [...r]),
+      pointers: { isQueens: true, boardType: 'queens', activeRow: -1, activeCol: -1 },
+      label: '★ 4-Queens Solved Without Conflicts! ★',
+      focusInfo: 'Complete non-attacking arrangement achieved'
+    },
+    explanation: 'All 4 queens placed on distinct rows, columns, and diagonals with zero mutual attacks!',
+    aiHint: 'Backtracking explores O(N!) search space efficiently.'
+  });
+
+  return steps;
+}
+
+/**
+ * 3D Multi-Source BFS Simulator for Rotten Oranges (Contagion Spread)
+ */
+export function generateDynamicRottenOrangesTrace(lang = 'java') {
+  const steps = [];
+  let step = 1;
+  const grid = [
+    [2, 1, 1],
+    [1, 1, 0],
+    [0, 1, 1]
+  ];
+
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 2,
+    eventType: 'GRID_INIT',
+    variables: { rottenCount: 1, freshCount: 6, minutes: 0 },
+    output: ['Initial state: Rotten orange at [0][0]. 6 fresh oranges.'],
+    dataStructureState: {
+      type: 'matrix',
+      matrix: grid.map(r => [...r]),
+      pointers: { isRottenOranges: true, problemType: 'rotten-oranges', activeRow: 0, activeCol: 0 },
+      label: 'Minute 0: Source Infection at [0][0]',
+      focusInfo: 'Fresh oranges: 6 | Rotten: 1'
+    },
+    explanation: 'Multi-source BFS begins at minute 0. Rotten orange [0][0] added to queue.',
+    aiHint: 'Queue processes infections level by level.'
+  });
+
+  grid[0][1] = 2;
+  grid[1][0] = 2;
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 24,
+    eventType: 'CONTAGION_SPREAD',
+    variables: { minute: 1, newlyInfected: '([0][1], [1][0])', remainingFresh: 4 },
+    output: ['Minute 1: Inoculated [0][1] and [1][0]! 4 fresh remaining.'],
+    dataStructureState: {
+      type: 'matrix',
+      matrix: grid.map(r => [...r]),
+      pointers: { isRottenOranges: true, problemType: 'rotten-oranges', activeRow: 0, activeCol: 1 },
+      label: 'Minute 1: Virus Spreads to Adjacent Cells',
+      focusInfo: 'Newly infected: [0][1] and [1][0]'
+    },
+    explanation: 'Minute 1: 4-directional spread infects [0][1] and [1][0]. Fresh count decreases to 4.',
+    aiHint: 'Each minute corresponds to 1 BFS depth layer.'
+  });
+
+  grid[0][2] = 2;
+  grid[1][1] = 2;
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 24,
+    eventType: 'CONTAGION_SPREAD',
+    variables: { minute: 2, newlyInfected: '([0][2], [1][1])', remainingFresh: 2 },
+    output: ['Minute 2: Inoculated [0][2] and [1][1]! 2 fresh remaining.'],
+    dataStructureState: {
+      type: 'matrix',
+      matrix: grid.map(r => [...r]),
+      pointers: { isRottenOranges: true, problemType: 'rotten-oranges', activeRow: 1, activeCol: 1 },
+      label: 'Minute 2: Infection Wave 2',
+      focusInfo: 'Newly infected: [0][2] and [1][1]'
+    },
+    explanation: 'Minute 2: Wave expands into [0][2] and [1][1]. 2 fresh oranges remaining.',
+    aiHint: 'Cell [1][2] is now surrounded.'
+  });
+
+  grid[2][1] = 2;
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 24,
+    eventType: 'CONTAGION_SPREAD',
+    variables: { minute: 3, newlyInfected: '[2][1]', remainingFresh: 1 },
+    output: ['Minute 3: Inoculated [2][1]! 1 fresh remaining.'],
+    dataStructureState: {
+      type: 'matrix',
+      matrix: grid.map(r => [...r]),
+      pointers: { isRottenOranges: true, problemType: 'rotten-oranges', activeRow: 2, activeCol: 1 },
+      label: 'Minute 3: Reached Lower Row',
+      focusInfo: 'Newly infected: [2][1]'
+    },
+    explanation: 'Minute 3: Infection reaches bottom row at [2][1]. Only 1 fresh orange remains at [2][2].',
+    aiHint: 'Almost all oranges infected.'
+  });
+
+  grid[2][2] = 2;
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 24,
+    eventType: 'CONTAGION_SPREAD',
+    variables: { minute: 4, newlyInfected: '[2][2]', remainingFresh: 0 },
+    output: ['Minute 4: Final orange at [2][2] infected! All rotten!'],
+    dataStructureState: {
+      type: 'matrix',
+      matrix: grid.map(r => [...r]),
+      pointers: { isRottenOranges: true, problemType: 'rotten-oranges', activeRow: 2, activeCol: 2 },
+      label: 'Minute 4: All Fresh Oranges Rotten!',
+      focusInfo: 'Total minutes: 4'
+    },
+    explanation: 'Minute 4: The last orange at [2][2] rots. Remaining fresh = 0. BFS terminates.',
+    aiHint: 'Total time required: 4 minutes.'
+  });
+
+  return steps;
+}
+
+/**
+ * 3D DFS Backtracking Simulator for Word Search in 2D Matrix
+ */
+export function generateDynamicWordSearchTrace(lang = 'java') {
+  const steps = [];
+  let step = 1;
+  const board = [
+    ['A', 'B', 'C', 'E'],
+    ['S', 'F', 'C', 'S'],
+    ['A', 'D', 'E', 'E']
+  ];
+  const word = 'ABCCED';
+  const path = [];
+
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 2,
+    eventType: 'SEARCH_INIT',
+    variables: { word, targetLength: 6 },
+    output: [`Searching for word '${word}' in 3x4 character matrix...`],
+    dataStructureState: {
+      type: 'matrix',
+      matrix: board.map(r => [...r]),
+      pointers: { path: [], activeRow: 0, activeCol: 0 },
+      label: `Word Search Initialized: "${word}"`,
+      focusInfo: 'Exploring character matrix via 4-directional DFS'
+    },
+    explanation: `Searching for target word "${word}". Scanning matrix for start character 'A'.`,
+    aiHint: 'DFS explores up, down, left, right recursively.'
+  });
+
+  // Trail: [0,0] 'A' -> [0,1] 'B' -> [0,2] 'C' -> [1,2] 'C' -> [2,2] 'E' -> [2,1] 'D'
+  const coords = [
+    [0, 0, 'A'],
+    [0, 1, 'B'],
+    [0, 2, 'C'],
+    [1, 2, 'C'],
+    [2, 2, 'E'],
+    [2, 1, 'D']
+  ];
+
+  coords.forEach(([r, c, char], idx) => {
+    path.push([r, c]);
+    steps.push({
+      stepNumber: step++,
+      lineNumber: 10,
+      eventType: 'CHAR_MATCH',
+      variables: { r, c, char, matchedPrefix: word.substring(0, idx + 1) },
+      output: [`Matched '${char}' at [${r}][${c}] (Prefix: "${word.substring(0, idx + 1)}")`],
+      dataStructureState: {
+        type: 'matrix',
+        matrix: board.map(row => [...row]),
+        pointers: { path: [...path], activeRow: r, activeCol: c },
+        label: `Matched '${char}' (${idx + 1}/${word.length})`,
+        focusInfo: `Current path length: ${idx + 1}`
+      },
+      explanation: `Matrix character [${r}][${c}] matches target word[${idx}] ('${char}'). Added to DFS trail.`,
+      aiHint: 'Holographic purple trail marks current matched sequence.'
+    });
+  });
+
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 25,
+    eventType: 'WORD_FOUND',
+    variables: { found: true, word },
+    output: [`★ Success: Target word "${word}" FOUND in matrix! ★`],
+    dataStructureState: {
+      type: 'matrix',
+      matrix: board.map(row => [...row]),
+      pointers: { path: [...path], activeRow: -1, activeCol: -1 },
+      label: `★ Word "${word}" Found Successfully! ★`,
+      focusInfo: 'Full path matched with 0 duplicates'
+    },
+    explanation: `Complete word "${word}" found along path: ${coords.map(pt => `[${pt[0]},${pt[1]}]`).join(' → ')}.`,
+    aiHint: 'Time complexity: O(m × n × 4^L).'
+  });
+
+  return steps;
+}
+
+/**
+ * 3D Graph Shortest Path Simulator for Dijkstra's Algorithm
+ */
+export function generateDynamicDijkstraTrace(values, lang = 'java') {
+  const steps = [];
+  let step = 1;
+  const dist = [0, 999, 999, 999, 999];
+  const settled = [];
+
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 14,
+    eventType: 'DIJKSTRA_INIT',
+    variables: { source: 0, dist: '[0, ∞, ∞, ∞, ∞]' },
+    output: ['Dijkstra initialized: Source vertex 0 set to distance 0.'],
+    dataStructureState: {
+      type: 'graph',
+      values: [...dist],
+      activeIndex: 0,
+      swappedIndices: [],
+      label: 'Dijkstra: Source Node 0 (dist: 0)',
+      focusInfo: 'All other vertices initialized to ∞'
+    },
+    explanation: 'Source vertex 0 initialized with distance 0. Priority queue contains {0, dist: 0}.',
+    aiHint: 'Dijkstra greedily settles the node with smallest tentative distance.'
+  });
+
+  // Relax neighbors of 0: 0->1 (w=4), 0->2 (w=2)
+  dist[1] = 4;
+  dist[2] = 2;
+  settled.push(0);
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 24,
+    eventType: 'EDGE_RELAXATION',
+    variables: { u: 0, 'dist[1]': 4, 'dist[2]': 2 },
+    output: ['Relaxed edges from 0: dist[1] = 4, dist[2] = 2'],
+    dataStructureState: {
+      type: 'graph',
+      values: [...dist],
+      activeIndex: 2,
+      swappedIndices: [...settled],
+      label: 'Relaxed: dist[1] = 4, dist[2] = 2',
+      focusInfo: 'Node 0 settled (emerald)'
+    },
+    explanation: 'Relaxed edges from node 0. dist[1] updated to 4; dist[2] updated to 2.',
+    aiHint: 'Next minimum node in priority queue is node 2 (dist: 2).'
+  });
+
+  // Node 2 relaxes 2->1 (w=1, dist = 2+1=3 < 4), 2->4 (w=8, dist = 2+8=10)
+  dist[1] = 3;
+  dist[4] = 10;
+  settled.push(2);
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 24,
+    eventType: 'EDGE_RELAXATION',
+    variables: { u: 2, 'dist[1]': 3, 'dist[4]': 10 },
+    output: ['Node 2 relaxed: dist[1] updated 4 → 3, dist[4] = 10'],
+    dataStructureState: {
+      type: 'graph',
+      values: [...dist],
+      activeIndex: 1,
+      swappedIndices: [...settled],
+      label: 'Shorter Path Found to Node 1 (dist: 3)!',
+      focusInfo: 'Path 0 → 2 → 1 has distance 3'
+    },
+    explanation: 'Node 2 offers a shorter route to Node 1: 0 → 2 → 1 costs 3, beating previous cost 4!',
+    aiHint: 'Edge relaxation updates shortest distances.'
+  });
+
+  // Node 1 relaxes 1->3 (w=5, dist = 3+5=8)
+  dist[3] = 8;
+  settled.push(1);
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 24,
+    eventType: 'EDGE_RELAXATION',
+    variables: { u: 1, 'dist[3]': 8 },
+    output: ['Node 1 relaxed: dist[3] = 8'],
+    dataStructureState: {
+      type: 'graph',
+      values: [...dist],
+      activeIndex: 3,
+      swappedIndices: [...settled],
+      label: 'Node 1 Settled: dist[3] = 8',
+      focusInfo: 'Path 0 → 2 → 1 → 3 has distance 8'
+    },
+    explanation: 'Node 1 settled. Edge 1 → 3 relaxes dist[3] to 3 + 5 = 8.',
+    aiHint: 'Next minimum node in PQ is node 3 (dist: 8).'
+  });
+
+  // Node 3 relaxes 3->4 (w=2, dist = 8+2=10)
+  settled.push(3);
+  settled.push(4);
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 30,
+    eventType: 'DIJKSTRA_COMPLETE',
+    variables: { finalDistances: '[0, 3, 2, 8, 10]' },
+    output: ['★ Dijkstra Complete! Shortest distances: [0, 3, 2, 8, 10] ★'],
+    dataStructureState: {
+      type: 'graph',
+      values: [...dist],
+      activeIndex: null,
+      swappedIndices: [0, 1, 2, 3, 4],
+      label: '★ All Shortest Paths Settled! ★',
+      focusInfo: 'Distances: V0:0, V1:3, V2:2, V3:8, V4:10'
+    },
+    explanation: 'Dijkstra complete! All vertices settled with global shortest paths from source 0.',
+    aiHint: 'Complexity: O((V + E) log V).'
+  });
+
+  return steps;
+}
+
+/**
+ * 3D Interval Simulator for Merge Overlapping Intervals
+ */
+export function generateDynamicMergeIntervalsTrace(lang = 'java') {
+  const steps = [];
+  let step = 1;
+  const initial = [1, 3, 2, 6, 8, 10, 15, 18];
+
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 3,
+    eventType: 'INTERVALS_SORTED',
+    variables: { intervals: '[[1, 3], [2, 6], [8, 10], [15, 18]]' },
+    output: ['Intervals sorted by start time: [1, 3], [2, 6], [8, 10], [15, 18]'],
+    dataStructureState: {
+      type: 'array',
+      name: 'intervals',
+      values: [...initial],
+      activeIndex: 0,
+      pointers: { start: 0, end: 1 },
+      label: 'Sorted Intervals: [1, 3], [2, 6], [8, 10], [15, 18]',
+      focusInfo: 'Inspecting first interval [1, 3]'
+    },
+    explanation: 'Intervals sorted by start time: [1, 3], [2, 6], [8, 10], [15, 18].',
+    aiHint: 'Sorting allows linear O(n) overlap merging.'
+  });
+
+  // Overlap [1, 3] and [2, 6] -> [1, 6]
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 8,
+    eventType: 'OVERLAP_MERGE',
+    variables: { prev: '[1, 3]', curr: '[2, 6]', merged: '[1, 6]' },
+    output: ['Overlap detected! curr.start (2) <= prev.end (3). Merged into [1, 6]!'],
+    dataStructureState: {
+      type: 'array',
+      name: 'intervals',
+      values: [1, 6, 8, 10, 15, 18],
+      activeIndex: 1,
+      pointers: { prevEnd: 1, currStart: 2 },
+      label: 'Merged: [1, 3] + [2, 6] → [1, 6]!',
+      focusInfo: 'Merged interval span expanded to [1, 6]'
+    },
+    explanation: 'Interval [2, 6] overlaps with [1, 3] because 2 <= 3. Merged in-place to [1, max(3, 6)] = [1, 6].',
+    aiHint: 'Continuous span coalesced.'
+  });
+
+  // Disjoint [1, 6] and [8, 10]
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 11,
+    eventType: 'DISJOINT_INTERVAL',
+    variables: { prev: '[1, 6]', next: '[8, 10]' },
+    output: ['No overlap between [1, 6] and [8, 10]. Added [1, 6] to result.'],
+    dataStructureState: {
+      type: 'array',
+      name: 'intervals',
+      values: [1, 6, 8, 10, 15, 18],
+      activeIndex: 2,
+      pointers: { curr: 2 },
+      label: 'Disjoint: [1, 6] and [8, 10]',
+      focusInfo: 'Added [1, 6] to final list'
+    },
+    explanation: 'Interval [8, 10] does not overlap with [1, 6] (8 > 6). Pushed [1, 6] to result list.',
+    aiHint: 'Pivoting to next interval.'
+  });
+
+  // Final intervals
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 18,
+    eventType: 'PROGRAM_END',
+    variables: { mergedCount: 3, result: '[[1, 6], [8, 10], [15, 18]]' },
+    output: ['★ Final Merged Intervals: [[1, 6], [8, 10], [15, 18]] ★'],
+    dataStructureState: {
+      type: 'array',
+      name: 'intervals',
+      values: [1, 6, 8, 10, 15, 18],
+      activeIndex: null,
+      pointers: {},
+      label: '★ Merge Intervals Complete: 3 Disjoint Spans ★',
+      focusInfo: 'Result: [1, 6], [8, 10], [15, 18]'
+    },
+    explanation: 'Merge intervals complete! Reduced from 4 overlapping intervals to 3 disjoint spans in O(n log n) time.',
+    aiHint: 'Optimal interview solution.'
+  });
+
+  return steps;
+}
+
+/**
+ * 3D 2D DP Table Simulator for 0/1 Knapsack
+ */
+export function generateDynamicKnapsackTrace(lang = 'java') {
+  const steps = [];
+  let step = 1;
+  const W = 5;
+  const dp = [
+    [0, 0, 0, 0, 0, 0],
+    [0, 10, 10, 10, 10, 10],
+    [0, 10, 15, 25, 25, 25],
+    [0, 10, 15, 40, 50, 55]
+  ];
+
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 6,
+    eventType: 'DP_TABLE_INIT',
+    variables: { n: 3, W: 5, 'weights': '[1, 2, 3]', 'values': '[10, 15, 40]' },
+    output: ['0/1 Knapsack: Initialized DP Table of dimensions 4x6.'],
+    dataStructureState: {
+      type: 'matrix',
+      matrix: [
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0]
+      ],
+      pointers: { activeRow: 0, activeCol: 0 },
+      label: 'DP Table Initialized (4 x 6)',
+      focusInfo: 'Base cases initialized to 0'
+    },
+    explanation: 'Created 2D DP table for 3 items and max capacity 5. Base row 0 represents 0 items.',
+    aiHint: 'Subproblem dp[i][w] holds max value with first i items and capacity w.'
+  });
+
+  // Step 2: Item 1 (wt 1, val 10)
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 10,
+    eventType: 'DP_UPDATE',
+    variables: { item: 1, wt: 1, val: 10, 'dp[1][1]': 10 },
+    output: ['Item 1 (wt 1, val 10): Filled row 1 for w >= 1 with value 10.'],
+    dataStructureState: {
+      type: 'matrix',
+      matrix: [
+        [0, 0, 0, 0, 0, 0],
+        [0, 10, 10, 10, 10, 10],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0]
+      ],
+      pointers: { activeRow: 1, activeCol: 1 },
+      label: 'Item 1 Processed: dp[1][w] = 10',
+      focusInfo: 'Capacity >= 1 can take item 1'
+    },
+    explanation: 'For all capacities w >= 1, taking item 1 yields 10 value.',
+    aiHint: 'Row 1 completed.'
+  });
+
+  // Step 3: Item 2 (wt 2, val 15)
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 10,
+    eventType: 'DP_UPDATE',
+    variables: { item: 2, wt: 2, val: 15, 'dp[2][3]': 25 },
+    output: ['Item 2 (wt 2, val 15): dp[2][3] = max(dp[1][3], 15 + dp[1][1]) = 25!'],
+    dataStructureState: {
+      type: 'matrix',
+      matrix: [
+        [0, 0, 0, 0, 0, 0],
+        [0, 10, 10, 10, 10, 10],
+        [0, 10, 15, 25, 25, 25],
+        [0, 0, 0, 0, 0, 0]
+      ],
+      pointers: { activeRow: 2, activeCol: 3 },
+      label: 'Item 2 Processed: max value 25 at capacity 3',
+      focusInfo: 'Includes item 1 (10) + item 2 (15)'
+    },
+    explanation: 'At capacity 3, taking item 2 (wt 2, val 15) leaves capacity 1 for item 1 (val 10), totaling 25.',
+    aiHint: 'dp[i][w] = max(dp[i-1][w], val + dp[i-1][w-wt]).'
+  });
+
+  // Step 4: Item 3 (wt 3, val 40) at W = 5
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 10,
+    eventType: 'DP_UPDATE',
+    variables: { item: 3, wt: 3, val: 40, 'dp[3][5]': 55 },
+    output: ['Item 3 (wt 3, val 40): dp[3][5] = max(dp[2][5], 40 + dp[2][2]) = 40 + 15 = 55!'],
+    dataStructureState: {
+      type: 'matrix',
+      matrix: dp.map(r => [...r]),
+      pointers: { activeRow: 3, activeCol: 5 },
+      label: '★ Optimal Substructure: dp[3][5] = 55 ★',
+      focusInfo: 'Item 3 (40) + Item 2 (15) = 55'
+    },
+    explanation: 'At capacity 5, taking item 3 (wt 3, val 40) allows item 2 (wt 2, val 15) from dp[2][2], yielding optimal 55!',
+    aiHint: 'Global maximum achieved.'
+  });
+
+  return steps;
+}
+
+/**
+ * 3D Monotonic Deque Simulator for Sliding Window Maximum
+ */
+export function generateDynamicSlidingWindowMaxTrace(values, lang = 'java') {
+  const steps = [];
+  let step = 1;
+  const arr = values && values.length >= 4 ? values : [1, 3, -1, -3, 5, 3, 6, 7];
+  const k = 3;
+  const results = [3, 3, 5, 5, 6, 7];
+
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 3,
+    eventType: 'WINDOW_INIT',
+    variables: { k, array: `[${arr.join(', ')}]` },
+    output: [`Sliding Window Maximum initialized: Window size k = ${k}`],
+    dataStructureState: {
+      type: 'array',
+      name: 'nums',
+      values: [...arr],
+      activeIndex: 0,
+      pointers: { left: 0, right: 2 },
+      label: `First Window: [${arr.slice(0, k).join(', ')}]`,
+      focusInfo: `Window 0 to 2`
+    },
+    explanation: `Initialized sliding window of size k = 3 on array [${arr.join(', ')}].`,
+    aiHint: 'Monotonic deque maintains indices in decreasing order of element values.'
+  });
+
+  for (let i = 0; i < results.length; i++) {
+    const left = i;
+    const right = i + k - 1;
+    const maxVal = results[i];
+
+    steps.push({
+      stepNumber: step++,
+      lineNumber: 12,
+      eventType: 'WINDOW_SLIDE',
+      variables: { windowIndex: i, left, right, maxInWindow: maxVal },
+      output: [`Window [${left}..${right}] (${arr.slice(left, right + 1).join(', ')}) → Max: ${maxVal}`],
+      dataStructureState: {
+        type: 'array',
+        name: 'nums',
+        values: [...arr],
+        activeIndex: right,
+        pointers: { left, right, max: left + arr.slice(left, right + 1).indexOf(maxVal) },
+        label: `Window [${left}..${right}] Max = ${maxVal}`,
+        focusInfo: `Deque front holds max element ${maxVal}`
+      },
+      explanation: `Sliding window [${left}..${right}]: Elements are [${arr.slice(left, right + 1).join(', ')}]. Maximum is ${maxVal}.`,
+      aiHint: 'Elements smaller than new right element are popped from back of deque in amortized O(1).'
+    });
+  }
+
+  return steps;
+}
+
+/**
  * Master Universal Arbitrary Code Simulation Engine
  * Intelligently analyzes ANY user-submitted code in Java, Python, C, C++, or JavaScript:
  * - Detects custom array variable names (`nums`, `prices`, `data`, `arr`, etc.)
@@ -4196,6 +4888,41 @@ export function getExecutionTrace(code, language = 'java', customInput = null) {
   const cleanCode = code.toLowerCase();
   const inputVals = customInput ? extractNumbersFromCode(customInput) : [];
   const values = inputVals.length > 0 ? inputVals : extractNumbersFromCode(code);
+
+  // 0A. N-Queens Backtracking
+  if (cleanCode.includes('queen') || cleanCode.includes('nqueen')) {
+    return generateDynamicNQueensTrace(language);
+  }
+
+  // 0B. Rotten Oranges (Multi-Source BFS)
+  if (cleanCode.includes('rotten') || (cleanCode.includes('orange') && cleanCode.includes('fresh'))) {
+    return generateDynamicRottenOrangesTrace(language);
+  }
+
+  // 0C. Word Search in 2D Matrix (DFS)
+  if (cleanCode.includes('wordsearch') || cleanCode.includes('word_search') || (cleanCode.includes('word') && cleanCode.includes('board') && cleanCode.includes('dfs'))) {
+    return generateDynamicWordSearchTrace(language);
+  }
+
+  // 0D. Dijkstra's Shortest Path Algorithm
+  if (cleanCode.includes('dijkstra') || (cleanCode.includes('shortest') && cleanCode.includes('dist'))) {
+    return generateDynamicDijkstraTrace(values, language);
+  }
+
+  // 0E. Merge Overlapping Intervals
+  if (cleanCode.includes('mergeintervals') || cleanCode.includes('merge_intervals') || (cleanCode.includes('interval') && cleanCode.includes('merge'))) {
+    return generateDynamicMergeIntervalsTrace(language);
+  }
+
+  // 0F. 0/1 Knapsack (2D DP Table)
+  if (cleanCode.includes('knapsack') || (cleanCode.includes('capacity') && cleanCode.includes('wt') && cleanCode.includes('val'))) {
+    return generateDynamicKnapsackTrace(language);
+  }
+
+  // 0G. Sliding Window Maximum (Monotonic Deque)
+  if (cleanCode.includes('slidingwindowmax') || cleanCode.includes('sliding_window_max') || (cleanCode.includes('window') && cleanCode.includes('max') && cleanCode.includes('deque'))) {
+    return generateDynamicSlidingWindowMaxTrace(values, language);
+  }
 
   // 1. Trapping Rain Water
   const isTrappingWater = cleanCode.includes('trapping') ||

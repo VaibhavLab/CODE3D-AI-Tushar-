@@ -350,6 +350,13 @@ public class MultiLanguageExecutionService {
             lower.contains("setzeroes") ||
             lower.contains("nextpermutation") ||
             lower.contains("pascal") ||
+            lower.contains("queen") ||
+            lower.contains("solvenq") ||
+            lower.contains("rotten") ||
+            lower.contains("wordsearch") ||
+            lower.contains("dijkstra") ||
+            lower.contains("mergeintervals") ||
+            lower.contains("knapsack") ||
             lower.contains("isvalid");
 
         if (isLeetCodeOrFunction) {
@@ -373,6 +380,11 @@ public class MultiLanguageExecutionService {
             if (lower.contains("rotate")) return List.of(1, 2, 3, 4, 5, 6, 7);
             if (lower.contains("climbstairs")) return List.of(1, 2, 3, 5, 8);
             if (lower.contains("productexceptself")) return List.of(1, 2, 3, 4);
+            if (lower.contains("queen")) return List.of(0, 1, 2, 3);
+            if (lower.contains("rotten")) return List.of(2, 1, 1, 1, 1, 0, 0, 1, 1);
+            if (lower.contains("interval")) return List.of(1, 3, 2, 6, 8, 10, 15, 18);
+            if (lower.contains("knapsack")) return List.of(60, 100, 120);
+            if (lower.contains("dijkstra")) return List.of(0, 4, 2, 5, 8);
 
             return List.of(15, 42, 8, 99, 23, 67);
         }

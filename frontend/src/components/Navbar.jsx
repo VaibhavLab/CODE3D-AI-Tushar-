@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Layers, HelpCircle, History, Settings, Play, Home, Code2, Stethoscope, User, LogOut, Sparkles, ChevronDown, Sun, Moon } from 'lucide-react';
+import { Box, Layers, HelpCircle, History, Settings, Play, Home, Code2, Stethoscope, User, LogOut, Sparkles, ChevronDown, Sun, Moon, BookOpen } from 'lucide-react';
 import { checkBackendHealth } from '../services/apiService';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -21,6 +20,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenCodeDoctor }) {
   const navLinks = [
     { id: 'dashboard', label: 'Dashboard', icon: Home, enabled: true },
     { id: 'visualizer', label: 'Visualizer', icon: Code2, enabled: true },
+    { id: 'striver', label: 'Striver Sheet 📜', icon: BookOpen, enabled: true, badge: '182' },
     { id: 'dsa', label: 'DSA Hub', icon: Layers, enabled: true },
     { id: 'quiz', label: 'Quiz Arena', icon: HelpCircle, enabled: true },
     { id: 'history', label: 'History', icon: History, enabled: true },
@@ -72,6 +72,17 @@ export default function Navbar({ activeTab, setActiveTab, onOpenCodeDoctor }) {
             >
               <Icon size={14} className={isActive ? (isBright ? 'text-cyan-600' : 'text-cyan-400') : ''} />
               <span>{item.label}</span>
+              {item.badge && (
+                <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
+                  isActive
+                    ? 'bg-amber-500 text-slate-950 font-bold'
+                    : isBright
+                      ? 'bg-amber-100 text-amber-800 border border-amber-300'
+                      : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                }`}>
+                  {item.badge}
+                </span>
+              )}
             </button>
           );
         })}

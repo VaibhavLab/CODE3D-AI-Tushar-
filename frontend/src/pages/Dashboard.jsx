@@ -13,6 +13,7 @@ import {
   BarChart3,
   TrendingUp,
   History,
+  BookOpen,
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { SAMPLE_PROGRAMS } from '../utils/sampleCodes';
@@ -28,6 +29,14 @@ export default function Dashboard({ onNavigate }) {
       action: () => onNavigate('visualizer'),
       primary: true,
       badge: 'Live Studio',
+    },
+    {
+      title: "Striver's SDE Sheet 📜",
+      desc: 'Master the top 182 SDE interview problems across Days 1–27 with interactive 3D WebGL trace.',
+      icon: BookOpen,
+      action: () => onNavigate('striver'),
+      primary: true,
+      badge: '182 Problems (Days 1–27)',
     },
     {
       title: 'Learn DSA',

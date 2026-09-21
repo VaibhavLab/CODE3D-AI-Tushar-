@@ -13,6 +13,7 @@ import StriverSheetDrawer from '../components/StriverSheetDrawer';
 import { useExecutionTimeline } from '../hooks/useExecutionTimeline';
 import { getExecutionTrace, extractNumbersFromCode } from '../services/executionSimulator';
 import { DEFAULT_JAVA_CODE, SAMPLE_PROGRAMS, LANGUAGE_DEFAULTS, CURRICULUM_CATEGORIES } from '../utils/sampleCodes';
+import { STRIVER_PROBLEMS } from '../utils/striverCatalog';
 import { executeProgram, analyzeCode, checkBackendHealth } from '../services/apiService';
 import { useTheme } from '../context/ThemeContext';
 import {
@@ -34,7 +35,7 @@ import {
   BookOpen
 } from 'lucide-react';
 
-export default function Visualizer({ initialConcept }) {
+export default function Visualizer({ initialConcept, initialOpenStriver = false }) {
   const { isBright } = useTheme();
   const [selectedSample, setSelectedSample] = useState(initialConcept || SAMPLE_PROGRAMS[0]);
   const [code, setCode] = useState(initialConcept?.code || DEFAULT_JAVA_CODE);
@@ -66,7 +67,7 @@ export default function Visualizer({ initialConcept }) {
   const [isQuizOpen, setIsQuizOpen] = useState(false);
   const [isCustomCodeOpen, setIsCustomCodeOpen] = useState(false);
   const [isCodeDoctorOpen, setIsCodeDoctorOpen] = useState(false);
-  const [isStriverSheetOpen, setIsStriverSheetOpen] = useState(false);
+  const [isStriverSheetOpen, setIsStriverSheetOpen] = useState(initialOpenStriver);
   const [activeStriverProblem, setActiveStriverProblem] = useState(null);
   const [mobileTab, setMobileTab] = useState('3d'); // '3d' | 'code' | 'state'
 
@@ -503,12 +504,37 @@ export default function Visualizer({ initialConcept }) {
             <span className="hidden sm:inline">Concept:</span>
           </span>
 
-          {/* Categorized Concept Dropdown grouped by 8 Curriculum Modules */}
+          {/* Categorized Concept Dropdown grouped by Curriculum & Striver Sheet */}
           <select
             value={selectedSample.id}
             onChange={(e) => {
-              const found = SAMPLE_PROGRAMS.find((p) => p.id === e.target.value);
-              if (found) handleSelectProgram(found);
+              const val = e.target.value;
+              if (val.startsWith('striver-')) {
+                const id = parseInt(val.replace('striver-', ''), 10);
+                const p = STRIVER_PROBLEMS.find((prob) => prob.id === id);
+                if (p) {
+                  handleSelectStriverProblem({
+                    id: `striver-${p.id}`,
+                    striverId: p.id,
+                    title: p.title,
+                    shortTitle: p.shortTitle,
+                    day: p.day,
+                    dayNumber: p.dayNumber,
+                    category: p.category,
+                    difficulty: p.difficulty,
+                    archetype: p.archetype,
+                    timeComplexity: p.timeComplexity,
+                    spaceComplexity: p.spaceComplexity,
+                    description: p.description,
+                    defaultInput: p.defaultInput,
+                    code: p.javaCode,
+                    language: 'java',
+                  });
+                }
+              } else {
+                const found = SAMPLE_PROGRAMS.find((p) => p.id === val);
+                if (found) handleSelectProgram(found);
+              }
             }}
             className={`border rounded-md px-2 py-1 text-xs font-mono focus:outline-none focus:border-cyan-500 cursor-pointer max-w-[160px] sm:max-w-none transition-colors ${
               isBright
@@ -521,6 +547,13 @@ export default function Visualizer({ initialConcept }) {
                 {selectedSample.title || '⚡ Custom Execution'}
               </option>
             )}
+            <optgroup label="📜 Striver SDE Sheet (Top Flagships)">
+              {STRIVER_PROBLEMS.slice(0, 40).map((p) => (
+                <option key={`striver-${p.id}`} value={`striver-${p.id}`}>
+                  {p.title} ({p.difficulty})
+                </option>
+              ))}
+            </optgroup>
             {CURRICULUM_CATEGORIES.map((category) => {
               const items = SAMPLE_PROGRAMS.filter((p) => p.category === category);
               if (items.length === 0) return null;

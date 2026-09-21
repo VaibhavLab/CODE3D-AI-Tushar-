@@ -1090,6 +1090,291 @@ public class Main {
         System.out.println("Length of LIS = " + maxLIS);
     }
 }`,
+  },
+  {
+    id: 'n-queens',
+    title: '41. N-Queens (4x4 Chessboard Backtracking)',
+    category: 'Dynamic Programming & Recursion',
+    description: 'Place 4 queens on a 4x4 chessboard such that no two queens attack each other using recursive backtracking.',
+    difficulty: 'Hard',
+    timeComplexity: 'O(N!)',
+    spaceComplexity: 'O(N²)',
+    code: `public class Main {
+    static int N = 4;
+    static boolean isSafe(int[][] board, int row, int col) {
+        for (int i = 0; i < col; i++) if (board[row][i] == 1) return false;
+        for (int i = row, j = col; i >= 0 && j >= 0; i--, j--) if (board[i][j] == 1) return false;
+        for (int i = row, j = col; j >= 0 && i < N; i++, j--) if (board[i][j] == 1) return false;
+        return true;
+    }
+    static boolean solveNQ(int[][] board, int col) {
+        if (col >= N) return true;
+        for (int i = 0; i < N; i++) {
+            if (isSafe(board, i, col)) {
+                board[i][col] = 1;
+                if (solveNQ(board, col + 1)) return true;
+                board[i][col] = 0; // Backtrack
+            }
+        }
+        return false;
+    }
+    public static void main(String[] args) {
+        int[][] board = new int[N][N];
+        if (solveNQ(board, 0)) System.out.println("N-Queens Solved!");
+    }
+}`,
+  },
+  {
+    id: 'sudoku-solver',
+    title: '42. Sudoku Solver (9x9 Volumetric Grid)',
+    category: 'Arrays & Matrices',
+    description: 'Solve 9x9 grid by probing numbers 1-9 checking row, column, and 3x3 subgrid validity.',
+    difficulty: 'Hard',
+    timeComplexity: 'O(9^(n*n))',
+    spaceComplexity: 'O(1)',
+    code: `public class Main {
+    static boolean isValid(int[][] board, int row, int col, int num) {
+        for (int i = 0; i < 9; i++) {
+            if (board[row][i] == num || board[i][col] == num) return false;
+            if (board[3 * (row / 3) + i / 3][3 * (col / 3) + i % 3] == num) return false;
+        }
+        return true;
+    }
+    static boolean solve(int[][] board) {
+        for (int r = 0; r < 9; r++) {
+            for (int c = 0; c < 9; c++) {
+                if (board[r][c] == 0) {
+                    for (int n = 1; n <= 9; n++) {
+                        if (isValid(board, r, c, n)) {
+                            board[r][c] = n;
+                            if (solve(board)) return true;
+                            board[r][c] = 0;
+                        }
+                    }
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    public static void main(String[] args) {
+        int[][] board = new int[9][9];
+        board[0][0] = 5; board[0][1] = 3; board[1][0] = 6;
+        solve(board);
+        System.out.println("Sudoku solved!");
+    }
+}`,
+  },
+  {
+    id: 'dijkstra-shortest-path',
+    title: '43. Dijkstra Shortest Path (Priority Queue)',
+    category: 'Graphs',
+    description: 'Find shortest paths from source vertex 0 to all vertices in weighted graph using min-heap relaxation.',
+    difficulty: 'Intermediate',
+    timeComplexity: 'O((V + E) log V)',
+    spaceComplexity: 'O(V)',
+    code: `import java.util.*;
+
+public class Main {
+    static class Edge { int to, weight; Edge(int t, int w) { to = t; weight = w; } }
+    public static void main(String[] args) {
+        int V = 5;
+        List<List<Edge>> adj = new ArrayList<>();
+        for (int i = 0; i < V; i++) adj.add(new ArrayList<>());
+        adj.get(0).add(new Edge(1, 4)); adj.get(0).add(new Edge(2, 2));
+        adj.get(1).add(new Edge(2, 1)); adj.get(1).add(new Edge(3, 5));
+        adj.get(2).add(new Edge(4, 8)); adj.get(3).add(new Edge(4, 2));
+
+        int[] dist = new int[V];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[0] = 0;
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> a[1] - b[1]);
+        pq.offer(new int[]{0, 0});
+
+        while (!pq.isEmpty()) {
+            int[] curr = pq.poll();
+            int u = curr[0], d = curr[1];
+            if (d > dist[u]) continue;
+            for (Edge e : adj.get(u)) {
+                if (dist[u] + e.weight < dist[e.to]) {
+                    dist[e.to] = dist[u] + e.weight;
+                    pq.offer(new int[]{e.to, dist[e.to]});
+                }
+            }
+        }
+        System.out.println("Shortest distances: " + Arrays.toString(dist));
+    }
+}`,
+  },
+  {
+    id: 'merge-intervals',
+    title: '44. Merge Overlapping Intervals',
+    category: 'Arrays & Matrices',
+    description: 'Sort interval spans by start time and merge contiguous overlapping segments in-place.',
+    difficulty: 'Intermediate',
+    timeComplexity: 'O(n log n)',
+    spaceComplexity: 'O(n)',
+    code: `import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        int[][] intervals = {{1, 3}, {2, 6}, {8, 10}, {15, 18}};
+        Arrays.sort(intervals, (a, b) -> a[0] - b[0]);
+        List<int[]> merged = new ArrayList<>();
+        int[] prev = intervals[0];
+        for (int i = 1; i < intervals.length; i++) {
+            if (intervals[i][0] <= prev[1]) {
+                prev[1] = Math.max(prev[1], intervals[i][1]); // Merge
+            } else {
+                merged.add(prev);
+                prev = intervals[i];
+            }
+        }
+        merged.add(prev);
+        for (int[] inv : merged) {
+            System.out.println("[" + inv[0] + ", " + inv[1] + "]");
+        }
+    }
+}`,
+  },
+  {
+    id: 'rotten-oranges',
+    title: '45. Rotten Oranges (Multi-Source BFS)',
+    category: 'Graphs',
+    description: 'Determine minimum minutes until all fresh oranges rot using 4-directional multi-source breadth-first search.',
+    difficulty: 'Intermediate',
+    timeComplexity: 'O(m × n)',
+    spaceComplexity: 'O(m × n)',
+    code: `import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        // 0: empty, 1: fresh, 2: rotten
+        int[][] grid = {
+            {2, 1, 1},
+            {1, 1, 0},
+            {0, 1, 1}
+        };
+        int m = grid.length, n = grid[0].length;
+        Queue<int[]> q = new LinkedList<>();
+        int fresh = 0;
+        for (int r = 0; r < m; r++) {
+            for (int c = 0; c < n; c++) {
+                if (grid[r][c] == 2) q.offer(new int[]{r, c, 0});
+                else if (grid[r][c] == 1) fresh++;
+            }
+        }
+        int minutes = 0;
+        int[][] dirs = {{-1,0},{1,0},{0,-1},{0,1}};
+        while (!q.isEmpty()) {
+            int[] cur = q.poll();
+            minutes = cur[2];
+            for (int[] d : dirs) {
+                int nr = cur[0] + d[0], nc = cur[1] + d[1];
+                if (nr >= 0 && nr < m && nc >= 0 && nc < n && grid[nr][nc] == 1) {
+                    grid[nr][nc] = 2; // Infect
+                    fresh--;
+                    q.offer(new int[]{nr, nc, cur[2] + 1});
+                }
+            }
+        }
+        System.out.println("Minutes to rot: " + (fresh == 0 ? minutes : -1));
+    }
+}`,
+  },
+  {
+    id: 'word-search',
+    title: '46. Word Search in 2D Matrix (DFS)',
+    category: 'Arrays & Matrices',
+    description: 'Search target word by recursively exploring 4-directional adjacent character tiles with visited masking.',
+    difficulty: 'Intermediate',
+    timeComplexity: 'O(m × n × 4^L)',
+    spaceComplexity: 'O(L)',
+    code: `public class Main {
+    static boolean dfs(char[][] board, String word, int r, int c, int idx) {
+        if (idx == word.length()) return true;
+        if (r < 0 || r >= board.length || c < 0 || c >= board[0].length || board[r][c] != word.charAt(idx)) return false;
+        char temp = board[r][c];
+        board[r][c] = '#'; // Mark visited
+        boolean found = dfs(board, word, r + 1, c, idx + 1) ||
+                        dfs(board, word, r - 1, c, idx + 1) ||
+                        dfs(board, word, r, c + 1, idx + 1) ||
+                        dfs(board, word, r, c - 1, idx + 1);
+        board[r][c] = temp; // Backtrack
+        return found;
+    }
+    public static void main(String[] args) {
+        char[][] board = {
+            {'A', 'B', 'C', 'E'},
+            {'S', 'F', 'C', 'S'},
+            {'A', 'D', 'E', 'E'}
+        };
+        String word = "ABCCED";
+        boolean exists = false;
+        for (int r = 0; r < board.length && !exists; r++) {
+            for (int c = 0; c < board[0].length && !exists; c++) {
+                if (dfs(board, word, r, c, 0)) exists = true;
+            }
+        }
+        System.out.println("Word '" + word + "' found: " + exists);
+    }
+}`,
+  },
+  {
+    id: 'knapsack-01',
+    title: '47. 0/1 Knapsack (2D DP Table)',
+    category: 'Dynamic Programming & Recursion',
+    description: 'Maximize total value of items fitting within weight capacity using 2D DP memoization table.',
+    difficulty: 'Intermediate',
+    timeComplexity: 'O(n × W)',
+    spaceComplexity: 'O(n × W)',
+    code: `public class Main {
+    public static void main(String[] args) {
+        int[] val = {60, 100, 120};
+        int[] wt = {10, 20, 30};
+        int W = 50;
+        int n = val.length;
+        int[][] dp = new int[n + 1][W + 1];
+
+        for (int i = 1; i <= n; i++) {
+            for (int w = 0; w <= W; w++) {
+                if (wt[i - 1] <= w) {
+                    dp[i][w] = Math.max(val[i - 1] + dp[i - 1][w - wt[i - 1]], dp[i - 1][w]);
+                } else {
+                    dp[i][w] = dp[i - 1][w];
+                }
+            }
+        }
+        System.out.println("Maximum value in knapsack: " + dp[n][W]);
+    }
+}`,
+  },
+  {
+    id: 'sliding-window-max',
+    title: '48. Sliding Window Maximum (Monotonic Deque)',
+    category: 'Stacks & Queues',
+    description: 'Find maximum element in each sliding window of size k using a doubly-linked monotonic deque.',
+    difficulty: 'Hard',
+    timeComplexity: 'O(n)',
+    spaceComplexity: 'O(k)',
+    code: `import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        int[] nums = {1, 3, -1, -3, 5, 3, 6, 7};
+        int k = 3;
+        Deque<Integer> dq = new ArrayDeque<>();
+        List<Integer> result = new ArrayList<>();
+
+        for (int i = 0; i < nums.length; i++) {
+            if (!dq.isEmpty() && dq.peekFirst() <= i - k) dq.pollFirst();
+            while (!dq.isEmpty() && nums[dq.peekLast()] <= nums[i]) dq.pollLast();
+            dq.offerLast(i);
+            if (i >= k - 1) result.add(nums[dq.peekFirst()]);
+        }
+        System.out.println("Window Maximums: " + result);
+    }
+}`,
   }
 ];
 

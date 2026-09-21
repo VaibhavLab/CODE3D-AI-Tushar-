@@ -48,9 +48,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "If an element in matrix is 0, set its entire row and column to 0.",
     "defaultInput": "1, 1, 1, 1, 0, 1, 1, 1, 1",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Set Matrix Zeroes (Medium)\n    // Time Complexity: O(m*n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: If an element in matrix is 0, set its entire row and column to 0.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Set Matrix Zeroes (Medium)\n    # Time: O(m*n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # If an element in matrix is 0, set its entire row and column to 0.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Set Matrix Zeroes (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: Set Matrix Zeroes (Medium)\n    // Time Complexity: O(m*n) | Space: O(1) in-place\n    public void setZeroes(int[][] matrix) {\n        int m = matrix.length, n = matrix[0].length;\n        boolean col0 = false;\n        for (int i = 0; i < m; i++) {\n            if (matrix[i][0] == 0) col0 = true;\n            for (int j = 1; j < n; j++) {\n                if (matrix[i][j] == 0) {\n                    matrix[i][0] = 0;\n                    matrix[0][j] = 0;\n                }\n            }\n        }\n        for (int i = m - 1; i >= 0; i--) {\n            for (int j = n - 1; j >= 1; j--) {\n                if (matrix[i][0] == 0 || matrix[0][j] == 0) matrix[i][j] = 0;\n            }\n            if (col0) matrix[i][0] = 0;\n        }\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Set Matrix Zeroes (Medium)\n    # Time: O(m*n) | Space: O(1) in-place\n    def setZeroes(self, matrix: list[list[int]]) -> None:\n        m, n = len(matrix), len(matrix[0])\n        col0 = False\n        for i in range(m):\n            if matrix[i][0] == 0: col0 = True\n            for j in range(1, n):\n                if matrix[i][j] == 0:\n                    matrix[i][0] = matrix[0][j] = 0\n        for i in range(m - 1, -1, -1):\n            for j in range(n - 1, 0, -1):\n                if matrix[i][0] == 0 or matrix[0][j] == 0:\n                    matrix[i][j] = 0\n            if col0: matrix[i][0] = 0",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Set Matrix Zeroes (Medium)\n    void setZeroes(vector<vector<int>>& matrix) {\n        int m = matrix.size(), n = matrix[0].size(), col0 = 1;\n        for (int i = 0; i < m; i++) {\n            if (matrix[i][0] == 0) col0 = 0;\n            for (int j = 1; j < n; j++)\n                if (matrix[i][j] == 0) matrix[i][0] = matrix[0][j] = 0;\n        }\n        for (int i = m - 1; i >= 0; i--) {\n            for (int j = n - 1; j >= 1; j--)\n                if (matrix[i][0] == 0 || matrix[0][j] == 0) matrix[i][j] = 0;\n            if (!col0) matrix[i][0] = 0;\n        }\n    }\n};"
   },
   {
     "id": 2,
@@ -65,9 +65,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n²)",
     "description": "Generate Pascal's triangle up to numRows.",
     "defaultInput": "5",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Pascal's Triangle (Easy)\n    // Time Complexity: O(n²) | Space: O(n²)\n    public int solve(int[] nums) {\n        // Algorithm: Generate Pascal's triangle up to numRows.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Pascal's Triangle (Easy)\n    # Time: O(n²) | Space: O(n²)\n    def solve(self, nums: list[int]) -> int:\n        # Generate Pascal's triangle up to numRows.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Pascal's Triangle (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: Pascal's Triangle (Easy)\n    // Time: O(n²) | Space: O(n²)\n    public List<List<Integer>> generate(int numRows) {\n        List<List<Integer>> triangle = new ArrayList<>();\n        for (int i = 0; i < numRows; i++) {\n            List<Integer> row = new ArrayList<>();\n            for (int j = 0; j <= i; j++) {\n                if (j == 0 || j == i) row.add(1);\n                else row.add(triangle.get(i - 1).get(j - 1) + triangle.get(i - 1).get(j));\n            }\n            triangle.add(row);\n        }\n        return triangle;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Pascal's Triangle (Easy)\n    def generate(self, numRows: int) -> list[list[int]]:\n        res = []\n        for i in range(numRows):\n            row = [1] * (i + 1)\n            for j in range(1, i):\n                row[j] = res[i - 1][j - 1] + res[i - 1][j]\n            res.append(row)\n        return res",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Pascal's Triangle (Easy)\n    vector<vector<int>> generate(int numRows) {\n        vector<vector<int>> res(numRows);\n        for (int i = 0; i < numRows; i++) {\n            res[i].resize(i + 1, 1);\n            for (int j = 1; j < i; j++)\n                res[i][j] = res[i - 1][j - 1] + res[i - 1][j];\n        }\n        return res;\n    }\n};"
   },
   {
     "id": 3,
@@ -82,9 +82,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Rearrange numbers into the lexicographically next greater permutation.",
     "defaultInput": "1, 2, 3, 6, 5, 4",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Next Permutation (Medium)\n    // Time Complexity: O(n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Rearrange numbers into the lexicographically next greater permutation.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Next Permutation (Medium)\n    # Time: O(n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Rearrange numbers into the lexicographically next greater permutation.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Next Permutation (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: Next Permutation (Medium)\n    // Time: O(n) | Space: O(1)\n    public void nextPermutation(int[] nums) {\n        int n = nums.length, i = n - 2;\n        while (i >= 0 && nums[i] >= nums[i + 1]) i--;\n        if (i >= 0) {\n            int j = n - 1;\n            while (nums[j] <= nums[i]) j--;\n            swap(nums, i, j);\n        }\n        reverse(nums, i + 1, n - 1);\n    }\n    void swap(int[] a, int i, int j) { int t = a[i]; a[i] = a[j]; a[j] = t; }\n    void reverse(int[] a, int l, int r) { while (l < r) swap(a, l++, r--); }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Next Permutation (Medium)\n    def nextPermutation(self, nums: list[int]) -> None:\n        n = len(nums)\n        i = n - 2\n        while i >= 0 and nums[i] >= nums[i + 1]: i -= 1\n        if i >= 0:\n            j = n - 1\n            while nums[j] <= nums[i]: j -= 1\n            nums[i], nums[j] = nums[j], nums[i]\n        nums[i + 1:] = reversed(nums[i + 1:])",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Next Permutation (Medium)\n    void nextPermutation(vector<int>& nums) {\n        int n = nums.size(), i = n - 2;\n        while (i >= 0 && nums[i] >= nums[i + 1]) i--;\n        if (i >= 0) {\n            int j = n - 1;\n            while (nums[j] <= nums[i]) j--;\n            swap(nums[i], nums[j]);\n        }\n        reverse(nums.begin() + i + 1, nums.end());\n    }\n};"
   },
   {
     "id": 4,
@@ -99,9 +99,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Find maximum contiguous subarray sum.",
     "defaultInput": "-2, 1, -3, 4, -1, 2, 1, -5, 4",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Kadane's Algorithm (Max Subarray) (Medium)\n    // Time Complexity: O(n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Find maximum contiguous subarray sum.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Kadane's Algorithm (Max Subarray) (Medium)\n    # Time: O(n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Find maximum contiguous subarray sum.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Kadane's Algorithm (Max Subarray) (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: Kadane's Algorithm (Max Subarray)\n    // Time: O(n) | Space: O(1)\n    public int maxSubArray(int[] nums) {\n        int maxSoFar = nums[0], currMax = nums[0];\n        for (int i = 1; i < nums.length; i++) {\n            currMax = Math.max(nums[i], currMax + nums[i]);\n            maxSoFar = Math.max(maxSoFar, currMax);\n        }\n        return maxSoFar;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Kadane's Algorithm (Max Subarray)\n    def maxSubArray(self, nums: list[int]) -> int:\n        cur_max = max_so_far = nums[0]\n        for x in nums[1:]:\n            cur_max = max(x, cur_max + x)\n            max_so_far = max(max_so_far, cur_max)\n        return max_so_far",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Kadane's Algorithm (Max Subarray)\n    int maxSubArray(vector<int>& nums) {\n        int curMax = nums[0], maxSoFar = nums[0];\n        for (size_t i = 1; i < nums.size(); i++) {\n            curMax = max(nums[i], curMax + nums[i]);\n            maxSoFar = max(maxSoFar, curMax);\n        }\n        return maxSoFar;\n    }\n};"
   },
   {
     "id": 5,
@@ -116,9 +116,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Sort an array of 0s, 1s, and 2s in-place.",
     "defaultInput": "2, 0, 2, 1, 1, 0",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Sort Colors (Dutch National Flag) (Medium)\n    // Time Complexity: O(n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Sort an array of 0s, 1s, and 2s in-place.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Sort Colors (Dutch National Flag) (Medium)\n    # Time: O(n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Sort an array of 0s, 1s, and 2s in-place.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Sort Colors (Dutch National Flag) (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: Sort Colors (Dutch National Flag)\n    // Time: O(n) | Space: O(1)\n    public void sortColors(int[] nums) {\n        int low = 0, mid = 0, high = nums.length - 1;\n        while (mid <= high) {\n            if (nums[mid] == 0) swap(nums, low++, mid++);\n            else if (nums[mid] == 1) mid++;\n            else swap(nums, mid, high--);\n        }\n    }\n    void swap(int[] a, int i, int j) { int t = a[i]; a[i] = a[j]; a[j] = t; }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Sort Colors (Dutch National Flag)\n    def sortColors(self, nums: list[int]) -> None:\n        low, mid, high = 0, 0, len(nums) - 1\n        while mid <= high:\n            if nums[mid] == 0:\n                nums[low], nums[mid] = nums[mid], nums[low]\n                low += 1; mid += 1\n            elif nums[mid] == 1:\n                mid += 1\n            else:\n                nums[mid], nums[high] = nums[high], nums[mid]\n                high -= 1",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Sort Colors (Dutch National Flag)\n    void sortColors(vector<int>& nums) {\n        int low = 0, mid = 0, high = nums.size() - 1;\n        while (mid <= high) {\n            if (nums[mid] == 0) swap(nums[low++], nums[mid++]);\n            else if (nums[mid] == 1) mid++;\n            else swap(nums, mid, high--);\n        }\n    }\n};"
   },
   {
     "id": 6,
@@ -133,9 +133,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Maximize profit from buying and selling stock once.",
     "defaultInput": "7, 1, 5, 3, 6, 4",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Best Time to Buy and Sell Stock (Easy)\n    // Time Complexity: O(n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Maximize profit from buying and selling stock once.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Best Time to Buy and Sell Stock (Easy)\n    # Time: O(n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Maximize profit from buying and selling stock once.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Best Time to Buy and Sell Stock (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: Best Time to Buy and Sell Stock\n    // Time: O(n) | Space: O(1)\n    public int maxProfit(int[] prices) {\n        int minPrice = Integer.MAX_VALUE, maxProfit = 0;\n        for (int price : prices) {\n            minPrice = Math.min(minPrice, price);\n            maxProfit = Math.max(maxProfit, price - minPrice);\n        }\n        return maxProfit;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Best Time to Buy and Sell Stock\n    def maxProfit(self, prices: list[int]) -> int:\n        min_price, max_profit = float('inf'), 0\n        for p in prices:\n            min_price = min(min_price, p)\n            max_profit = max(max_profit, p - min_price)\n        return max_profit",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Best Time to Buy and Sell Stock\n    int maxProfit(vector<int>& prices) {\n        int minPrice = INT_MAX, maxProfit = 0;\n        for (int p : prices) {\n            minPrice = min(minPrice, p);\n            maxProfit = max(maxProfit, p - minPrice);\n        }\n        return maxProfit;\n    }\n};"
   },
   {
     "id": 7,
@@ -150,9 +150,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Rotate an n x n 2D matrix by 90 degrees clockwise in-place.",
     "defaultInput": "1, 2, 3, 4, 5, 6, 7, 8, 9",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Rotate Image / Matrix by 90° (Medium)\n    // Time Complexity: O(n²) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Rotate an n x n 2D matrix by 90 degrees clockwise in-place.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Rotate Image / Matrix by 90° (Medium)\n    # Time: O(n²) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Rotate an n x n 2D matrix by 90 degrees clockwise in-place.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Rotate Image / Matrix by 90° (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: Rotate Image / Matrix by 90°\n    // Time: O(n²) | Space: O(1) in-place\n    public void rotate(int[][] matrix) {\n        int n = matrix.length;\n        for (int i = 0; i < n; i++) {\n            for (int j = i + 1; j < n; j++) {\n                int temp = matrix[i][j];\n                matrix[i][j] = matrix[j][i];\n                matrix[j][i] = temp;\n            }\n        }\n        for (int i = 0; i < n; i++) {\n            for (int j = 0; j < n / 2; j++) {\n                int temp = matrix[i][j];\n                matrix[i][j] = matrix[i][n - 1 - j];\n                matrix[i][n - 1 - j] = temp;\n            }\n        }\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Rotate Image by 90° Clockwise\n    def rotate(self, matrix: list[list[int]]) -> None:\n        matrix.reverse()\n        for i in range(len(matrix)):\n            for j in range(i):\n                matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Rotate Image by 90°\n    void rotate(vector<vector<int>>& matrix) {\n        int n = matrix.size();\n        for (int i = 0; i < n; i++)\n            for (int j = i + 1; j < n; j++)\n                swap(matrix[i][j], matrix[j][i]);\n        for (int i = 0; i < n; i++)\n            reverse(matrix[i].begin(), matrix[i].end());\n    }\n};"
   },
   {
     "id": 8,
@@ -167,9 +167,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Merge all overlapping intervals.",
     "defaultInput": "1, 3, 2, 6, 8, 10, 15, 18",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Merge Overlapping Subintervals (Medium)\n    // Time Complexity: O(n log n) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Merge all overlapping intervals.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Merge Overlapping Subintervals (Medium)\n    # Time: O(n log n) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Merge all overlapping intervals.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Merge Overlapping Subintervals (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: Merge Overlapping Subintervals\n    // Time: O(n log n) | Space: O(n)\n    public int[][] merge(int[][] intervals) {\n        Arrays.sort(intervals, (a, b) -> a[0] - b[0]);\n        List<int[]> res = new ArrayList<>();\n        int[] prev = intervals[0];\n        for (int i = 1; i < intervals.length; i++) {\n            if (intervals[i][0] <= prev[1]) prev[1] = Math.max(prev[1], intervals[i][1]);\n            else { res.add(prev); prev = intervals[i]; }\n        }\n        res.add(prev);\n        return res.toArray(new int[res.size()][]);\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Merge Overlapping Subintervals\n    def merge(self, intervals: list[list[int]]) -> list[list[int]]:\n        intervals.sort(key=lambda x: x[0])\n        merged = [intervals[0]]\n        for cur in intervals[1:]:\n            if cur[0] <= merged[-1][1]:\n                merged[-1][1] = max(merged[-1][1], cur[1])\n            else:\n                merged.append(cur)\n        return merged",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Merge Overlapping Subintervals\n    vector<vector<int>> merge(vector<vector<int>>& intervals) {\n        sort(intervals.begin(), intervals.end());\n        vector<vector<int>> res = {intervals[0]};\n        for (size_t i = 1; i < intervals.size(); i++) {\n            if (intervals[i][0] <= res.back()[1]) res.back()[1] = max(res.back()[1], intervals[i][1]);\n            else res.push_back(intervals[i]);\n        }\n        return res;\n    }\n};"
   },
   {
     "id": 9,
@@ -184,9 +184,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Merge nums1 and nums2 into nums1 in-place without extra memory.",
     "defaultInput": "1, 2, 3, 0, 0, 0",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Merge Two Sorted Arrays (Medium)\n    // Time Complexity: O(m+n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Merge nums1 and nums2 into nums1 in-place without extra memory.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Merge Two Sorted Arrays (Medium)\n    # Time: O(m+n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Merge nums1 and nums2 into nums1 in-place without extra memory.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Merge Two Sorted Arrays (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 9. Merge Two Sorted Arrays (Medium)\n    // Time Complexity: O(m+n) | Space: O(1)\n    public int mergeTwoSortedArrays(int[] nums) {\n        // Algorithm: Merge nums1 and nums2 into nums1 in-place without extra memory.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 9. Merge Two Sorted Arrays (Medium)\n    # Time: O(m+n) | Space: O(1)\n    def mergeTwoSortedArrays(self, nums: list[int]) -> int:\n        # Merge nums1 and nums2 into nums1 in-place without extra memory.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 9. Merge Two Sorted Arrays (Medium)\n    int mergeTwoSortedArrays(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 10,
@@ -201,9 +201,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Find duplicate in array of n+1 integers using Floyd cycle detection.",
     "defaultInput": "1, 3, 4, 2, 2",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Find the Duplicate Number (Medium)\n    // Time Complexity: O(n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Find duplicate in array of n+1 integers using Floyd cycle detection.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Find the Duplicate Number (Medium)\n    # Time: O(n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Find duplicate in array of n+1 integers using Floyd cycle detection.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Find the Duplicate Number (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: Find the Duplicate Number (Medium)\n    // Time: O(n) | Space: O(1) Floyd's Tortoise and Hare\n    public int findDuplicate(int[] nums) {\n        int slow = nums[0], fast = nums[0];\n        do {\n            slow = nums[slow];\n            fast = nums[nums[fast]];\n        } while (slow != fast);\n        fast = nums[0];\n        while (slow != fast) {\n            slow = nums[slow];\n            fast = nums[fast];\n        }\n        return slow;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Find the Duplicate Number\n    def findDuplicate(self, nums: list[int]) -> int:\n        slow = fast = nums[0]\n        while True:\n            slow = nums[slow]\n            fast = nums[nums[fast]]\n            if slow == fast: break\n        fast = nums[0]\n        while slow != fast:\n            slow = nums[slow]\n            fast = nums[fast]\n        return slow",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Find the Duplicate Number\n    int findDuplicate(vector<int>& nums) {\n        int slow = nums[0], fast = nums[0];\n        do {\n            slow = nums[slow];\n            fast = nums[nums[fast]];\n        } while (slow != fast);\n        fast = nums[0];\n        while (slow != fast) {\n            slow = nums[slow];\n            fast = nums[fast];\n        }\n        return slow;\n    }\n};"
   },
   {
     "id": 11,
@@ -218,9 +218,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Find the one repeating and one missing number from 1 to n.",
     "defaultInput": "3, 1, 2, 5, 3",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Repeat and Missing Number (Medium)\n    // Time Complexity: O(n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Find the one repeating and one missing number from 1 to n.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Repeat and Missing Number (Medium)\n    # Time: O(n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Find the one repeating and one missing number from 1 to n.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Repeat and Missing Number (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 11. Repeat and Missing Number (Medium)\n    // Time Complexity: O(n) | Space: O(1)\n    public int repeatandMissingNumber(int[] nums) {\n        // Algorithm: Find the one repeating and one missing number from 1 to n.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 11. Repeat and Missing Number (Medium)\n    # Time: O(n) | Space: O(1)\n    def repeatandMissingNumber(self, nums: list[int]) -> int:\n        # Find the one repeating and one missing number from 1 to n.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 11. Repeat and Missing Number (Medium)\n    int repeatandMissingNumber(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 12,
@@ -235,9 +235,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Count inversion pairs where i < j and arr[i] > arr[j].",
     "defaultInput": "8, 4, 2, 1",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Inversion of Array (Medium)\n    // Time Complexity: O(n log n) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Count inversion pairs where i < j and arr[i] > arr[j].\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Inversion of Array (Medium)\n    # Time: O(n log n) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Count inversion pairs where i < j and arr[i] > arr[j].\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Inversion of Array (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 12. Inversion of Array (Medium)\n    // Time Complexity: O(n log n) | Space: O(n)\n    public int inversionofArray(int[] nums) {\n        // Algorithm: Count inversion pairs where i < j and arr[i] > arr[j].\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 12. Inversion of Array (Medium)\n    # Time: O(n log n) | Space: O(n)\n    def inversionofArray(self, nums: list[int]) -> int:\n        # Count inversion pairs where i < j and arr[i] > arr[j].\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 12. Inversion of Array (Medium)\n    int inversionofArray(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 13,
@@ -252,9 +252,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Search for target in m x n matrix with sorted rows.",
     "defaultInput": "1, 3, 5, 7, 10, 11, 16, 20, 23, 30, 34, 60",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Search in a 2D Matrix (Medium)\n    // Time Complexity: O(log(m*n)) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Search for target in m x n matrix with sorted rows.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Search in a 2D Matrix (Medium)\n    # Time: O(log(m*n)) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Search for target in m x n matrix with sorted rows.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Search in a 2D Matrix (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 13. Search in a 2D Matrix (Medium)\n    // Time Complexity: O(log(m*n)) | Space: O(1)\n    public int searchina2DMatrix(int[] nums) {\n        // Algorithm: Search for target in m x n matrix with sorted rows.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 13. Search in a 2D Matrix (Medium)\n    # Time: O(log(m*n)) | Space: O(1)\n    def searchina2DMatrix(self, nums: list[int]) -> int:\n        # Search for target in m x n matrix with sorted rows.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 13. Search in a 2D Matrix (Medium)\n    int searchina2DMatrix(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 14,
@@ -269,9 +269,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(log n)",
     "description": "Implement pow(x, n) in logarithmic time.",
     "defaultInput": "2, 10",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Pow(x, n) Binary Exponentiation (Medium)\n    // Time Complexity: O(log n) | Space: O(log n)\n    public int solve(int[] nums) {\n        // Algorithm: Implement pow(x, n) in logarithmic time.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Pow(x, n) Binary Exponentiation (Medium)\n    # Time: O(log n) | Space: O(log n)\n    def solve(self, nums: list[int]) -> int:\n        # Implement pow(x, n) in logarithmic time.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Pow(x, n) Binary Exponentiation (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 14. Pow(x, n) Binary Exponentiation (Medium)\n    // Time Complexity: O(log n) | Space: O(log n)\n    public int powxnBinaryExponentiation(int[] nums) {\n        // Algorithm: Implement pow(x, n) in logarithmic time.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 14. Pow(x, n) Binary Exponentiation (Medium)\n    # Time: O(log n) | Space: O(log n)\n    def powxnBinaryExponentiation(self, nums: list[int]) -> int:\n        # Implement pow(x, n) in logarithmic time.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 14. Pow(x, n) Binary Exponentiation (Medium)\n    int powxnBinaryExponentiation(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 15,
@@ -286,9 +286,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Find element appearing more than n/2 times using Boyer-Moore.",
     "defaultInput": "2, 2, 1, 1, 1, 2, 2",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Majority Element (> n/2 times) (Easy)\n    // Time Complexity: O(n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Find element appearing more than n/2 times using Boyer-Moore.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Majority Element (> n/2 times) (Easy)\n    # Time: O(n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Find element appearing more than n/2 times using Boyer-Moore.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Majority Element (> n/2 times) (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 15. Majority Element (> n/2 times) (Easy)\n    // Time Complexity: O(n) | Space: O(1)\n    public int majorityElementn2times(int[] nums) {\n        // Algorithm: Find element appearing more than n/2 times using Boyer-Moore.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 15. Majority Element (> n/2 times) (Easy)\n    # Time: O(n) | Space: O(1)\n    def majorityElementn2times(self, nums: list[int]) -> int:\n        # Find element appearing more than n/2 times using Boyer-Moore.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 15. Majority Element (> n/2 times) (Easy)\n    int majorityElementn2times(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 16,
@@ -303,9 +303,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Find all elements that appear more than n/3 times.",
     "defaultInput": "3, 2, 3",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Majority Element (> n/3 times) (Medium)\n    // Time Complexity: O(n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Find all elements that appear more than n/3 times.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Majority Element (> n/3 times) (Medium)\n    # Time: O(n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Find all elements that appear more than n/3 times.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Majority Element (> n/3 times) (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 16. Majority Element (> n/3 times) (Medium)\n    // Time Complexity: O(n) | Space: O(1)\n    public int majorityElementn3times(int[] nums) {\n        // Algorithm: Find all elements that appear more than n/3 times.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 16. Majority Element (> n/3 times) (Medium)\n    # Time: O(n) | Space: O(1)\n    def majorityElementn3times(self, nums: list[int]) -> int:\n        # Find all elements that appear more than n/3 times.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 16. Majority Element (> n/3 times) (Medium)\n    int majorityElementn3times(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 17,
@@ -320,9 +320,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Count unique paths from top-left to bottom-right in grid.",
     "defaultInput": "3, 7",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Grid Unique Paths (Medium)\n    // Time Complexity: O(m*n) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Count unique paths from top-left to bottom-right in grid.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Grid Unique Paths (Medium)\n    # Time: O(m*n) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Count unique paths from top-left to bottom-right in grid.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Grid Unique Paths (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 17. Grid Unique Paths (Medium)\n    // Time Complexity: O(m*n) | Space: O(n)\n    public int gridUniquePaths(int[] nums) {\n        // Algorithm: Count unique paths from top-left to bottom-right in grid.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 17. Grid Unique Paths (Medium)\n    # Time: O(m*n) | Space: O(n)\n    def gridUniquePaths(self, nums: list[int]) -> int:\n        # Count unique paths from top-left to bottom-right in grid.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 17. Grid Unique Paths (Medium)\n    int gridUniquePaths(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 18,
@@ -337,9 +337,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Count pairs (i, j) where i < j and nums[i] > 2*nums[j].",
     "defaultInput": "1, 3, 2, 3, 1",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Reverse Pairs (Hard)\n    // Time Complexity: O(n log n) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Count pairs (i, j) where i < j and nums[i] > 2*nums[j].\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Reverse Pairs (Hard)\n    # Time: O(n log n) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Count pairs (i, j) where i < j and nums[i] > 2*nums[j].\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Reverse Pairs (Hard)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 18. Reverse Pairs (Hard)\n    // Time Complexity: O(n log n) | Space: O(n)\n    public int reversePairs(int[] nums) {\n        // Algorithm: Count pairs (i, j) where i < j and nums[i] > 2*nums[j].\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 18. Reverse Pairs (Hard)\n    # Time: O(n log n) | Space: O(n)\n    def reversePairs(self, nums: list[int]) -> int:\n        # Count pairs (i, j) where i < j and nums[i] > 2*nums[j].\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 18. Reverse Pairs (Hard)\n    int reversePairs(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 19,
@@ -354,9 +354,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Find two indices whose values sum to target.",
     "defaultInput": "2, 7, 11, 15",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: 2 Sum Problem (Easy)\n    // Time Complexity: O(n) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Find two indices whose values sum to target.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 2 Sum Problem (Easy)\n    # Time: O(n) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Find two indices whose values sum to target.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 2 Sum Problem (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: Two Sum (Easy)\n    // Time: O(n) | Space: O(n) Hash Table\n    public int[] twoSum(int[] nums, int target) {\n        Map<Integer, Integer> map = new HashMap<>();\n        for (int i = 0; i < nums.length; i++) {\n            int comp = target - nums[i];\n            if (map.containsKey(comp)) return new int[]{map.get(comp), i};\n            map.put(nums[i], i);\n        }\n        return new int[]{};\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Two Sum\n    def twoSum(self, nums: list[int], target: int) -> list[int]:\n        seen = {}\n        for i, num in enumerate(nums):\n            comp = target - num\n            if comp in seen: return [seen[comp], i]\n            seen[num] = i\n        return []",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Two Sum\n    vector<int> twoSum(vector<int>& nums, int target) {\n        unordered_map<int, int> mp;\n        for (int i = 0; i < nums.size(); i++) {\n            int comp = target - nums[i];\n            if (mp.count(comp)) return {mp[comp], i};\n            mp[nums[i]] = i;\n        }\n        return {};\n    }\n};"
   },
   {
     "id": 20,
@@ -371,9 +371,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Find all unique quadruplets summing to target.",
     "defaultInput": "1, 0, -1, 0, -2, 2",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: 4 Sum Problem (Medium)\n    // Time Complexity: O(n³) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Find all unique quadruplets summing to target.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 4 Sum Problem (Medium)\n    # Time: O(n³) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Find all unique quadruplets summing to target.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 4 Sum Problem (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 20. 4 Sum Problem (Medium)\n    // Time Complexity: O(n³) | Space: O(1)\n    public int 4SumProblem(int[] nums) {\n        // Algorithm: Find all unique quadruplets summing to target.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 20. 4 Sum Problem (Medium)\n    # Time: O(n³) | Space: O(1)\n    def 4SumProblem(self, nums: list[int]) -> int:\n        # Find all unique quadruplets summing to target.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 20. 4 Sum Problem (Medium)\n    int 4SumProblem(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 21,
@@ -388,9 +388,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Length of longest consecutive elements sequence.",
     "defaultInput": "100, 4, 200, 1, 3, 2",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Longest Consecutive Sequence (Medium)\n    // Time Complexity: O(n) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Length of longest consecutive elements sequence.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Longest Consecutive Sequence (Medium)\n    # Time: O(n) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Length of longest consecutive elements sequence.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Longest Consecutive Sequence (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 21. Longest Consecutive Sequence (Medium)\n    // Time Complexity: O(n) | Space: O(n)\n    public int longestConsecutiveSequence(int[] nums) {\n        // Algorithm: Length of longest consecutive elements sequence.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 21. Longest Consecutive Sequence (Medium)\n    # Time: O(n) | Space: O(n)\n    def longestConsecutiveSequence(self, nums: list[int]) -> int:\n        # Length of longest consecutive elements sequence.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 21. Longest Consecutive Sequence (Medium)\n    int longestConsecutiveSequence(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 22,
@@ -405,9 +405,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Length of largest subarray with sum equal to 0.",
     "defaultInput": "15, -2, 2, -8, 1, 7, 10, 23",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Largest Subarray with 0 Sum (Medium)\n    // Time Complexity: O(n) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Length of largest subarray with sum equal to 0.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Largest Subarray with 0 Sum (Medium)\n    # Time: O(n) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Length of largest subarray with sum equal to 0.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Largest Subarray with 0 Sum (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 22. Largest Subarray with 0 Sum (Medium)\n    // Time Complexity: O(n) | Space: O(n)\n    public int largestSubarraywith0Sum(int[] nums) {\n        // Algorithm: Length of largest subarray with sum equal to 0.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 22. Largest Subarray with 0 Sum (Medium)\n    # Time: O(n) | Space: O(n)\n    def largestSubarraywith0Sum(self, nums: list[int]) -> int:\n        # Length of largest subarray with sum equal to 0.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 22. Largest Subarray with 0 Sum (Medium)\n    int largestSubarraywith0Sum(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 23,
@@ -422,9 +422,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Count number of subarrays having XOR equal to k.",
     "defaultInput": "4, 2, 2, 6, 4",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Count Subarrays with Given XOR K (Medium)\n    // Time Complexity: O(n) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Count number of subarrays having XOR equal to k.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Count Subarrays with Given XOR K (Medium)\n    # Time: O(n) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Count number of subarrays having XOR equal to k.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Count Subarrays with Given XOR K (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 23. Count Subarrays with Given XOR K (Medium)\n    // Time Complexity: O(n) | Space: O(n)\n    public int countSubarrayswithGivenXORK(int[] nums) {\n        // Algorithm: Count number of subarrays having XOR equal to k.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 23. Count Subarrays with Given XOR K (Medium)\n    # Time: O(n) | Space: O(n)\n    def countSubarrayswithGivenXORK(self, nums: list[int]) -> int:\n        # Count number of subarrays having XOR equal to k.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 23. Count Subarrays with Given XOR K (Medium)\n    int countSubarrayswithGivenXORK(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 24,
@@ -439,9 +439,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(k)",
     "description": "Longest substring without repeating characters.",
     "defaultInput": "1, 2, 3, 1, 2, 3, 4",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Longest Substring Without Repeat (Medium)\n    // Time Complexity: O(n) | Space: O(k)\n    public int solve(int[] nums) {\n        // Algorithm: Longest substring without repeating characters.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Longest Substring Without Repeat (Medium)\n    # Time: O(n) | Space: O(k)\n    def solve(self, nums: list[int]) -> int:\n        # Longest substring without repeating characters.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Longest Substring Without Repeat (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 24. Longest Substring Without Repeat (Medium)\n    // Time Complexity: O(n) | Space: O(k)\n    public int longestSubstringWithoutRepeat(int[] nums) {\n        // Algorithm: Longest substring without repeating characters.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 24. Longest Substring Without Repeat (Medium)\n    # Time: O(n) | Space: O(k)\n    def longestSubstringWithoutRepeat(self, nums: list[int]) -> int:\n        # Longest substring without repeating characters.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 24. Longest Substring Without Repeat (Medium)\n    int longestSubstringWithoutRepeat(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 25,
@@ -456,9 +456,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Reverse a singly linked list in-place.",
     "defaultInput": "1, 2, 3, 4, 5",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Reverse a Linked List (Easy)\n    // Time Complexity: O(n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Reverse a singly linked list in-place.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Reverse a Linked List (Easy)\n    # Time: O(n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Reverse a singly linked list in-place.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Reverse a Linked List (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: Reverse a Linked List\n    // Time: O(n) | Space: O(1)\n    public ListNode reverseList(ListNode head) {\n        ListNode prev = null, curr = head;\n        while (curr != null) {\n            ListNode next = curr.next;\n            curr.next = prev;\n            prev = curr;\n            curr = next;\n        }\n        return prev;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Reverse a Linked List\n    def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]:\n        prev, curr = None, head\n        while curr:\n            nxt = curr.next\n            curr.next = prev\n            prev = curr\n            curr = nxt\n        return prev",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Reverse a Linked List\n    ListNode* reverseList(ListNode* head) {\n        ListNode *prev = nullptr, *curr = head;\n        while (curr) {\n            ListNode* nxt = curr->next;\n            curr->next = prev;\n            prev = curr;\n            curr = nxt;\n        }\n        return prev;\n    }\n};"
   },
   {
     "id": 26,
@@ -473,9 +473,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Find the middle node using slow and fast pointers.",
     "defaultInput": "1, 2, 3, 4, 5",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Find Middle of Linked List (Easy)\n    // Time Complexity: O(n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Find the middle node using slow and fast pointers.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Find Middle of Linked List (Easy)\n    # Time: O(n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Find the middle node using slow and fast pointers.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Find Middle of Linked List (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 26. Find Middle of Linked List (Easy)\n    // Time Complexity: O(n) | Space: O(1)\n    public int findMiddleofLinkedList(int[] nums) {\n        // Algorithm: Find the middle node using slow and fast pointers.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 26. Find Middle of Linked List (Easy)\n    # Time: O(n) | Space: O(1)\n    def findMiddleofLinkedList(self, nums: list[int]) -> int:\n        # Find the middle node using slow and fast pointers.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 26. Find Middle of Linked List (Easy)\n    int findMiddleofLinkedList(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 27,
@@ -490,9 +490,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Merge two sorted linked lists into one sorted list.",
     "defaultInput": "1, 2, 4, 1, 3, 4",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Merge Two Sorted Lists (Easy)\n    // Time Complexity: O(m+n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Merge two sorted linked lists into one sorted list.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Merge Two Sorted Lists (Easy)\n    # Time: O(m+n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Merge two sorted linked lists into one sorted list.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Merge Two Sorted Lists (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 27. Merge Two Sorted Lists (Easy)\n    // Time Complexity: O(m+n) | Space: O(1)\n    public int mergeTwoSortedLists(int[] nums) {\n        // Algorithm: Merge two sorted linked lists into one sorted list.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 27. Merge Two Sorted Lists (Easy)\n    # Time: O(m+n) | Space: O(1)\n    def mergeTwoSortedLists(self, nums: list[int]) -> int:\n        # Merge two sorted linked lists into one sorted list.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 27. Merge Two Sorted Lists (Easy)\n    int mergeTwoSortedLists(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 28,
@@ -507,9 +507,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Remove nth node from end in one single pass.",
     "defaultInput": "1, 2, 3, 4, 5",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Remove Nth Node From End (Medium)\n    // Time Complexity: O(n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Remove nth node from end in one single pass.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Remove Nth Node From End (Medium)\n    # Time: O(n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Remove nth node from end in one single pass.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Remove Nth Node From End (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 28. Remove Nth Node From End (Medium)\n    // Time Complexity: O(n) | Space: O(1)\n    public int removeNthNodeFromEnd(int[] nums) {\n        // Algorithm: Remove nth node from end in one single pass.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 28. Remove Nth Node From End (Medium)\n    # Time: O(n) | Space: O(1)\n    def removeNthNodeFromEnd(self, nums: list[int]) -> int:\n        # Remove nth node from end in one single pass.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 28. Remove Nth Node From End (Medium)\n    int removeNthNodeFromEnd(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 29,
@@ -524,9 +524,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(max(m,n))",
     "description": "Add two numbers represented by linked lists.",
     "defaultInput": "2, 4, 3, 5, 6, 4",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Add Two Numbers as Linked List (Medium)\n    // Time Complexity: O(max(m,n)) | Space: O(max(m,n))\n    public int solve(int[] nums) {\n        // Algorithm: Add two numbers represented by linked lists.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Add Two Numbers as Linked List (Medium)\n    # Time: O(max(m,n)) | Space: O(max(m,n))\n    def solve(self, nums: list[int]) -> int:\n        # Add two numbers represented by linked lists.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Add Two Numbers as Linked List (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 29. Add Two Numbers as Linked List (Medium)\n    // Time Complexity: O(max(m,n)) | Space: O(max(m,n))\n    public int addTwoNumbersasLinkedList(int[] nums) {\n        // Algorithm: Add two numbers represented by linked lists.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 29. Add Two Numbers as Linked List (Medium)\n    # Time: O(max(m,n)) | Space: O(max(m,n))\n    def addTwoNumbersasLinkedList(self, nums: list[int]) -> int:\n        # Add two numbers represented by linked lists.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 29. Add Two Numbers as Linked List (Medium)\n    int addTwoNumbersasLinkedList(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 30,
@@ -541,9 +541,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Delete given node given only access to that node.",
     "defaultInput": "4, 5, 1, 9",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Delete Node in a Linked List (Easy)\n    // Time Complexity: O(1) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Delete given node given only access to that node.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Delete Node in a Linked List (Easy)\n    # Time: O(1) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Delete given node given only access to that node.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Delete Node in a Linked List (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 30. Delete Node in a Linked List (Easy)\n    // Time Complexity: O(1) | Space: O(1)\n    public int deleteNodeinaLinkedList(int[] nums) {\n        // Algorithm: Delete given node given only access to that node.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 30. Delete Node in a Linked List (Easy)\n    # Time: O(1) | Space: O(1)\n    def deleteNodeinaLinkedList(self, nums: list[int]) -> int:\n        # Delete given node given only access to that node.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 30. Delete Node in a Linked List (Easy)\n    int deleteNodeinaLinkedList(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 31,
@@ -558,9 +558,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Find the node at which two singly linked lists intersect.",
     "defaultInput": "4, 1, 8, 4, 5",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Intersection of Two Linked Lists (Easy)\n    // Time Complexity: O(m+n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Find the node at which two singly linked lists intersect.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Intersection of Two Linked Lists (Easy)\n    # Time: O(m+n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Find the node at which two singly linked lists intersect.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Intersection of Two Linked Lists (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 31. Intersection of Two Linked Lists (Easy)\n    // Time Complexity: O(m+n) | Space: O(1)\n    public int intersectionofTwoLinkedLists(int[] nums) {\n        // Algorithm: Find the node at which two singly linked lists intersect.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 31. Intersection of Two Linked Lists (Easy)\n    # Time: O(m+n) | Space: O(1)\n    def intersectionofTwoLinkedLists(self, nums: list[int]) -> int:\n        # Find the node at which two singly linked lists intersect.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 31. Intersection of Two Linked Lists (Easy)\n    int intersectionofTwoLinkedLists(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 32,
@@ -575,9 +575,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Determine if linked list has a cycle using Floyd cycle.",
     "defaultInput": "3, 2, 0, -4",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Detect Cycle in Linked List (Easy)\n    // Time Complexity: O(n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Determine if linked list has a cycle using Floyd cycle.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Detect Cycle in Linked List (Easy)\n    # Time: O(n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Determine if linked list has a cycle using Floyd cycle.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Detect Cycle in Linked List (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 32. Detect Cycle in Linked List (Easy)\n    // Time Complexity: O(n) | Space: O(1)\n    public int detectCycleinLinkedList(int[] nums) {\n        // Algorithm: Determine if linked list has a cycle using Floyd cycle.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 32. Detect Cycle in Linked List (Easy)\n    # Time: O(n) | Space: O(1)\n    def detectCycleinLinkedList(self, nums: list[int]) -> int:\n        # Determine if linked list has a cycle using Floyd cycle.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 32. Detect Cycle in Linked List (Easy)\n    int detectCycleinLinkedList(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 33,
@@ -592,9 +592,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Reverse nodes of linked list k at a time.",
     "defaultInput": "1, 2, 3, 4, 5",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Reverse Nodes in k-Group (Hard)\n    // Time Complexity: O(n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Reverse nodes of linked list k at a time.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Reverse Nodes in k-Group (Hard)\n    # Time: O(n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Reverse nodes of linked list k at a time.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Reverse Nodes in k-Group (Hard)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 33. Reverse Nodes in k-Group (Hard)\n    // Time Complexity: O(n) | Space: O(1)\n    public int reverseNodesinkGroup(int[] nums) {\n        // Algorithm: Reverse nodes of linked list k at a time.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 33. Reverse Nodes in k-Group (Hard)\n    # Time: O(n) | Space: O(1)\n    def reverseNodesinkGroup(self, nums: list[int]) -> int:\n        # Reverse nodes of linked list k at a time.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 33. Reverse Nodes in k-Group (Hard)\n    int reverseNodesinkGroup(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 34,
@@ -609,9 +609,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Check if linked list values form a palindrome.",
     "defaultInput": "1, 2, 2, 1",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Check Palindrome Linked List (Easy)\n    // Time Complexity: O(n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Check if linked list values form a palindrome.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Check Palindrome Linked List (Easy)\n    # Time: O(n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Check if linked list values form a palindrome.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Check Palindrome Linked List (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 34. Check Palindrome Linked List (Easy)\n    // Time Complexity: O(n) | Space: O(1)\n    public int checkPalindromeLinkedList(int[] nums) {\n        // Algorithm: Check if linked list values form a palindrome.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 34. Check Palindrome Linked List (Easy)\n    # Time: O(n) | Space: O(1)\n    def checkPalindromeLinkedList(self, nums: list[int]) -> int:\n        # Check if linked list values form a palindrome.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 34. Check Palindrome Linked List (Easy)\n    int checkPalindromeLinkedList(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 35,
@@ -626,9 +626,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Find the node where the cycle begins.",
     "defaultInput": "3, 2, 0, -4",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Starting Point of Loop in Linked List (Medium)\n    // Time Complexity: O(n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Find the node where the cycle begins.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Starting Point of Loop in Linked List (Medium)\n    # Time: O(n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Find the node where the cycle begins.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Starting Point of Loop in Linked List (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 35. Starting Point of Loop in Linked List (Medium)\n    // Time Complexity: O(n) | Space: O(1)\n    public int startingPointofLoopinLinkedList(int[] nums) {\n        // Algorithm: Find the node where the cycle begins.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 35. Starting Point of Loop in Linked List (Medium)\n    # Time: O(n) | Space: O(1)\n    def startingPointofLoopinLinkedList(self, nums: list[int]) -> int:\n        # Find the node where the cycle begins.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 35. Starting Point of Loop in Linked List (Medium)\n    int startingPointofLoopinLinkedList(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 36,
@@ -643,9 +643,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Flatten a linked list with next and bottom pointers.",
     "defaultInput": "5, 10, 19, 28",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Flattening of a Linked List (Medium)\n    // Time Complexity: O(n*k) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Flatten a linked list with next and bottom pointers.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Flattening of a Linked List (Medium)\n    # Time: O(n*k) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Flatten a linked list with next and bottom pointers.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Flattening of a Linked List (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 36. Flattening of a Linked List (Medium)\n    // Time Complexity: O(n*k) | Space: O(1)\n    public int flatteningofaLinkedList(int[] nums) {\n        // Algorithm: Flatten a linked list with next and bottom pointers.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 36. Flattening of a Linked List (Medium)\n    # Time: O(n*k) | Space: O(1)\n    def flatteningofaLinkedList(self, nums: list[int]) -> int:\n        # Flatten a linked list with next and bottom pointers.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 36. Flattening of a Linked List (Medium)\n    int flatteningofaLinkedList(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 37,
@@ -660,9 +660,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Rotate list to right by k places.",
     "defaultInput": "1, 2, 3, 4, 5",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Rotate Linked List (Medium)\n    // Time Complexity: O(n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Rotate list to right by k places.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Rotate Linked List (Medium)\n    # Time: O(n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Rotate list to right by k places.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Rotate Linked List (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 37. Rotate Linked List (Medium)\n    // Time Complexity: O(n) | Space: O(1)\n    public int rotateLinkedList(int[] nums) {\n        // Algorithm: Rotate list to right by k places.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 37. Rotate Linked List (Medium)\n    # Time: O(n) | Space: O(1)\n    def rotateLinkedList(self, nums: list[int]) -> int:\n        # Rotate list to right by k places.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 37. Rotate Linked List (Medium)\n    int rotateLinkedList(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 38,
@@ -677,9 +677,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Deep copy of list with random pointer.",
     "defaultInput": "7, 13, 11, 10, 1",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Clone a Linked List with Random Pointer (Medium)\n    // Time Complexity: O(n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Deep copy of list with random pointer.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Clone a Linked List with Random Pointer (Medium)\n    # Time: O(n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Deep copy of list with random pointer.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Clone a Linked List with Random Pointer (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 38. Clone a Linked List with Random Pointer (Medium)\n    // Time Complexity: O(n) | Space: O(1)\n    public int cloneaLinkedListwithRandomPointer(int[] nums) {\n        // Algorithm: Deep copy of list with random pointer.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 38. Clone a Linked List with Random Pointer (Medium)\n    # Time: O(n) | Space: O(1)\n    def cloneaLinkedListwithRandomPointer(self, nums: list[int]) -> int:\n        # Deep copy of list with random pointer.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 38. Clone a Linked List with Random Pointer (Medium)\n    int cloneaLinkedListwithRandomPointer(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 39,
@@ -694,9 +694,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Find all unique triplets summing to 0.",
     "defaultInput": "-1, 0, 1, 2, -1, -4",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: 3 Sum Problem (Medium)\n    // Time Complexity: O(n²) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Find all unique triplets summing to 0.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 3 Sum Problem (Medium)\n    # Time: O(n²) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Find all unique triplets summing to 0.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 3 Sum Problem (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 3Sum (Medium)\n    // Time: O(n²) | Space: O(1)\n    public List<List<Integer>> threeSum(int[] nums) {\n        Arrays.sort(nums);\n        List<List<Integer>> res = new ArrayList<>();\n        for (int i = 0; i < nums.length - 2; i++) {\n            if (i > 0 && nums[i] == nums[i - 1]) continue;\n            int l = i + 1, r = nums.length - 1;\n            while (l < r) {\n                int sum = nums[i] + nums[l] + nums[r];\n                if (sum == 0) {\n                    res.add(Arrays.asList(nums[i], nums[l], nums[r]));\n                    while (l < r && nums[l] == nums[l + 1]) l++;\n                    while (l < r && nums[r] == nums[r - 1]) r--;\n                    l++; r--;\n                } else if (sum < 0) l++;\n                else r--;\n            }\n        }\n        return res;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 3Sum\n    def threeSum(self, nums: list[int]) -> list[list[int]]:\n        nums.sort()\n        res = []\n        for i in range(len(nums) - 2):\n            if i > 0 and nums[i] == nums[i - 1]: continue\n            l, r = i + 1, len(nums) - 1\n            while l < r:\n                s = nums[i] + nums[l] + nums[r]\n                if s == 0:\n                    res.append([nums[i], nums[l], nums[r]])\n                    while l < r and nums[l] == nums[l + 1]: l += 1\n                    while l < r and nums[r] == nums[r - 1]: r -= 1\n                    l += 1; r -= 1\n                elif s < 0: l += 1\n                else: r -= 1\n        return res",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 3Sum\n    vector<vector<int>> threeSum(vector<int>& nums) {\n        sort(nums.begin(), nums.end());\n        vector<vector<int>> res;\n        for (int i = 0; i < (int)nums.size() - 2; i++) {\n            if (i > 0 && nums[i] == nums[i - 1]) continue;\n            int l = i + 1, r = nums.size() - 1;\n            while (l < r) {\n                int s = nums[i] + nums[l] + nums[r];\n                if (s == 0) {\n                    res.push_back({nums[i], nums[l], nums[r]});\n                    while (l < r && nums[l] == nums[l + 1]) l++;\n                    while (l < r && nums[r] == nums[r - 1]) r--;\n                    l++; r--;\n                } else if (s < 0) l++;\n                else r--;\n            }\n        }\n        return res;\n    }\n};"
   },
   {
     "id": 40,
@@ -711,9 +711,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Compute how much water can be trapped after raining.",
     "defaultInput": "0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Trapping Rain Water (Hard)\n    // Time Complexity: O(n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Compute how much water can be trapped after raining.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Trapping Rain Water (Hard)\n    # Time: O(n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Compute how much water can be trapped after raining.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Trapping Rain Water (Hard)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: Trapping Rain Water (Hard)\n    // Time: O(n) | Space: O(1) Two Pointers\n    public int trap(int[] height) {\n        int l = 0, r = height.length - 1;\n        int leftMax = 0, rightMax = 0, water = 0;\n        while (l < r) {\n            if (height[l] <= height[r]) {\n                if (height[l] >= leftMax) leftMax = height[l];\n                else water += leftMax - height[l];\n                l++;\n            } else {\n                if (height[r] >= rightMax) rightMax = height[r];\n                else water += rightMax - height[r];\n                r--;\n            }\n        }\n        return water;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Trapping Rain Water\n    def trap(self, height: list[int]) -> int:\n        l, r = 0, len(height) - 1\n        left_max = right_max = water = 0\n        while l < r:\n            if height[l] <= height[r]:\n                if height[l] >= left_max: left_max = height[l]\n                else: water += left_max - height[l]\n                l += 1\n            else:\n                if height[r] >= right_max: right_max = height[r]\n                else: water += right_max - height[r]\n                r -= 1\n        return water",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Trapping Rain Water\n    int trap(vector<int>& height) {\n        int l = 0, r = height.size() - 1, leftMax = 0, rightMax = 0, water = 0;\n        while (l < r) {\n            if (height[l] <= height[r]) {\n                if (height[l] >= leftMax) leftMax = height[l];\n                else water += leftMax - height[l];\n                l++;\n            } else {\n                if (height[r] >= rightMax) rightMax = height[r];\n                else water += rightMax - height[r];\n                r--;\n            }\n        }\n        return water;\n    }\n};"
   },
   {
     "id": 41,
@@ -728,9 +728,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Remove duplicates in-place such that each appears once.",
     "defaultInput": "1, 1, 2, 2, 3, 4, 4",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Remove Duplicates from Sorted Array (Easy)\n    // Time Complexity: O(n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Remove duplicates in-place such that each appears once.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Remove Duplicates from Sorted Array (Easy)\n    # Time: O(n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Remove duplicates in-place such that each appears once.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Remove Duplicates from Sorted Array (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 41. Remove Duplicates from Sorted Array (Easy)\n    // Time Complexity: O(n) | Space: O(1)\n    public int removeDuplicatesfromSortedArray(int[] nums) {\n        // Algorithm: Remove duplicates in-place such that each appears once.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 41. Remove Duplicates from Sorted Array (Easy)\n    # Time: O(n) | Space: O(1)\n    def removeDuplicatesfromSortedArray(self, nums: list[int]) -> int:\n        # Remove duplicates in-place such that each appears once.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 41. Remove Duplicates from Sorted Array (Easy)\n    int removeDuplicatesfromSortedArray(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 42,
@@ -745,9 +745,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Find the maximum number of consecutive 1s in binary array.",
     "defaultInput": "1, 1, 0, 1, 1, 1",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Max Consecutive Ones (Easy)\n    // Time Complexity: O(n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Find the maximum number of consecutive 1s in binary array.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Max Consecutive Ones (Easy)\n    # Time: O(n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Find the maximum number of consecutive 1s in binary array.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Max Consecutive Ones (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 42. Max Consecutive Ones (Easy)\n    // Time Complexity: O(n) | Space: O(1)\n    public int maxConsecutiveOnes(int[] nums) {\n        // Algorithm: Find the maximum number of consecutive 1s in binary array.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 42. Max Consecutive Ones (Easy)\n    # Time: O(n) | Space: O(1)\n    def maxConsecutiveOnes(self, nums: list[int]) -> int:\n        # Find the maximum number of consecutive 1s in binary array.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 42. Max Consecutive Ones (Easy)\n    int maxConsecutiveOnes(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 174,
@@ -762,9 +762,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Find two lines that together with x-axis forms a container containing the most water.",
     "defaultInput": "1, 8, 6, 2, 5, 4, 8, 3, 7",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Container With Most Water (Medium)\n    // Time Complexity: O(n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Find two lines that together with x-axis forms a container containing the most water.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Container With Most Water (Medium)\n    # Time: O(n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Find two lines that together with x-axis forms a container containing the most water.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Container With Most Water (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 174. Container With Most Water (Medium)\n    // Time Complexity: O(n) | Space: O(1)\n    public int containerWithMostWater(int[] nums) {\n        // Algorithm: Find two lines that together with x-axis forms a container containing the most water.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 174. Container With Most Water (Medium)\n    # Time: O(n) | Space: O(1)\n    def containerWithMostWater(self, nums: list[int]) -> int:\n        # Find two lines that together with x-axis forms a container containing the most water.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 174. Container With Most Water (Medium)\n    int containerWithMostWater(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 43,
@@ -779,9 +779,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Find max meetings that can be accommodated in room.",
     "defaultInput": "1, 3, 0, 5, 8, 5",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: N Meetings in One Room (Easy)\n    // Time Complexity: O(n log n) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Find max meetings that can be accommodated in room.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: N Meetings in One Room (Easy)\n    # Time: O(n log n) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Find max meetings that can be accommodated in room.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: N Meetings in One Room (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 43. N Meetings in One Room (Easy)\n    // Time Complexity: O(n log n) | Space: O(n)\n    public int nMeetingsinOneRoom(int[] nums) {\n        // Algorithm: Find max meetings that can be accommodated in room.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 43. N Meetings in One Room (Easy)\n    # Time: O(n log n) | Space: O(n)\n    def nMeetingsinOneRoom(self, nums: list[int]) -> int:\n        # Find max meetings that can be accommodated in room.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 43. N Meetings in One Room (Easy)\n    int nMeetingsinOneRoom(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 44,
@@ -796,9 +796,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Minimum platforms required for trains.",
     "defaultInput": "900, 940, 950, 1100, 1500, 1800",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Minimum Platforms for Railway (Medium)\n    // Time Complexity: O(n log n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Minimum platforms required for trains.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Minimum Platforms for Railway (Medium)\n    # Time: O(n log n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Minimum platforms required for trains.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Minimum Platforms for Railway (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 44. Minimum Platforms for Railway (Medium)\n    // Time Complexity: O(n log n) | Space: O(1)\n    public int minimumPlatformsforRailway(int[] nums) {\n        // Algorithm: Minimum platforms required for trains.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 44. Minimum Platforms for Railway (Medium)\n    # Time: O(n log n) | Space: O(1)\n    def minimumPlatformsforRailway(self, nums: list[int]) -> int:\n        # Minimum platforms required for trains.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 44. Minimum Platforms for Railway (Medium)\n    int minimumPlatformsforRailway(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 45,
@@ -813,9 +813,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(m)",
     "description": "Maximize total profit from job deadlines.",
     "defaultInput": "4, 20, 1, 10, 1, 40, 1, 30",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Job Sequencing Problem (Medium)\n    // Time Complexity: O(n log n + n*m) | Space: O(m)\n    public int solve(int[] nums) {\n        // Algorithm: Maximize total profit from job deadlines.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Job Sequencing Problem (Medium)\n    # Time: O(n log n + n*m) | Space: O(m)\n    def solve(self, nums: list[int]) -> int:\n        # Maximize total profit from job deadlines.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Job Sequencing Problem (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 45. Job Sequencing Problem (Medium)\n    // Time Complexity: O(n log n + n*m) | Space: O(m)\n    public int jobSequencingProblem(int[] nums) {\n        // Algorithm: Maximize total profit from job deadlines.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 45. Job Sequencing Problem (Medium)\n    # Time: O(n log n + n*m) | Space: O(m)\n    def jobSequencingProblem(self, nums: list[int]) -> int:\n        # Maximize total profit from job deadlines.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 45. Job Sequencing Problem (Medium)\n    int jobSequencingProblem(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 46,
@@ -830,9 +830,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Maximize value in knapsack allowing fractional items.",
     "defaultInput": "60, 10, 100, 20, 120, 30",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Fractional Knapsack Problem (Medium)\n    // Time Complexity: O(n log n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Maximize value in knapsack allowing fractional items.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Fractional Knapsack Problem (Medium)\n    # Time: O(n log n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Maximize value in knapsack allowing fractional items.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Fractional Knapsack Problem (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 46. Fractional Knapsack Problem (Medium)\n    // Time Complexity: O(n log n) | Space: O(1)\n    public int fractionalKnapsackProblem(int[] nums) {\n        // Algorithm: Maximize value in knapsack allowing fractional items.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 46. Fractional Knapsack Problem (Medium)\n    # Time: O(n log n) | Space: O(1)\n    def fractionalKnapsackProblem(self, nums: list[int]) -> int:\n        # Maximize value in knapsack allowing fractional items.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 46. Fractional Knapsack Problem (Medium)\n    int fractionalKnapsackProblem(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 47,
@@ -847,9 +847,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Find minimum number of coins to make amount V.",
     "defaultInput": "1, 2, 5, 10, 20, 50, 100, 500, 1000",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Greedy Coin Change (Easy)\n    // Time Complexity: O(V) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Find minimum number of coins to make amount V.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Greedy Coin Change (Easy)\n    # Time: O(V) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Find minimum number of coins to make amount V.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Greedy Coin Change (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 47. Greedy Coin Change (Easy)\n    // Time Complexity: O(V) | Space: O(1)\n    public int greedyCoinChange(int[] nums) {\n        // Algorithm: Find minimum number of coins to make amount V.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 47. Greedy Coin Change (Easy)\n    # Time: O(V) | Space: O(1)\n    def greedyCoinChange(self, nums: list[int]) -> int:\n        # Find minimum number of coins to make amount V.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 47. Greedy Coin Change (Easy)\n    int greedyCoinChange(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 48,
@@ -864,9 +864,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Maximize number of content children with cookie sizes.",
     "defaultInput": "1, 2, 3, 1, 1",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Assign Cookies (Easy)\n    // Time Complexity: O(n log n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Maximize number of content children with cookie sizes.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Assign Cookies (Easy)\n    # Time: O(n log n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Maximize number of content children with cookie sizes.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Assign Cookies (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 48. Assign Cookies (Easy)\n    // Time Complexity: O(n log n) | Space: O(1)\n    public int assignCookies(int[] nums) {\n        // Algorithm: Maximize number of content children with cookie sizes.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 48. Assign Cookies (Easy)\n    # Time: O(n log n) | Space: O(1)\n    def assignCookies(self, nums: list[int]) -> int:\n        # Maximize number of content children with cookie sizes.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 48. Assign Cookies (Easy)\n    int assignCookies(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 175,
@@ -881,9 +881,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Find minimum number of intervals to remove to make remainder non-overlapping.",
     "defaultInput": "1, 2, 2, 3, 3, 4, 1, 3",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Non-overlapping Intervals (Medium)\n    // Time Complexity: O(n log n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Find minimum number of intervals to remove to make remainder non-overlapping.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Non-overlapping Intervals (Medium)\n    # Time: O(n log n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Find minimum number of intervals to remove to make remainder non-overlapping.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Non-overlapping Intervals (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 175. Non-overlapping Intervals (Medium)\n    // Time Complexity: O(n log n) | Space: O(1)\n    public int nonoverlappingIntervals(int[] nums) {\n        // Algorithm: Find minimum number of intervals to remove to make remainder non-overlapping.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 175. Non-overlapping Intervals (Medium)\n    # Time: O(n log n) | Space: O(1)\n    def nonoverlappingIntervals(self, nums: list[int]) -> int:\n        # Find minimum number of intervals to remove to make remainder non-overlapping.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 175. Non-overlapping Intervals (Medium)\n    int nonoverlappingIntervals(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 49,
@@ -898,9 +898,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Find sums of all subsets in array.",
     "defaultInput": "2, 3",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Subset Sums (Easy)\n    // Time Complexity: O(2ⁿ) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Find sums of all subsets in array.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Subset Sums (Easy)\n    # Time: O(2ⁿ) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Find sums of all subsets in array.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Subset Sums (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 49. Subset Sums (Easy)\n    // Time Complexity: O(2ⁿ) | Space: O(n)\n    public int subsetSums(int[] nums) {\n        // Algorithm: Find sums of all subsets in array.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 49. Subset Sums (Easy)\n    # Time: O(2ⁿ) | Space: O(n)\n    def subsetSums(self, nums: list[int]) -> int:\n        # Find sums of all subsets in array.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 49. Subset Sums (Easy)\n    int subsetSums(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 50,
@@ -915,9 +915,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Return all possible unique subsets of array with duplicates.",
     "defaultInput": "1, 2, 2",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Subsets II (Unique Subsets) (Medium)\n    // Time Complexity: O(2ⁿ * n) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Return all possible unique subsets of array with duplicates.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Subsets II (Unique Subsets) (Medium)\n    # Time: O(2ⁿ * n) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Return all possible unique subsets of array with duplicates.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Subsets II (Unique Subsets) (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 50. Subsets II (Unique Subsets) (Medium)\n    // Time Complexity: O(2ⁿ * n) | Space: O(n)\n    public int subsetsIIUniqueSubsets(int[] nums) {\n        // Algorithm: Return all possible unique subsets of array with duplicates.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 50. Subsets II (Unique Subsets) (Medium)\n    # Time: O(2ⁿ * n) | Space: O(n)\n    def subsetsIIUniqueSubsets(self, nums: list[int]) -> int:\n        # Return all possible unique subsets of array with duplicates.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 50. Subsets II (Unique Subsets) (Medium)\n    int subsetsIIUniqueSubsets(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 51,
@@ -932,9 +932,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(t)",
     "description": "Find all unique combinations summing to target.",
     "defaultInput": "2, 3, 6, 7",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Combination Sum (Medium)\n    // Time Complexity: O(2^t) | Space: O(t)\n    public int solve(int[] nums) {\n        // Algorithm: Find all unique combinations summing to target.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Combination Sum (Medium)\n    # Time: O(2^t) | Space: O(t)\n    def solve(self, nums: list[int]) -> int:\n        # Find all unique combinations summing to target.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Combination Sum (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 51. Combination Sum (Medium)\n    // Time Complexity: O(2^t) | Space: O(t)\n    public int combinationSum(int[] nums) {\n        // Algorithm: Find all unique combinations summing to target.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 51. Combination Sum (Medium)\n    # Time: O(2^t) | Space: O(t)\n    def combinationSum(self, nums: list[int]) -> int:\n        # Find all unique combinations summing to target.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 51. Combination Sum (Medium)\n    int combinationSum(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 52,
@@ -949,9 +949,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(k)",
     "description": "Each number used at most once to sum to target.",
     "defaultInput": "10, 1, 2, 7, 6, 1, 5",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Combination Sum II (Medium)\n    // Time Complexity: O(2ⁿ * k) | Space: O(k)\n    public int solve(int[] nums) {\n        // Algorithm: Each number used at most once to sum to target.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Combination Sum II (Medium)\n    # Time: O(2ⁿ * k) | Space: O(k)\n    def solve(self, nums: list[int]) -> int:\n        # Each number used at most once to sum to target.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Combination Sum II (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 52. Combination Sum II (Medium)\n    // Time Complexity: O(2ⁿ * k) | Space: O(k)\n    public int combinationSumII(int[] nums) {\n        // Algorithm: Each number used at most once to sum to target.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 52. Combination Sum II (Medium)\n    # Time: O(2ⁿ * k) | Space: O(k)\n    def combinationSumII(self, nums: list[int]) -> int:\n        # Each number used at most once to sum to target.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 52. Combination Sum II (Medium)\n    int combinationSumII(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 53,
@@ -966,9 +966,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Partition string such that every substring is a palindrome.",
     "defaultInput": "1, 2, 1",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Palindrome Partitioning (Medium)\n    // Time Complexity: O(n * 2ⁿ) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Partition string such that every substring is a palindrome.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Palindrome Partitioning (Medium)\n    # Time: O(n * 2ⁿ) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Partition string such that every substring is a palindrome.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Palindrome Partitioning (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 53. Palindrome Partitioning (Medium)\n    // Time Complexity: O(n * 2ⁿ) | Space: O(n)\n    public int palindromePartitioning(int[] nums) {\n        // Algorithm: Partition string such that every substring is a palindrome.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 53. Palindrome Partitioning (Medium)\n    # Time: O(n * 2ⁿ) | Space: O(n)\n    def palindromePartitioning(self, nums: list[int]) -> int:\n        # Partition string such that every substring is a palindrome.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 53. Palindrome Partitioning (Medium)\n    int palindromePartitioning(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 54,
@@ -983,9 +983,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Find the k-th permutation sequence of numbers 1 to n.",
     "defaultInput": "4, 9",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: K-th Permutation Sequence (Hard)\n    // Time Complexity: O(n²) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Find the k-th permutation sequence of numbers 1 to n.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: K-th Permutation Sequence (Hard)\n    # Time: O(n²) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Find the k-th permutation sequence of numbers 1 to n.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: K-th Permutation Sequence (Hard)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 54. K-th Permutation Sequence (Hard)\n    // Time Complexity: O(n²) | Space: O(n)\n    public int kthPermutationSequence(int[] nums) {\n        // Algorithm: Find the k-th permutation sequence of numbers 1 to n.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 54. K-th Permutation Sequence (Hard)\n    # Time: O(n²) | Space: O(n)\n    def kthPermutationSequence(self, nums: list[int]) -> int:\n        # Find the k-th permutation sequence of numbers 1 to n.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 54. K-th Permutation Sequence (Hard)\n    int kthPermutationSequence(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 55,
@@ -1000,9 +1000,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Generate all possible permutations.",
     "defaultInput": "1, 2, 3",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Print All Permutations of Array/String (Medium)\n    // Time Complexity: O(n * n!) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Generate all possible permutations.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Print All Permutations of Array/String (Medium)\n    # Time: O(n * n!) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Generate all possible permutations.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Print All Permutations of Array/String (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 55. Print All Permutations of Array/String (Medium)\n    // Time Complexity: O(n * n!) | Space: O(n)\n    public int printAllPermutationsofArrayString(int[] nums) {\n        // Algorithm: Generate all possible permutations.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 55. Print All Permutations of Array/String (Medium)\n    # Time: O(n * n!) | Space: O(n)\n    def printAllPermutationsofArrayString(self, nums: list[int]) -> int:\n        # Generate all possible permutations.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 55. Print All Permutations of Array/String (Medium)\n    int printAllPermutationsofArrayString(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 56,
@@ -1017,9 +1017,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n²)",
     "description": "Place n queens on n x n chessboard so none attack each other.",
     "defaultInput": "4",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: N-Queens Problem (Hard)\n    // Time Complexity: O(n!) | Space: O(n²)\n    public int solve(int[] nums) {\n        // Algorithm: Place n queens on n x n chessboard so none attack each other.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: N-Queens Problem (Hard)\n    # Time: O(n!) | Space: O(n²)\n    def solve(self, nums: list[int]) -> int:\n        # Place n queens on n x n chessboard so none attack each other.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: N-Queens Problem (Hard)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: N-Queens (Hard)\n    // Time: O(N!) | Space: O(N²)\n    public List<List<String>> solveNQueens(int n) {\n        List<List<String>> res = new ArrayList<>();\n        char[][] board = new char[n][n];\n        for (char[] row : board) Arrays.fill(row, '.');\n        dfs(0, board, res, n);\n        return res;\n    }\n    void dfs(int col, char[][] board, List<List<String>> res, int n) {\n        if (col == n) {\n            List<String> b = new ArrayList<>();\n            for (char[] r : board) b.add(new String(r));\n            res.add(b);\n            return;\n        }\n        for (int row = 0; row < n; row++) {\n            if (isSafe(board, row, col, n)) {\n                board[row][col] = 'Q';\n                dfs(col + 1, board, res, n);\n                board[row][col] = '.';\n            }\n        }\n    }\n    boolean isSafe(char[][] b, int r, int c, int n) {\n        for (int i = 0; i < c; i++) if (b[r][i] == 'Q') return false;\n        for (int i = r, j = c; i >= 0 && j >= 0; i--, j--) if (b[i][j] == 'Q') return false;\n        for (int i = r, j = c; i < n && j >= 0; i++, j--) if (b[i][j] == 'Q') return false;\n        return true;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: N-Queens\n    def solveNQueens(self, n: int) -> list[list[str]]:\n        res, board = [], [['.'] * n for _ in range(n)]\n        def is_safe(r, c):\n            for j in range(c):\n                if board[r][j] == 'Q': return False\n            i, j = r, c\n            while i >= 0 and j >= 0:\n                if board[i][j] == 'Q': return False\n                i -= 1; j -= 1\n            i, j = r, c\n            while i < n and j >= 0:\n                if board[i][j] == 'Q': return False\n                i += 1; j -= 1\n            return True\n        def backtrack(c):\n            if c == n:\n                res.append([\"\".join(row) for row in board])\n                return\n            for r in range(n):\n                if is_safe(r, c):\n                    board[r][c] = 'Q'\n                    backtrack(c + 1)\n                    board[r][c] = '.'\n        backtrack(0)\n        return res",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: N-Queens\n    vector<vector<string>> solveNQueens(int n) {\n        vector<vector<string>> res;\n        vector<string> board(n, string(n, '.'));\n        solve(0, board, res, n);\n        return res;\n    }\n    void solve(int col, vector<string>& b, vector<vector<string>>& res, int n) {\n        if (col == n) { res.push_back(b); return; }\n        for (int row = 0; row < n; row++) {\n            if (isSafe(b, row, col, n)) {\n                b[row][col] = 'Q';\n                solve(col + 1, b, res, n);\n                b[row][col] = '.';\n            }\n        }\n    }\n    bool isSafe(vector<string>& b, int r, int c, int n) {\n        for (int j = 0; j < c; j++) if (b[r][j] == 'Q') return false;\n        for (int i = r, j = c; i >= 0 && j >= 0; i--, j--) if (b[i][j] == 'Q') return false;\n        for (int i = r, j = c; i < n && j >= 0; i++, j--) if (b[i][j] == 'Q') return false;\n        return true;\n    }\n};"
   },
   {
     "id": 57,
@@ -1034,9 +1034,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Solve a 9 x 9 Sudoku puzzle.",
     "defaultInput": "9",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Sudoku Solver (Hard)\n    // Time Complexity: O(9^(n²)) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Solve a 9 x 9 Sudoku puzzle.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Sudoku Solver (Hard)\n    # Time: O(9^(n²)) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Solve a 9 x 9 Sudoku puzzle.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Sudoku Solver (Hard)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 57. Sudoku Solver (Hard)\n    // Time Complexity: O(9^(n²)) | Space: O(1)\n    public int sudokuSolver(int[] nums) {\n        // Algorithm: Solve a 9 x 9 Sudoku puzzle.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 57. Sudoku Solver (Hard)\n    # Time: O(9^(n²)) | Space: O(1)\n    def sudokuSolver(self, nums: list[int]) -> int:\n        # Solve a 9 x 9 Sudoku puzzle.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 57. Sudoku Solver (Hard)\n    int sudokuSolver(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 58,
@@ -1051,9 +1051,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(V)",
     "description": "Color graph vertices with m colors such that no adjacent have same color.",
     "defaultInput": "4, 3",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: M-Coloring Problem (Medium)\n    // Time Complexity: O(m^V) | Space: O(V)\n    public int solve(int[] nums) {\n        // Algorithm: Color graph vertices with m colors such that no adjacent have same color.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: M-Coloring Problem (Medium)\n    # Time: O(m^V) | Space: O(V)\n    def solve(self, nums: list[int]) -> int:\n        # Color graph vertices with m colors such that no adjacent have same color.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: M-Coloring Problem (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 58. M-Coloring Problem (Medium)\n    // Time Complexity: O(m^V) | Space: O(V)\n    public int mColoringProblem(int[] nums) {\n        // Algorithm: Color graph vertices with m colors such that no adjacent have same color.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 58. M-Coloring Problem (Medium)\n    # Time: O(m^V) | Space: O(V)\n    def mColoringProblem(self, nums: list[int]) -> int:\n        # Color graph vertices with m colors such that no adjacent have same color.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 58. M-Coloring Problem (Medium)\n    int mColoringProblem(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 59,
@@ -1068,9 +1068,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n²)",
     "description": "Find all paths from (0,0) to (n-1,n-1) in maze.",
     "defaultInput": "1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Rat in a Maze (Medium)\n    // Time Complexity: O(4^(n²)) | Space: O(n²)\n    public int solve(int[] nums) {\n        // Algorithm: Find all paths from (0,0) to (n-1,n-1) in maze.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Rat in a Maze (Medium)\n    # Time: O(4^(n²)) | Space: O(n²)\n    def solve(self, nums: list[int]) -> int:\n        # Find all paths from (0,0) to (n-1,n-1) in maze.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Rat in a Maze (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 59. Rat in a Maze (Medium)\n    // Time Complexity: O(4^(n²)) | Space: O(n²)\n    public int ratinaMaze(int[] nums) {\n        // Algorithm: Find all paths from (0,0) to (n-1,n-1) in maze.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 59. Rat in a Maze (Medium)\n    # Time: O(4^(n²)) | Space: O(n²)\n    def ratinaMaze(self, nums: list[int]) -> int:\n        # Find all paths from (0,0) to (n-1,n-1) in maze.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 59. Rat in a Maze (Medium)\n    int ratinaMaze(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 60,
@@ -1085,9 +1085,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Segment string into dictionary words.",
     "defaultInput": "8, 4",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Word Break (Backtracking) (Medium)\n    // Time Complexity: O(2ⁿ) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Segment string into dictionary words.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Word Break (Backtracking) (Medium)\n    # Time: O(2ⁿ) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Segment string into dictionary words.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Word Break (Backtracking) (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 60. Word Break (Backtracking) (Medium)\n    // Time Complexity: O(2ⁿ) | Space: O(n)\n    public int wordBreakBacktracking(int[] nums) {\n        // Algorithm: Segment string into dictionary words.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 60. Word Break (Backtracking) (Medium)\n    # Time: O(2ⁿ) | Space: O(n)\n    def wordBreakBacktracking(self, nums: list[int]) -> int:\n        # Segment string into dictionary words.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 60. Word Break (Backtracking) (Medium)\n    int wordBreakBacktracking(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 61,
@@ -1102,9 +1102,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Find nth root of m using binary search.",
     "defaultInput": "3, 27",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: The N-th Root of an Integer (Easy)\n    // Time Complexity: O(log(m)*n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Find nth root of m using binary search.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: The N-th Root of an Integer (Easy)\n    # Time: O(log(m)*n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Find nth root of m using binary search.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: The N-th Root of an Integer (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 61. The N-th Root of an Integer (Easy)\n    // Time Complexity: O(log(m)*n) | Space: O(1)\n    public int theNthRootofanInteger(int[] nums) {\n        // Algorithm: Find nth root of m using binary search.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 61. The N-th Root of an Integer (Easy)\n    # Time: O(log(m)*n) | Space: O(1)\n    def theNthRootofanInteger(self, nums: list[int]) -> int:\n        # Find nth root of m using binary search.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 61. The N-th Root of an Integer (Easy)\n    int theNthRootofanInteger(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 62,
@@ -1119,9 +1119,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Find median in row-wise sorted matrix.",
     "defaultInput": "1, 3, 5, 2, 6, 9, 3, 6, 9",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Matrix Median (Hard)\n    // Time Complexity: O(r * log(c)) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Find median in row-wise sorted matrix.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Matrix Median (Hard)\n    # Time: O(r * log(c)) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Find median in row-wise sorted matrix.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Matrix Median (Hard)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 62. Matrix Median (Hard)\n    // Time Complexity: O(r * log(c)) | Space: O(1)\n    public int matrixMedian(int[] nums) {\n        // Algorithm: Find median in row-wise sorted matrix.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 62. Matrix Median (Hard)\n    # Time: O(r * log(c)) | Space: O(1)\n    def matrixMedian(self, nums: list[int]) -> int:\n        # Find median in row-wise sorted matrix.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 62. Matrix Median (Hard)\n    int matrixMedian(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 63,
@@ -1136,9 +1136,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Find the single non-duplicate in sorted array.",
     "defaultInput": "1, 1, 2, 3, 3, 4, 4, 8, 8",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Find Element that Appears Once (Medium)\n    // Time Complexity: O(log n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Find the single non-duplicate in sorted array.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Find Element that Appears Once (Medium)\n    # Time: O(log n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Find the single non-duplicate in sorted array.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Find Element that Appears Once (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 63. Find Element that Appears Once (Medium)\n    // Time Complexity: O(log n) | Space: O(1)\n    public int findElementthatAppearsOnce(int[] nums) {\n        // Algorithm: Find the single non-duplicate in sorted array.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 63. Find Element that Appears Once (Medium)\n    # Time: O(log n) | Space: O(1)\n    def findElementthatAppearsOnce(self, nums: list[int]) -> int:\n        # Find the single non-duplicate in sorted array.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 63. Find Element that Appears Once (Medium)\n    int findElementthatAppearsOnce(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 64,
@@ -1153,9 +1153,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Search target in sorted array rotated at pivot.",
     "defaultInput": "4, 5, 6, 7, 0, 1, 2",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Search in Rotated Sorted Array (Medium)\n    // Time Complexity: O(log n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Search target in sorted array rotated at pivot.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Search in Rotated Sorted Array (Medium)\n    # Time: O(log n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Search target in sorted array rotated at pivot.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Search in Rotated Sorted Array (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 64. Search in Rotated Sorted Array (Medium)\n    // Time Complexity: O(log n) | Space: O(1)\n    public int searchinRotatedSortedArray(int[] nums) {\n        // Algorithm: Search target in sorted array rotated at pivot.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 64. Search in Rotated Sorted Array (Medium)\n    # Time: O(log n) | Space: O(1)\n    def searchinRotatedSortedArray(self, nums: list[int]) -> int:\n        # Search target in sorted array rotated at pivot.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 64. Search in Rotated Sorted Array (Medium)\n    int searchinRotatedSortedArray(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 65,
@@ -1170,9 +1170,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Find median of two sorted arrays in O(log(m+n)).",
     "defaultInput": "1, 3, 2",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Median of Two Sorted Arrays (Hard)\n    // Time Complexity: O(log(min(n,m))) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Find median of two sorted arrays in O(log(m+n)).\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Median of Two Sorted Arrays (Hard)\n    # Time: O(log(min(n,m))) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Find median of two sorted arrays in O(log(m+n)).\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Median of Two Sorted Arrays (Hard)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 65. Median of Two Sorted Arrays (Hard)\n    // Time Complexity: O(log(min(n,m))) | Space: O(1)\n    public int medianofTwoSortedArrays(int[] nums) {\n        // Algorithm: Find median of two sorted arrays in O(log(m+n)).\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 65. Median of Two Sorted Arrays (Hard)\n    # Time: O(log(min(n,m))) | Space: O(1)\n    def medianofTwoSortedArrays(self, nums: list[int]) -> int:\n        # Find median of two sorted arrays in O(log(m+n)).\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 65. Median of Two Sorted Arrays (Hard)\n    int medianofTwoSortedArrays(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 66,
@@ -1187,9 +1187,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Find element at kth position in merged array.",
     "defaultInput": "2, 3, 6, 7, 9, 1, 4, 8, 10",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: K-th Element of Two Sorted Arrays (Medium)\n    // Time Complexity: O(log(min(n,m))) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Find element at kth position in merged array.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: K-th Element of Two Sorted Arrays (Medium)\n    # Time: O(log(min(n,m))) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Find element at kth position in merged array.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: K-th Element of Two Sorted Arrays (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 66. K-th Element of Two Sorted Arrays (Medium)\n    // Time Complexity: O(log(min(n,m))) | Space: O(1)\n    public int kthElementofTwoSortedArrays(int[] nums) {\n        // Algorithm: Find element at kth position in merged array.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 66. K-th Element of Two Sorted Arrays (Medium)\n    # Time: O(log(min(n,m))) | Space: O(1)\n    def kthElementofTwoSortedArrays(self, nums: list[int]) -> int:\n        # Find element at kth position in merged array.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 66. K-th Element of Two Sorted Arrays (Medium)\n    int kthElementofTwoSortedArrays(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 67,
@@ -1204,9 +1204,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Allocate books to m students minimizing max pages.",
     "defaultInput": "12, 34, 67, 90",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Allocate Minimum Number of Pages (Hard)\n    // Time Complexity: O(n * log(sum)) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Allocate books to m students minimizing max pages.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Allocate Minimum Number of Pages (Hard)\n    # Time: O(n * log(sum)) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Allocate books to m students minimizing max pages.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Allocate Minimum Number of Pages (Hard)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 67. Allocate Minimum Number of Pages (Hard)\n    // Time Complexity: O(n * log(sum)) | Space: O(1)\n    public int allocateMinimumNumberofPages(int[] nums) {\n        // Algorithm: Allocate books to m students minimizing max pages.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 67. Allocate Minimum Number of Pages (Hard)\n    # Time: O(n * log(sum)) | Space: O(1)\n    def allocateMinimumNumberofPages(self, nums: list[int]) -> int:\n        # Allocate books to m students minimizing max pages.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 67. Allocate Minimum Number of Pages (Hard)\n    int allocateMinimumNumberofPages(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 68,
@@ -1221,9 +1221,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Place c cows in stalls maximizing minimum distance.",
     "defaultInput": "1, 2, 8, 4, 9",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Aggressive Cows (Hard)\n    // Time Complexity: O(n log n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Place c cows in stalls maximizing minimum distance.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Aggressive Cows (Hard)\n    # Time: O(n log n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Place c cows in stalls maximizing minimum distance.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Aggressive Cows (Hard)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 68. Aggressive Cows (Hard)\n    // Time Complexity: O(n log n) | Space: O(1)\n    public int aggressiveCows(int[] nums) {\n        // Algorithm: Place c cows in stalls maximizing minimum distance.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 68. Aggressive Cows (Hard)\n    # Time: O(n log n) | Space: O(1)\n    def aggressiveCows(self, nums: list[int]) -> int:\n        # Place c cows in stalls maximizing minimum distance.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 68. Aggressive Cows (Hard)\n    int aggressiveCows(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 176,
@@ -1238,9 +1238,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Find least weight capacity to ship all packages within D days.",
     "defaultInput": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Capacity to Ship Packages within D Days (Medium)\n    // Time Complexity: O(n log(sum)) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Find least weight capacity to ship all packages within D days.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Capacity to Ship Packages within D Days (Medium)\n    # Time: O(n log(sum)) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Find least weight capacity to ship all packages within D days.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Capacity to Ship Packages within D Days (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 176. Capacity to Ship Packages within D Days (Medium)\n    // Time Complexity: O(n log(sum)) | Space: O(1)\n    public int capacitytoShipPackageswithinDDays(int[] nums) {\n        // Algorithm: Find least weight capacity to ship all packages within D days.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 176. Capacity to Ship Packages within D Days (Medium)\n    # Time: O(n log(sum)) | Space: O(1)\n    def capacitytoShipPackageswithinDDays(self, nums: list[int]) -> int:\n        # Find least weight capacity to ship all packages within D days.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 176. Capacity to Ship Packages within D Days (Medium)\n    int capacitytoShipPackageswithinDDays(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 69,
@@ -1255,9 +1255,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Implement binary heap with push and pop.",
     "defaultInput": "10, 15, 20, 17, 25, 30, 40",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Min Heap / Max Heap Implementation (Medium)\n    // Time Complexity: O(log n) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Implement binary heap with push and pop.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Min Heap / Max Heap Implementation (Medium)\n    # Time: O(log n) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Implement binary heap with push and pop.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Min Heap / Max Heap Implementation (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 69. Min Heap / Max Heap Implementation (Medium)\n    // Time Complexity: O(log n) | Space: O(n)\n    public int minHeapMaxHeapImplementation(int[] nums) {\n        // Algorithm: Implement binary heap with push and pop.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 69. Min Heap / Max Heap Implementation (Medium)\n    # Time: O(log n) | Space: O(n)\n    def minHeapMaxHeapImplementation(self, nums: list[int]) -> int:\n        # Implement binary heap with push and pop.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 69. Min Heap / Max Heap Implementation (Medium)\n    int minHeapMaxHeapImplementation(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 70,
@@ -1272,9 +1272,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(k)",
     "description": "Find the kth largest element using min-heap.",
     "defaultInput": "3, 2, 1, 5, 6, 4",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Kth Largest Element in Array (Medium)\n    // Time Complexity: O(n log k) | Space: O(k)\n    public int solve(int[] nums) {\n        // Algorithm: Find the kth largest element using min-heap.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Kth Largest Element in Array (Medium)\n    # Time: O(n log k) | Space: O(k)\n    def solve(self, nums: list[int]) -> int:\n        # Find the kth largest element using min-heap.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Kth Largest Element in Array (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 70. Kth Largest Element in Array (Medium)\n    // Time Complexity: O(n log k) | Space: O(k)\n    public int kthLargestElementinArray(int[] nums) {\n        // Algorithm: Find the kth largest element using min-heap.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 70. Kth Largest Element in Array (Medium)\n    # Time: O(n log k) | Space: O(k)\n    def kthLargestElementinArray(self, nums: list[int]) -> int:\n        # Find the kth largest element using min-heap.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 70. Kth Largest Element in Array (Medium)\n    int kthLargestElementinArray(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 71,
@@ -1289,9 +1289,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(k)",
     "description": "Find top k max combinations from two arrays.",
     "defaultInput": "3, 2, 1, 4",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Maximum Sum Combination (Medium)\n    // Time Complexity: O(k log k) | Space: O(k)\n    public int solve(int[] nums) {\n        // Algorithm: Find top k max combinations from two arrays.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Maximum Sum Combination (Medium)\n    # Time: O(k log k) | Space: O(k)\n    def solve(self, nums: list[int]) -> int:\n        # Find top k max combinations from two arrays.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Maximum Sum Combination (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 71. Maximum Sum Combination (Medium)\n    // Time Complexity: O(k log k) | Space: O(k)\n    public int maximumSumCombination(int[] nums) {\n        // Algorithm: Find top k max combinations from two arrays.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 71. Maximum Sum Combination (Medium)\n    # Time: O(k log k) | Space: O(k)\n    def maximumSumCombination(self, nums: list[int]) -> int:\n        # Find top k max combinations from two arrays.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 71. Maximum Sum Combination (Medium)\n    int maximumSumCombination(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 72,
@@ -1306,9 +1306,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Maintain running median using two heaps (Min & Max).",
     "defaultInput": "1, 2, 3",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Find Median from Data Stream (Hard)\n    // Time Complexity: O(log n) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Maintain running median using two heaps (Min & Max).\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Find Median from Data Stream (Hard)\n    # Time: O(log n) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Maintain running median using two heaps (Min & Max).\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Find Median from Data Stream (Hard)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 72. Find Median from Data Stream (Hard)\n    // Time Complexity: O(log n) | Space: O(n)\n    public int findMedianfromDataStream(int[] nums) {\n        // Algorithm: Maintain running median using two heaps (Min & Max).\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 72. Find Median from Data Stream (Hard)\n    # Time: O(log n) | Space: O(n)\n    def findMedianfromDataStream(self, nums: list[int]) -> int:\n        # Maintain running median using two heaps (Min & Max).\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 72. Find Median from Data Stream (Hard)\n    int findMedianfromDataStream(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 73,
@@ -1323,9 +1323,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(k)",
     "description": "Merge k sorted arrays into single sorted array.",
     "defaultInput": "1, 4, 5, 1, 3, 4, 2, 6",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Merge K Sorted Arrays (Medium)\n    // Time Complexity: O(n*k log k) | Space: O(k)\n    public int solve(int[] nums) {\n        // Algorithm: Merge k sorted arrays into single sorted array.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Merge K Sorted Arrays (Medium)\n    # Time: O(n*k log k) | Space: O(k)\n    def solve(self, nums: list[int]) -> int:\n        # Merge k sorted arrays into single sorted array.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Merge K Sorted Arrays (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 73. Merge K Sorted Arrays (Medium)\n    // Time Complexity: O(n*k log k) | Space: O(k)\n    public int mergeKSortedArrays(int[] nums) {\n        // Algorithm: Merge k sorted arrays into single sorted array.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 73. Merge K Sorted Arrays (Medium)\n    # Time: O(n*k log k) | Space: O(k)\n    def mergeKSortedArrays(self, nums: list[int]) -> int:\n        # Merge k sorted arrays into single sorted array.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 73. Merge K Sorted Arrays (Medium)\n    int mergeKSortedArrays(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 74,
@@ -1340,9 +1340,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Return top k frequent elements using heap or bucket sort.",
     "defaultInput": "1, 1, 1, 2, 2, 3",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: K Most Frequent Elements (Medium)\n    // Time Complexity: O(n log k) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Return top k frequent elements using heap or bucket sort.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: K Most Frequent Elements (Medium)\n    # Time: O(n log k) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Return top k frequent elements using heap or bucket sort.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: K Most Frequent Elements (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 74. K Most Frequent Elements (Medium)\n    // Time Complexity: O(n log k) | Space: O(n)\n    public int kMostFrequentElements(int[] nums) {\n        // Algorithm: Return top k frequent elements using heap or bucket sort.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 74. K Most Frequent Elements (Medium)\n    # Time: O(n log k) | Space: O(n)\n    def kMostFrequentElements(self, nums: list[int]) -> int:\n        # Return top k frequent elements using heap or bucket sort.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 74. K Most Frequent Elements (Medium)\n    int kMostFrequentElements(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 75,
@@ -1357,9 +1357,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Array-based stack push, pop, peek.",
     "defaultInput": "10, 20, 30, 40",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Implement Stack using Array (Easy)\n    // Time Complexity: O(1) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Array-based stack push, pop, peek.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Implement Stack using Array (Easy)\n    # Time: O(1) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Array-based stack push, pop, peek.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Implement Stack using Array (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 75. Implement Stack using Array (Easy)\n    // Time Complexity: O(1) | Space: O(n)\n    public int implementStackusingArray(int[] nums) {\n        // Algorithm: Array-based stack push, pop, peek.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 75. Implement Stack using Array (Easy)\n    # Time: O(1) | Space: O(n)\n    def implementStackusingArray(self, nums: list[int]) -> int:\n        # Array-based stack push, pop, peek.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 75. Implement Stack using Array (Easy)\n    int implementStackusingArray(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 76,
@@ -1374,9 +1374,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Array-based circular queue enqueue and dequeue.",
     "defaultInput": "10, 20, 30, 40",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Implement Queue using Array (Easy)\n    // Time Complexity: O(1) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Array-based circular queue enqueue and dequeue.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Implement Queue using Array (Easy)\n    # Time: O(1) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Array-based circular queue enqueue and dequeue.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Implement Queue using Array (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 76. Implement Queue using Array (Easy)\n    // Time Complexity: O(1) | Space: O(n)\n    public int implementQueueusingArray(int[] nums) {\n        // Algorithm: Array-based circular queue enqueue and dequeue.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 76. Implement Queue using Array (Easy)\n    # Time: O(1) | Space: O(n)\n    def implementQueueusingArray(self, nums: list[int]) -> int:\n        # Array-based circular queue enqueue and dequeue.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 76. Implement Queue using Array (Easy)\n    int implementQueueusingArray(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 77,
@@ -1391,9 +1391,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Implement LIFO stack with single queue.",
     "defaultInput": "1, 2, 3",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Implement Stack using Queue (Easy)\n    // Time Complexity: O(n) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Implement LIFO stack with single queue.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Implement Stack using Queue (Easy)\n    # Time: O(n) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Implement LIFO stack with single queue.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Implement Stack using Queue (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 77. Implement Stack using Queue (Easy)\n    // Time Complexity: O(n) | Space: O(n)\n    public int implementStackusingQueue(int[] nums) {\n        // Algorithm: Implement LIFO stack with single queue.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 77. Implement Stack using Queue (Easy)\n    # Time: O(n) | Space: O(n)\n    def implementStackusingQueue(self, nums: list[int]) -> int:\n        # Implement LIFO stack with single queue.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 77. Implement Stack using Queue (Easy)\n    int implementStackusingQueue(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 78,
@@ -1408,9 +1408,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Implement FIFO queue with two stacks.",
     "defaultInput": "1, 2, 3",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Implement Queue using Stack (Easy)\n    // Time Complexity: O(1) amortized | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Implement FIFO queue with two stacks.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Implement Queue using Stack (Easy)\n    # Time: O(1) amortized | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Implement FIFO queue with two stacks.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Implement Queue using Stack (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class LRUCache {\n    // Striver SDE Sheet: LRU Cache (Hard)\n    // Time: O(1) get & put | Space: O(capacity)\n    class Node { int key, val; Node prev, next; Node(int k, int v) { key = k; val = v; } }\n    private final int cap;\n    private final Map<Integer, Node> map = new HashMap<>();\n    private final Node head = new Node(0, 0), tail = new Node(0, 0);\n\n    public LRUCache(int capacity) {\n        cap = capacity;\n        head.next = tail; tail.prev = head;\n    }\n    public int get(int key) {\n        if (!map.containsKey(key)) return -1;\n        Node node = map.get(key);\n        remove(node); insert(node);\n        return node.val;\n    }\n    public void put(int key, int value) {\n        if (map.containsKey(key)) remove(map.get(key));\n        if (map.size() == cap) { map.remove(tail.prev.key); remove(tail.prev); }\n        Node node = new Node(key, value);\n        insert(node); map.put(key, node);\n    }\n    private void remove(Node node) { node.prev.next = node.next; node.next.prev = node.prev; }\n    private void insert(Node node) { node.next = head.next; node.next.prev = node; head.next = node; node.prev = head; }\n}",
+    "pythonCode": "class LRUCache:\n    # Striver SDE Sheet: LRU Cache\n    def __init__(self, capacity: int):\n        from collections import OrderedDict\n        self.cap = capacity\n        self.cache = OrderedDict()\n\n    def get(self, key: int) -> int:\n        if key not in self.cache: return -1\n        self.cache.move_to_end(key)\n        return self.cache[key]\n\n    def put(self, key: int, value: int) -> None:\n        if key in self.cache: self.cache.move_to_end(key)\n        self.cache[key] = value\n        if len(self.cache) > self.cap: self.cache.popitem(last=False)",
+    "cppCode": "class LRUCache {\n    int cap;\n    list<pair<int, int>> lru;\n    unordered_map<int, list<pair<int, int>>::iterator> mp;\npublic:\n    LRUCache(int capacity) : cap(capacity) {}\n    int get(int key) {\n        if (!mp.count(key)) return -1;\n        lru.splice(lru.begin(), lru, mp[key]);\n        return mp[key]->second;\n    }\n    void put(int key, int value) {\n        if (mp.count(key)) {\n            lru.splice(lru.begin(), lru, mp[key]);\n            mp[key]->second = value;\n            return;\n        }\n        if (lru.size() == cap) {\n            mp.erase(lru.back().first);\n            lru.pop_back();\n        }\n        lru.emplace_front(key, value);\n        mp[key] = lru.begin();\n    }\n};"
   },
   {
     "id": 79,
@@ -1425,9 +1425,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Determine if input parentheses strings are well-formed.",
     "defaultInput": "1, 2, 3",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Valid Parentheses (Easy)\n    // Time Complexity: O(n) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Determine if input parentheses strings are well-formed.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Valid Parentheses (Easy)\n    # Time: O(n) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Determine if input parentheses strings are well-formed.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Valid Parentheses (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 79. Valid Parentheses (Easy)\n    // Time Complexity: O(n) | Space: O(n)\n    public int validParentheses(int[] nums) {\n        // Algorithm: Determine if input parentheses strings are well-formed.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 79. Valid Parentheses (Easy)\n    # Time: O(n) | Space: O(n)\n    def validParentheses(self, nums: list[int]) -> int:\n        # Determine if input parentheses strings are well-formed.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 79. Valid Parentheses (Easy)\n    int validParentheses(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 80,
@@ -1442,9 +1442,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Find first greater element to right using monotonic stack.",
     "defaultInput": "4, 5, 2, 25, 7, 8",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Next Greater Element (Medium)\n    // Time Complexity: O(n) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Find first greater element to right using monotonic stack.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Next Greater Element (Medium)\n    # Time: O(n) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Find first greater element to right using monotonic stack.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Next Greater Element (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 80. Next Greater Element (Medium)\n    // Time Complexity: O(n) | Space: O(n)\n    public int nextGreaterElement(int[] nums) {\n        // Algorithm: Find first greater element to right using monotonic stack.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 80. Next Greater Element (Medium)\n    # Time: O(n) | Space: O(n)\n    def nextGreaterElement(self, nums: list[int]) -> int:\n        # Find first greater element to right using monotonic stack.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 80. Next Greater Element (Medium)\n    int nextGreaterElement(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 81,
@@ -1459,9 +1459,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Sort stack in ascending order recursively.",
     "defaultInput": "3, 2, 4, 1",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Sort a Stack using Recursion (Medium)\n    // Time Complexity: O(n²) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Sort stack in ascending order recursively.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Sort a Stack using Recursion (Medium)\n    # Time: O(n²) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Sort stack in ascending order recursively.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Sort a Stack using Recursion (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 81. Sort a Stack using Recursion (Medium)\n    // Time Complexity: O(n²) | Space: O(n)\n    public int sortaStackusingRecursion(int[] nums) {\n        // Algorithm: Sort stack in ascending order recursively.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 81. Sort a Stack using Recursion (Medium)\n    # Time: O(n²) | Space: O(n)\n    def sortaStackusingRecursion(self, nums: list[int]) -> int:\n        # Sort stack in ascending order recursively.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 81. Sort a Stack using Recursion (Medium)\n    int sortaStackusingRecursion(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 177,
@@ -1476,9 +1476,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Find next greater element for each in circular array.",
     "defaultInput": "1, 2, 1",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Next Greater Element II (Circular) (Medium)\n    // Time Complexity: O(n) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Find next greater element for each in circular array.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Next Greater Element II (Circular) (Medium)\n    # Time: O(n) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Find next greater element for each in circular array.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Next Greater Element II (Circular) (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 177. Next Greater Element II (Circular) (Medium)\n    // Time Complexity: O(n) | Space: O(n)\n    public int nextGreaterElementIICircular(int[] nums) {\n        // Algorithm: Find next greater element for each in circular array.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 177. Next Greater Element II (Circular) (Medium)\n    # Time: O(n) | Space: O(n)\n    def nextGreaterElementIICircular(self, nums: list[int]) -> int:\n        # Find next greater element for each in circular array.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 177. Next Greater Element II (Circular) (Medium)\n    int nextGreaterElementIICircular(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 82,
@@ -1493,9 +1493,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Find nearest smaller element to the left.",
     "defaultInput": "4, 5, 2, 10, 8",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Next Smaller Element (Medium)\n    // Time Complexity: O(n) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Find nearest smaller element to the left.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Next Smaller Element (Medium)\n    # Time: O(n) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Find nearest smaller element to the left.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Next Smaller Element (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 82. Next Smaller Element (Medium)\n    // Time Complexity: O(n) | Space: O(n)\n    public int nextSmallerElement(int[] nums) {\n        // Algorithm: Find nearest smaller element to the left.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 82. Next Smaller Element (Medium)\n    # Time: O(n) | Space: O(n)\n    def nextSmallerElement(self, nums: list[int]) -> int:\n        # Find nearest smaller element to the left.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 82. Next Smaller Element (Medium)\n    int nextSmallerElement(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 83,
@@ -1510,9 +1510,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(capacity)",
     "description": "Least Recently Used cache with fast get and put.",
     "defaultInput": "1, 2, 3, 4",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: LRU Cache Implementation (Medium)\n    // Time Complexity: O(1) | Space: O(capacity)\n    public int solve(int[] nums) {\n        // Algorithm: Least Recently Used cache with fast get and put.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: LRU Cache Implementation (Medium)\n    # Time: O(1) | Space: O(capacity)\n    def solve(self, nums: list[int]) -> int:\n        # Least Recently Used cache with fast get and put.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: LRU Cache Implementation (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 83. LRU Cache Implementation (Medium)\n    // Time Complexity: O(1) | Space: O(capacity)\n    public int lRUCacheImplementation(int[] nums) {\n        // Algorithm: Least Recently Used cache with fast get and put.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 83. LRU Cache Implementation (Medium)\n    # Time: O(1) | Space: O(capacity)\n    def lRUCacheImplementation(self, nums: list[int]) -> int:\n        # Least Recently Used cache with fast get and put.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 83. LRU Cache Implementation (Medium)\n    int lRUCacheImplementation(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 84,
@@ -1527,9 +1527,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(capacity)",
     "description": "Least Frequently Used cache design.",
     "defaultInput": "1, 2, 3, 4",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: LFU Cache Implementation (Hard)\n    // Time Complexity: O(1) | Space: O(capacity)\n    public int solve(int[] nums) {\n        // Algorithm: Least Frequently Used cache design.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: LFU Cache Implementation (Hard)\n    # Time: O(1) | Space: O(capacity)\n    def solve(self, nums: list[int]) -> int:\n        # Least Frequently Used cache design.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: LFU Cache Implementation (Hard)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 84. LFU Cache Implementation (Hard)\n    // Time Complexity: O(1) | Space: O(capacity)\n    public int lFUCacheImplementation(int[] nums) {\n        // Algorithm: Least Frequently Used cache design.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 84. LFU Cache Implementation (Hard)\n    # Time: O(1) | Space: O(capacity)\n    def lFUCacheImplementation(self, nums: list[int]) -> int:\n        # Least Frequently Used cache design.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 84. LFU Cache Implementation (Hard)\n    int lFUCacheImplementation(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 85,
@@ -1544,9 +1544,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Largest rectangle area under histogram bars.",
     "defaultInput": "2, 1, 5, 6, 2, 3",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Largest Rectangle in Histogram (Hard)\n    // Time Complexity: O(n) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Largest rectangle area under histogram bars.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Largest Rectangle in Histogram (Hard)\n    # Time: O(n) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Largest rectangle area under histogram bars.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Largest Rectangle in Histogram (Hard)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 85. Largest Rectangle in Histogram (Hard)\n    // Time Complexity: O(n) | Space: O(n)\n    public int largestRectangleinHistogram(int[] nums) {\n        // Algorithm: Largest rectangle area under histogram bars.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 85. Largest Rectangle in Histogram (Hard)\n    # Time: O(n) | Space: O(n)\n    def largestRectangleinHistogram(self, nums: list[int]) -> int:\n        # Largest rectangle area under histogram bars.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 85. Largest Rectangle in Histogram (Hard)\n    int largestRectangleinHistogram(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 86,
@@ -1561,9 +1561,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(k)",
     "description": "Max value in moving window of size k using monotonic deque.",
     "defaultInput": "1, 3, -1, -3, 5, 3, 6, 7",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Sliding Window Maximum (Hard)\n    // Time Complexity: O(n) | Space: O(k)\n    public int solve(int[] nums) {\n        // Algorithm: Max value in moving window of size k using monotonic deque.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Sliding Window Maximum (Hard)\n    # Time: O(n) | Space: O(k)\n    def solve(self, nums: list[int]) -> int:\n        # Max value in moving window of size k using monotonic deque.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Sliding Window Maximum (Hard)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 86. Sliding Window Maximum (Hard)\n    // Time Complexity: O(n) | Space: O(k)\n    public int slidingWindowMaximum(int[] nums) {\n        // Algorithm: Max value in moving window of size k using monotonic deque.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 86. Sliding Window Maximum (Hard)\n    # Time: O(n) | Space: O(k)\n    def slidingWindowMaximum(self, nums: list[int]) -> int:\n        # Max value in moving window of size k using monotonic deque.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 86. Sliding Window Maximum (Hard)\n    int slidingWindowMaximum(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 87,
@@ -1578,9 +1578,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Stack retrieving minimum element in O(1) time.",
     "defaultInput": "-2, 0, -3",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Implement Min Stack (Medium)\n    // Time Complexity: O(1) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Stack retrieving minimum element in O(1) time.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Implement Min Stack (Medium)\n    # Time: O(1) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Stack retrieving minimum element in O(1) time.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Implement Min Stack (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 87. Implement Min Stack (Medium)\n    // Time Complexity: O(1) | Space: O(n)\n    public int implementMinStack(int[] nums) {\n        // Algorithm: Stack retrieving minimum element in O(1) time.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 87. Implement Min Stack (Medium)\n    # Time: O(1) | Space: O(n)\n    def implementMinStack(self, nums: list[int]) -> int:\n        # Stack retrieving minimum element in O(1) time.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 87. Implement Min Stack (Medium)\n    int implementMinStack(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 88,
@@ -1595,9 +1595,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(m*n)",
     "description": "Minimum minutes until no fresh orange remains using multi-source BFS.",
     "defaultInput": "2, 1, 1, 1, 1, 0, 0, 1, 1",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Rotting Oranges (BFS) (Medium)\n    // Time Complexity: O(m*n) | Space: O(m*n)\n    public int solve(int[] nums) {\n        // Algorithm: Minimum minutes until no fresh orange remains using multi-source BFS.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Rotting Oranges (BFS) (Medium)\n    # Time: O(m*n) | Space: O(m*n)\n    def solve(self, nums: list[int]) -> int:\n        # Minimum minutes until no fresh orange remains using multi-source BFS.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Rotting Oranges (BFS) (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 88. Rotting Oranges (BFS) (Medium)\n    // Time Complexity: O(m*n) | Space: O(m*n)\n    public int rottingOrangesBFS(int[] nums) {\n        // Algorithm: Minimum minutes until no fresh orange remains using multi-source BFS.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 88. Rotting Oranges (BFS) (Medium)\n    # Time: O(m*n) | Space: O(m*n)\n    def rottingOrangesBFS(self, nums: list[int]) -> int:\n        # Minimum minutes until no fresh orange remains using multi-source BFS.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 88. Rotting Oranges (BFS) (Medium)\n    int rottingOrangesBFS(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 89,
@@ -1612,9 +1612,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Span of stock price for today using monotonic stack.",
     "defaultInput": "100, 80, 60, 70, 60, 75, 85",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Online Stock Span (Medium)\n    // Time Complexity: O(1) amortized | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Span of stock price for today using monotonic stack.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Online Stock Span (Medium)\n    # Time: O(1) amortized | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Span of stock price for today using monotonic stack.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Online Stock Span (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 89. Online Stock Span (Medium)\n    // Time Complexity: O(1) amortized | Space: O(n)\n    public int onlineStockSpan(int[] nums) {\n        // Algorithm: Span of stock price for today using monotonic stack.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 89. Online Stock Span (Medium)\n    # Time: O(1) amortized | Space: O(n)\n    def onlineStockSpan(self, nums: list[int]) -> int:\n        # Span of stock price for today using monotonic stack.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 89. Online Stock Span (Medium)\n    int onlineStockSpan(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 178,
@@ -1629,9 +1629,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Find the celebrity who is known by all but knows none.",
     "defaultInput": "0, 1, 0, 0, 0, 0, 0, 1, 0",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: The Celebrity Problem (Medium)\n    // Time Complexity: O(n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Find the celebrity who is known by all but knows none.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: The Celebrity Problem (Medium)\n    # Time: O(n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Find the celebrity who is known by all but knows none.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: The Celebrity Problem (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 178. The Celebrity Problem (Medium)\n    // Time Complexity: O(n) | Space: O(1)\n    public int theCelebrityProblem(int[] nums) {\n        // Algorithm: Find the celebrity who is known by all but knows none.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 178. The Celebrity Problem (Medium)\n    # Time: O(n) | Space: O(1)\n    def theCelebrityProblem(self, nums: list[int]) -> int:\n        # Find the celebrity who is known by all but knows none.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 178. The Celebrity Problem (Medium)\n    int theCelebrityProblem(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 90,
@@ -1646,9 +1646,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Reverse the order of words in given string.",
     "defaultInput": "10, 20, 30, 40",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Reverse Words in a String (Medium)\n    // Time Complexity: O(n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Reverse the order of words in given string.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Reverse Words in a String (Medium)\n    # Time: O(n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Reverse the order of words in given string.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Reverse Words in a String (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 90. Reverse Words in a String (Medium)\n    // Time Complexity: O(n) | Space: O(1)\n    public int reverseWordsinaString(int[] nums) {\n        // Algorithm: Reverse the order of words in given string.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 90. Reverse Words in a String (Medium)\n    # Time: O(n) | Space: O(1)\n    def reverseWordsinaString(self, nums: list[int]) -> int:\n        # Reverse the order of words in given string.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 90. Reverse Words in a String (Medium)\n    int reverseWordsinaString(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 91,
@@ -1663,9 +1663,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Longest palindromic substring using expand around center.",
     "defaultInput": "1, 2, 3, 2, 1",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Longest Palindrome in a String (Medium)\n    // Time Complexity: O(n²) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Longest palindromic substring using expand around center.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Longest Palindrome in a String (Medium)\n    # Time: O(n²) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Longest palindromic substring using expand around center.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Longest Palindrome in a String (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 91. Longest Palindrome in a String (Medium)\n    // Time Complexity: O(n²) | Space: O(1)\n    public int longestPalindromeinaString(int[] nums) {\n        // Algorithm: Longest palindromic substring using expand around center.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 91. Longest Palindrome in a String (Medium)\n    # Time: O(n²) | Space: O(1)\n    def longestPalindromeinaString(self, nums: list[int]) -> int:\n        # Longest palindromic substring using expand around center.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 91. Longest Palindrome in a String (Medium)\n    int longestPalindromeinaString(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 92,
@@ -1680,9 +1680,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Convert Roman numeral string to integer.",
     "defaultInput": "3, 4, 9, 58",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Roman to Integer (Easy)\n    // Time Complexity: O(n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Convert Roman numeral string to integer.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Roman to Integer (Easy)\n    # Time: O(n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Convert Roman numeral string to integer.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Roman to Integer (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 92. Roman to Integer (Easy)\n    // Time Complexity: O(n) | Space: O(1)\n    public int romantoInteger(int[] nums) {\n        // Algorithm: Convert Roman numeral string to integer.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 92. Roman to Integer (Easy)\n    # Time: O(n) | Space: O(1)\n    def romantoInteger(self, nums: list[int]) -> int:\n        # Convert Roman numeral string to integer.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 92. Roman to Integer (Easy)\n    int romantoInteger(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 93,
@@ -1697,9 +1697,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Parse 32-bit signed integer from string with overflow clamping.",
     "defaultInput": "4, 2",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: String to Integer (atoi) (Medium)\n    // Time Complexity: O(n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Parse 32-bit signed integer from string with overflow clamping.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: String to Integer (atoi) (Medium)\n    # Time: O(n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Parse 32-bit signed integer from string with overflow clamping.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: String to Integer (atoi) (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 93. String to Integer (atoi) (Medium)\n    // Time Complexity: O(n) | Space: O(1)\n    public int stringtoIntegeratoi(int[] nums) {\n        // Algorithm: Parse 32-bit signed integer from string with overflow clamping.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 93. String to Integer (atoi) (Medium)\n    # Time: O(n) | Space: O(1)\n    def stringtoIntegeratoi(self, nums: list[int]) -> int:\n        # Parse 32-bit signed integer from string with overflow clamping.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 93. String to Integer (atoi) (Medium)\n    int stringtoIntegeratoi(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 94,
@@ -1714,9 +1714,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Longest common prefix string amongst an array of strings.",
     "defaultInput": "1, 2, 3",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Longest Common Prefix (Easy)\n    // Time Complexity: O(n*m) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Longest common prefix string amongst an array of strings.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Longest Common Prefix (Easy)\n    # Time: O(n*m) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Longest common prefix string amongst an array of strings.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Longest Common Prefix (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 94. Longest Common Prefix (Easy)\n    // Time Complexity: O(n*m) | Space: O(1)\n    public int longestCommonPrefix(int[] nums) {\n        // Algorithm: Longest common prefix string amongst an array of strings.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 94. Longest Common Prefix (Easy)\n    # Time: O(n*m) | Space: O(1)\n    def longestCommonPrefix(self, nums: list[int]) -> int:\n        # Longest common prefix string amongst an array of strings.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 94. Longest Common Prefix (Easy)\n    int longestCommonPrefix(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 95,
@@ -1731,9 +1731,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Minimum times to repeat A so B is a substring.",
     "defaultInput": "3, 4",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Repeated String Match (Rabin-Karp) (Medium)\n    // Time Complexity: O(n+m) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Minimum times to repeat A so B is a substring.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Repeated String Match (Rabin-Karp) (Medium)\n    # Time: O(n+m) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Minimum times to repeat A so B is a substring.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Repeated String Match (Rabin-Karp) (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 95. Repeated String Match (Rabin-Karp) (Medium)\n    // Time Complexity: O(n+m) | Space: O(1)\n    public int repeatedStringMatchRabinKarp(int[] nums) {\n        // Algorithm: Minimum times to repeat A so B is a substring.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 95. Repeated String Match (Rabin-Karp) (Medium)\n    # Time: O(n+m) | Space: O(1)\n    def repeatedStringMatchRabinKarp(self, nums: list[int]) -> int:\n        # Minimum times to repeat A so B is a substring.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 95. Repeated String Match (Rabin-Karp) (Medium)\n    int repeatedStringMatchRabinKarp(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 96,
@@ -1748,9 +1748,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Compute Z-array for linear pattern matching.",
     "defaultInput": "1, 2, 3, 4",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Z-Function String Matching (Hard)\n    // Time Complexity: O(n+m) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Compute Z-array for linear pattern matching.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Z-Function String Matching (Hard)\n    # Time: O(n+m) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Compute Z-array for linear pattern matching.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Z-Function String Matching (Hard)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 96. Z-Function String Matching (Hard)\n    // Time Complexity: O(n+m) | Space: O(n)\n    public int zFunctionStringMatching(int[] nums) {\n        // Algorithm: Compute Z-array for linear pattern matching.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 96. Z-Function String Matching (Hard)\n    # Time: O(n+m) | Space: O(n)\n    def zFunctionStringMatching(self, nums: list[int]) -> int:\n        # Compute Z-array for linear pattern matching.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 96. Z-Function String Matching (Hard)\n    int zFunctionStringMatching(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 97,
@@ -1765,9 +1765,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(m)",
     "description": "Knuth-Morris-Pratt pattern matching with prefix table.",
     "defaultInput": "1, 2, 3, 4",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: KMP Algorithm (LPS Array) (Hard)\n    // Time Complexity: O(n+m) | Space: O(m)\n    public int solve(int[] nums) {\n        // Algorithm: Knuth-Morris-Pratt pattern matching with prefix table.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: KMP Algorithm (LPS Array) (Hard)\n    # Time: O(n+m) | Space: O(m)\n    def solve(self, nums: list[int]) -> int:\n        # Knuth-Morris-Pratt pattern matching with prefix table.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: KMP Algorithm (LPS Array) (Hard)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 97. KMP Algorithm (LPS Array) (Hard)\n    // Time Complexity: O(n+m) | Space: O(m)\n    public int kMPAlgorithmLPSArray(int[] nums) {\n        // Algorithm: Knuth-Morris-Pratt pattern matching with prefix table.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 97. KMP Algorithm (LPS Array) (Hard)\n    # Time: O(n+m) | Space: O(m)\n    def kMPAlgorithmLPSArray(self, nums: list[int]) -> int:\n        # Knuth-Morris-Pratt pattern matching with prefix table.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 97. KMP Algorithm (LPS Array) (Hard)\n    int kMPAlgorithmLPSArray(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 98,
@@ -1782,9 +1782,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Minimum characters added in front to make string palindrome.",
     "defaultInput": "1, 2, 3",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Min Characters to Make Palindrome (Hard)\n    // Time Complexity: O(n) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Minimum characters added in front to make string palindrome.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Min Characters to Make Palindrome (Hard)\n    # Time: O(n) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Minimum characters added in front to make string palindrome.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Min Characters to Make Palindrome (Hard)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 98. Min Characters to Make Palindrome (Hard)\n    // Time Complexity: O(n) | Space: O(n)\n    public int minCharacterstoMakePalindrome(int[] nums) {\n        // Algorithm: Minimum characters added in front to make string palindrome.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 98. Min Characters to Make Palindrome (Hard)\n    # Time: O(n) | Space: O(n)\n    def minCharacterstoMakePalindrome(self, nums: list[int]) -> int:\n        # Minimum characters added in front to make string palindrome.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 98. Min Characters to Make Palindrome (Hard)\n    int minCharacterstoMakePalindrome(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 99,
@@ -1799,9 +1799,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Determine if two strings are anagrams using frequency array.",
     "defaultInput": "1, 2, 3, 4",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Valid Anagram (Easy)\n    // Time Complexity: O(n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Determine if two strings are anagrams using frequency array.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Valid Anagram (Easy)\n    # Time: O(n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Determine if two strings are anagrams using frequency array.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Valid Anagram (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 99. Valid Anagram (Easy)\n    // Time Complexity: O(n) | Space: O(1)\n    public int validAnagram(int[] nums) {\n        // Algorithm: Determine if two strings are anagrams using frequency array.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 99. Valid Anagram (Easy)\n    # Time: O(n) | Space: O(1)\n    def validAnagram(self, nums: list[int]) -> int:\n        # Determine if two strings are anagrams using frequency array.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 99. Valid Anagram (Easy)\n    int validAnagram(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 100,
@@ -1816,9 +1816,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(2ⁿ)",
     "description": "Generate nth term of count-and-say sequence.",
     "defaultInput": "4",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Count and Say (Medium)\n    // Time Complexity: O(2ⁿ) | Space: O(2ⁿ)\n    public int solve(int[] nums) {\n        // Algorithm: Generate nth term of count-and-say sequence.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Count and Say (Medium)\n    # Time: O(2ⁿ) | Space: O(2ⁿ)\n    def solve(self, nums: list[int]) -> int:\n        # Generate nth term of count-and-say sequence.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Count and Say (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 100. Count and Say (Medium)\n    // Time Complexity: O(2ⁿ) | Space: O(2ⁿ)\n    public int countandSay(int[] nums) {\n        // Algorithm: Generate nth term of count-and-say sequence.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 100. Count and Say (Medium)\n    # Time: O(2ⁿ) | Space: O(2ⁿ)\n    def countandSay(self, nums: list[int]) -> int:\n        # Generate nth term of count-and-say sequence.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 100. Count and Say (Medium)\n    int countandSay(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 101,
@@ -1833,9 +1833,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Compare revision numbers separated by dots.",
     "defaultInput": "1, 0, 1, 1",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Compare Version Numbers (Medium)\n    // Time Complexity: O(max(n,m)) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Compare revision numbers separated by dots.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Compare Version Numbers (Medium)\n    # Time: O(max(n,m)) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Compare revision numbers separated by dots.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Compare Version Numbers (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 101. Compare Version Numbers (Medium)\n    // Time Complexity: O(max(n,m)) | Space: O(1)\n    public int compareVersionNumbers(int[] nums) {\n        // Algorithm: Compare revision numbers separated by dots.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 101. Compare Version Numbers (Medium)\n    # Time: O(max(n,m)) | Space: O(1)\n    def compareVersionNumbers(self, nums: list[int]) -> int:\n        # Compare revision numbers separated by dots.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 101. Compare Version Numbers (Medium)\n    int compareVersionNumbers(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 102,
@@ -1850,9 +1850,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(h)",
     "description": "Left -> Root -> Right traversal.",
     "defaultInput": "1, null, 2, 3",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Inorder Traversal of Binary Tree (Easy)\n    // Time Complexity: O(n) | Space: O(h)\n    public int solve(int[] nums) {\n        // Algorithm: Left -> Root -> Right traversal.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Inorder Traversal of Binary Tree (Easy)\n    # Time: O(n) | Space: O(h)\n    def solve(self, nums: list[int]) -> int:\n        # Left -> Root -> Right traversal.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Inorder Traversal of Binary Tree (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 102. Inorder Traversal of Binary Tree (Easy)\n    // Time Complexity: O(n) | Space: O(h)\n    public int inorderTraversalofBinaryTree(int[] nums) {\n        // Algorithm: Left -> Root -> Right traversal.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 102. Inorder Traversal of Binary Tree (Easy)\n    # Time: O(n) | Space: O(h)\n    def inorderTraversalofBinaryTree(self, nums: list[int]) -> int:\n        # Left -> Root -> Right traversal.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 102. Inorder Traversal of Binary Tree (Easy)\n    int inorderTraversalofBinaryTree(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 103,
@@ -1867,9 +1867,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(h)",
     "description": "Root -> Left -> Right traversal.",
     "defaultInput": "1, 2, 3",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Preorder Traversal of Binary Tree (Easy)\n    // Time Complexity: O(n) | Space: O(h)\n    public int solve(int[] nums) {\n        // Algorithm: Root -> Left -> Right traversal.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Preorder Traversal of Binary Tree (Easy)\n    # Time: O(n) | Space: O(h)\n    def solve(self, nums: list[int]) -> int:\n        # Root -> Left -> Right traversal.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Preorder Traversal of Binary Tree (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 103. Preorder Traversal of Binary Tree (Easy)\n    // Time Complexity: O(n) | Space: O(h)\n    public int preorderTraversalofBinaryTree(int[] nums) {\n        // Algorithm: Root -> Left -> Right traversal.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 103. Preorder Traversal of Binary Tree (Easy)\n    # Time: O(n) | Space: O(h)\n    def preorderTraversalofBinaryTree(self, nums: list[int]) -> int:\n        # Root -> Left -> Right traversal.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 103. Preorder Traversal of Binary Tree (Easy)\n    int preorderTraversalofBinaryTree(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 104,
@@ -1884,9 +1884,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(h)",
     "description": "Left -> Right -> Root traversal.",
     "defaultInput": "1, 2, 3",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Postorder Traversal of Binary Tree (Easy)\n    // Time Complexity: O(n) | Space: O(h)\n    public int solve(int[] nums) {\n        // Algorithm: Left -> Right -> Root traversal.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Postorder Traversal of Binary Tree (Easy)\n    # Time: O(n) | Space: O(h)\n    def solve(self, nums: list[int]) -> int:\n        # Left -> Right -> Root traversal.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Postorder Traversal of Binary Tree (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 104. Postorder Traversal of Binary Tree (Easy)\n    // Time Complexity: O(n) | Space: O(h)\n    public int postorderTraversalofBinaryTree(int[] nums) {\n        // Algorithm: Left -> Right -> Root traversal.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 104. Postorder Traversal of Binary Tree (Easy)\n    # Time: O(n) | Space: O(h)\n    def postorderTraversalofBinaryTree(self, nums: list[int]) -> int:\n        # Left -> Right -> Root traversal.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 104. Postorder Traversal of Binary Tree (Easy)\n    int postorderTraversalofBinaryTree(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 105,
@@ -1901,9 +1901,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Inorder traversal with O(1) auxiliary space using threaded binary tree.",
     "defaultInput": "1, 2, 3, 4, 5",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Morris Inorder Traversal (Medium)\n    // Time Complexity: O(n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Inorder traversal with O(1) auxiliary space using threaded binary tree.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Morris Inorder Traversal (Medium)\n    # Time: O(n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Inorder traversal with O(1) auxiliary space using threaded binary tree.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Morris Inorder Traversal (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 105. Morris Inorder Traversal (Medium)\n    // Time Complexity: O(n) | Space: O(1)\n    public int morrisInorderTraversal(int[] nums) {\n        // Algorithm: Inorder traversal with O(1) auxiliary space using threaded binary tree.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 105. Morris Inorder Traversal (Medium)\n    # Time: O(n) | Space: O(1)\n    def morrisInorderTraversal(self, nums: list[int]) -> int:\n        # Inorder traversal with O(1) auxiliary space using threaded binary tree.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 105. Morris Inorder Traversal (Medium)\n    int morrisInorderTraversal(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 106,
@@ -1918,9 +1918,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(h)",
     "description": "Nodes visible from the left and right sides.",
     "defaultInput": "1, 2, 3, null, 5",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Left & Right View of Binary Tree (Medium)\n    // Time Complexity: O(n) | Space: O(h)\n    public int solve(int[] nums) {\n        // Algorithm: Nodes visible from the left and right sides.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Left & Right View of Binary Tree (Medium)\n    # Time: O(n) | Space: O(h)\n    def solve(self, nums: list[int]) -> int:\n        # Nodes visible from the left and right sides.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Left & Right View of Binary Tree (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 106. Left & Right View of Binary Tree (Medium)\n    // Time Complexity: O(n) | Space: O(h)\n    public int leftRightViewofBinaryTree(int[] nums) {\n        // Algorithm: Nodes visible from the left and right sides.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 106. Left & Right View of Binary Tree (Medium)\n    # Time: O(n) | Space: O(h)\n    def leftRightViewofBinaryTree(self, nums: list[int]) -> int:\n        # Nodes visible from the left and right sides.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 106. Left & Right View of Binary Tree (Medium)\n    int leftRightViewofBinaryTree(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 107,
@@ -1935,9 +1935,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Vertical order projection of tree nodes.",
     "defaultInput": "1, 2, 3, 4, 5, 6, 7",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Top & Bottom View of Binary Tree (Medium)\n    // Time Complexity: O(n) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Vertical order projection of tree nodes.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Top & Bottom View of Binary Tree (Medium)\n    # Time: O(n) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Vertical order projection of tree nodes.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Top & Bottom View of Binary Tree (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 107. Top & Bottom View of Binary Tree (Medium)\n    // Time Complexity: O(n) | Space: O(n)\n    public int topBottomViewofBinaryTree(int[] nums) {\n        // Algorithm: Vertical order projection of tree nodes.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 107. Top & Bottom View of Binary Tree (Medium)\n    # Time: O(n) | Space: O(n)\n    def topBottomViewofBinaryTree(self, nums: list[int]) -> int:\n        # Vertical order projection of tree nodes.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 107. Top & Bottom View of Binary Tree (Medium)\n    int topBottomViewofBinaryTree(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 108,
@@ -1952,9 +1952,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(h)",
     "description": "Find path from root to target node.",
     "defaultInput": "1, 2, 3, 4, 5",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Path to Given Node (Medium)\n    // Time Complexity: O(n) | Space: O(h)\n    public int solve(int[] nums) {\n        // Algorithm: Find path from root to target node.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Path to Given Node (Medium)\n    # Time: O(n) | Space: O(h)\n    def solve(self, nums: list[int]) -> int:\n        # Find path from root to target node.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Path to Given Node (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 108. Path to Given Node (Medium)\n    // Time Complexity: O(n) | Space: O(h)\n    public int pathtoGivenNode(int[] nums) {\n        // Algorithm: Find path from root to target node.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 108. Path to Given Node (Medium)\n    # Time: O(n) | Space: O(h)\n    def pathtoGivenNode(self, nums: list[int]) -> int:\n        # Find path from root to target node.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 108. Path to Given Node (Medium)\n    int pathtoGivenNode(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 109,
@@ -1969,9 +1969,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Maximum width across any level using indexing.",
     "defaultInput": "1, 3, 2, 5, 3, null, 9",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Maximum Width of Binary Tree (Medium)\n    // Time Complexity: O(n) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Maximum width across any level using indexing.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Maximum Width of Binary Tree (Medium)\n    # Time: O(n) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Maximum width across any level using indexing.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Maximum Width of Binary Tree (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 109. Maximum Width of Binary Tree (Medium)\n    // Time Complexity: O(n) | Space: O(n)\n    public int maximumWidthofBinaryTree(int[] nums) {\n        // Algorithm: Maximum width across any level using indexing.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 109. Maximum Width of Binary Tree (Medium)\n    # Time: O(n) | Space: O(n)\n    def maximumWidthofBinaryTree(self, nums: list[int]) -> int:\n        # Maximum width across any level using indexing.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 109. Maximum Width of Binary Tree (Medium)\n    int maximumWidthofBinaryTree(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 110,
@@ -1986,9 +1986,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Level-by-level traversal using a queue.",
     "defaultInput": "3, 9, 20, 15, 7",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Level Order Traversal / BFS (Easy)\n    // Time Complexity: O(n) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Level-by-level traversal using a queue.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Level Order Traversal / BFS (Easy)\n    # Time: O(n) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Level-by-level traversal using a queue.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Level Order Traversal / BFS (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 110. Level Order Traversal / BFS (Easy)\n    // Time Complexity: O(n) | Space: O(n)\n    public int levelOrderTraversalBFS(int[] nums) {\n        // Algorithm: Level-by-level traversal using a queue.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 110. Level Order Traversal / BFS (Easy)\n    # Time: O(n) | Space: O(n)\n    def levelOrderTraversalBFS(self, nums: list[int]) -> int:\n        # Level-by-level traversal using a queue.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 110. Level Order Traversal / BFS (Easy)\n    int levelOrderTraversalBFS(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 111,
@@ -2003,9 +2003,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(h)",
     "description": "Find maximum number of nodes along longest root-to-leaf path.",
     "defaultInput": "3, 9, 20, 15, 7",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Maximum Depth / Height of Binary Tree (Easy)\n    // Time Complexity: O(n) | Space: O(h)\n    public int solve(int[] nums) {\n        // Algorithm: Find maximum number of nodes along longest root-to-leaf path.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Maximum Depth / Height of Binary Tree (Easy)\n    # Time: O(n) | Space: O(h)\n    def solve(self, nums: list[int]) -> int:\n        # Find maximum number of nodes along longest root-to-leaf path.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Maximum Depth / Height of Binary Tree (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 111. Maximum Depth / Height of Binary Tree (Easy)\n    // Time Complexity: O(n) | Space: O(h)\n    public int maximumDepthHeightofBinaryTree(int[] nums) {\n        // Algorithm: Find maximum number of nodes along longest root-to-leaf path.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 111. Maximum Depth / Height of Binary Tree (Easy)\n    # Time: O(n) | Space: O(h)\n    def maximumDepthHeightofBinaryTree(self, nums: list[int]) -> int:\n        # Find maximum number of nodes along longest root-to-leaf path.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 111. Maximum Depth / Height of Binary Tree (Easy)\n    int maximumDepthHeightofBinaryTree(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 112,
@@ -2020,9 +2020,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(h)",
     "description": "Length of the longest path between any two nodes.",
     "defaultInput": "1, 2, 3, 4, 5",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Diameter of Binary Tree (Easy)\n    // Time Complexity: O(n) | Space: O(h)\n    public int solve(int[] nums) {\n        // Algorithm: Length of the longest path between any two nodes.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Diameter of Binary Tree (Easy)\n    # Time: O(n) | Space: O(h)\n    def solve(self, nums: list[int]) -> int:\n        # Length of the longest path between any two nodes.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Diameter of Binary Tree (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 112. Diameter of Binary Tree (Easy)\n    // Time Complexity: O(n) | Space: O(h)\n    public int diameterofBinaryTree(int[] nums) {\n        // Algorithm: Length of the longest path between any two nodes.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 112. Diameter of Binary Tree (Easy)\n    # Time: O(n) | Space: O(h)\n    def diameterofBinaryTree(self, nums: list[int]) -> int:\n        # Length of the longest path between any two nodes.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 112. Diameter of Binary Tree (Easy)\n    int diameterofBinaryTree(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 113,
@@ -2037,9 +2037,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(h)",
     "description": "Heights of two subtrees of any node differ by at most one.",
     "defaultInput": "3, 9, 20, 15, 7",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Check if Binary Tree is Height Balanced (Easy)\n    // Time Complexity: O(n) | Space: O(h)\n    public int solve(int[] nums) {\n        // Algorithm: Heights of two subtrees of any node differ by at most one.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Check if Binary Tree is Height Balanced (Easy)\n    # Time: O(n) | Space: O(h)\n    def solve(self, nums: list[int]) -> int:\n        # Heights of two subtrees of any node differ by at most one.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Check if Binary Tree is Height Balanced (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 113. Check if Binary Tree is Height Balanced (Easy)\n    // Time Complexity: O(n) | Space: O(h)\n    public int checkifBinaryTreeisHeightBalanced(int[] nums) {\n        // Algorithm: Heights of two subtrees of any node differ by at most one.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 113. Check if Binary Tree is Height Balanced (Easy)\n    # Time: O(n) | Space: O(h)\n    def checkifBinaryTreeisHeightBalanced(self, nums: list[int]) -> int:\n        # Heights of two subtrees of any node differ by at most one.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 113. Check if Binary Tree is Height Balanced (Easy)\n    int checkifBinaryTreeisHeightBalanced(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 114,
@@ -2054,9 +2054,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(h)",
     "description": "Lowest node having both p and q as descendants.",
     "defaultInput": "3, 5, 1, 6, 2, 0, 8",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Lowest Common Ancestor (LCA) (Medium)\n    // Time Complexity: O(n) | Space: O(h)\n    public int solve(int[] nums) {\n        // Algorithm: Lowest node having both p and q as descendants.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Lowest Common Ancestor (LCA) (Medium)\n    # Time: O(n) | Space: O(h)\n    def solve(self, nums: list[int]) -> int:\n        # Lowest node having both p and q as descendants.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Lowest Common Ancestor (LCA) (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 114. Lowest Common Ancestor (LCA) (Medium)\n    // Time Complexity: O(n) | Space: O(h)\n    public int lowestCommonAncestorLCA(int[] nums) {\n        // Algorithm: Lowest node having both p and q as descendants.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 114. Lowest Common Ancestor (LCA) (Medium)\n    # Time: O(n) | Space: O(h)\n    def lowestCommonAncestorLCA(self, nums: list[int]) -> int:\n        # Lowest node having both p and q as descendants.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 114. Lowest Common Ancestor (LCA) (Medium)\n    int lowestCommonAncestorLCA(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 115,
@@ -2071,9 +2071,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(h)",
     "description": "Determine if two binary trees are structurally equal.",
     "defaultInput": "1, 2, 3, 1, 2, 3",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Check if Two Trees are Identical (Easy)\n    // Time Complexity: O(n) | Space: O(h)\n    public int solve(int[] nums) {\n        // Algorithm: Determine if two binary trees are structurally equal.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Check if Two Trees are Identical (Easy)\n    # Time: O(n) | Space: O(h)\n    def solve(self, nums: list[int]) -> int:\n        # Determine if two binary trees are structurally equal.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Check if Two Trees are Identical (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 115. Check if Two Trees are Identical (Easy)\n    // Time Complexity: O(n) | Space: O(h)\n    public int checkifTwoTreesareIdentical(int[] nums) {\n        // Algorithm: Determine if two binary trees are structurally equal.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 115. Check if Two Trees are Identical (Easy)\n    # Time: O(n) | Space: O(h)\n    def checkifTwoTreesareIdentical(self, nums: list[int]) -> int:\n        # Determine if two binary trees are structurally equal.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 115. Check if Two Trees are Identical (Easy)\n    int checkifTwoTreesareIdentical(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 116,
@@ -2088,9 +2088,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Traverse levels alternating left-to-right and right-to-left.",
     "defaultInput": "3, 9, 20, 15, 7",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Zig-Zag / Spiral Level Order Traversal (Medium)\n    // Time Complexity: O(n) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Traverse levels alternating left-to-right and right-to-left.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Zig-Zag / Spiral Level Order Traversal (Medium)\n    # Time: O(n) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Traverse levels alternating left-to-right and right-to-left.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Zig-Zag / Spiral Level Order Traversal (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 116. Zig-Zag / Spiral Level Order Traversal (Medium)\n    // Time Complexity: O(n) | Space: O(n)\n    public int zigZagSpiralLevelOrderTraversal(int[] nums) {\n        // Algorithm: Traverse levels alternating left-to-right and right-to-left.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 116. Zig-Zag / Spiral Level Order Traversal (Medium)\n    # Time: O(n) | Space: O(n)\n    def zigZagSpiralLevelOrderTraversal(self, nums: list[int]) -> int:\n        # Traverse levels alternating left-to-right and right-to-left.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 116. Zig-Zag / Spiral Level Order Traversal (Medium)\n    int zigZagSpiralLevelOrderTraversal(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 117,
@@ -2105,9 +2105,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(h)",
     "description": "Left boundary, leaves, and right boundary anticlockwise.",
     "defaultInput": "1, 2, 3, 4, 5, 6, 7",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Boundary Traversal of Binary Tree (Medium)\n    // Time Complexity: O(n) | Space: O(h)\n    public int solve(int[] nums) {\n        // Algorithm: Left boundary, leaves, and right boundary anticlockwise.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Boundary Traversal of Binary Tree (Medium)\n    # Time: O(n) | Space: O(h)\n    def solve(self, nums: list[int]) -> int:\n        # Left boundary, leaves, and right boundary anticlockwise.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Boundary Traversal of Binary Tree (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 117. Boundary Traversal of Binary Tree (Medium)\n    // Time Complexity: O(n) | Space: O(h)\n    public int boundaryTraversalofBinaryTree(int[] nums) {\n        // Algorithm: Left boundary, leaves, and right boundary anticlockwise.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 117. Boundary Traversal of Binary Tree (Medium)\n    # Time: O(n) | Space: O(h)\n    def boundaryTraversalofBinaryTree(self, nums: list[int]) -> int:\n        # Left boundary, leaves, and right boundary anticlockwise.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 117. Boundary Traversal of Binary Tree (Medium)\n    int boundaryTraversalofBinaryTree(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 118,
@@ -2122,9 +2122,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(h)",
     "description": "Path with maximum sum between any two nodes.",
     "defaultInput": "-10, 9, 20, 15, 7",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Maximum Path Sum in Binary Tree (Hard)\n    // Time Complexity: O(n) | Space: O(h)\n    public int solve(int[] nums) {\n        // Algorithm: Path with maximum sum between any two nodes.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Maximum Path Sum in Binary Tree (Hard)\n    # Time: O(n) | Space: O(h)\n    def solve(self, nums: list[int]) -> int:\n        # Path with maximum sum between any two nodes.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Maximum Path Sum in Binary Tree (Hard)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 118. Maximum Path Sum in Binary Tree (Hard)\n    // Time Complexity: O(n) | Space: O(h)\n    public int maximumPathSuminBinaryTree(int[] nums) {\n        // Algorithm: Path with maximum sum between any two nodes.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 118. Maximum Path Sum in Binary Tree (Hard)\n    # Time: O(n) | Space: O(h)\n    def maximumPathSuminBinaryTree(self, nums: list[int]) -> int:\n        # Path with maximum sum between any two nodes.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 118. Maximum Path Sum in Binary Tree (Hard)\n    int maximumPathSuminBinaryTree(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 119,
@@ -2139,9 +2139,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Build binary tree from preorder and inorder traversals.",
     "defaultInput": "3, 9, 20, 15, 7",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Construct Tree from Preorder & Inorder (Medium)\n    // Time Complexity: O(n) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Build binary tree from preorder and inorder traversals.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Construct Tree from Preorder & Inorder (Medium)\n    # Time: O(n) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Build binary tree from preorder and inorder traversals.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Construct Tree from Preorder & Inorder (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 119. Construct Tree from Preorder & Inorder (Medium)\n    // Time Complexity: O(n) | Space: O(n)\n    public int constructTreefromPreorderInorder(int[] nums) {\n        // Algorithm: Build binary tree from preorder and inorder traversals.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 119. Construct Tree from Preorder & Inorder (Medium)\n    # Time: O(n) | Space: O(n)\n    def constructTreefromPreorderInorder(self, nums: list[int]) -> int:\n        # Build binary tree from preorder and inorder traversals.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 119. Construct Tree from Preorder & Inorder (Medium)\n    int constructTreefromPreorderInorder(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 120,
@@ -2156,9 +2156,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Build binary tree from inorder and postorder traversals.",
     "defaultInput": "9, 3, 15, 20, 7",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Construct Tree from Inorder & Postorder (Medium)\n    // Time Complexity: O(n) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Build binary tree from inorder and postorder traversals.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Construct Tree from Inorder & Postorder (Medium)\n    # Time: O(n) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Build binary tree from inorder and postorder traversals.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Construct Tree from Inorder & Postorder (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 120. Construct Tree from Inorder & Postorder (Medium)\n    // Time Complexity: O(n) | Space: O(n)\n    public int constructTreefromInorderPostorder(int[] nums) {\n        // Algorithm: Build binary tree from inorder and postorder traversals.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 120. Construct Tree from Inorder & Postorder (Medium)\n    # Time: O(n) | Space: O(n)\n    def constructTreefromInorderPostorder(self, nums: list[int]) -> int:\n        # Build binary tree from inorder and postorder traversals.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 120. Construct Tree from Inorder & Postorder (Medium)\n    int constructTreefromInorderPostorder(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 121,
@@ -2173,9 +2173,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(h)",
     "description": "Check if binary tree is a mirror image of itself.",
     "defaultInput": "1, 2, 2, 3, 4, 4, 3",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Symmetric Binary Tree (Mirror) (Easy)\n    // Time Complexity: O(n) | Space: O(h)\n    public int solve(int[] nums) {\n        // Algorithm: Check if binary tree is a mirror image of itself.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Symmetric Binary Tree (Mirror) (Easy)\n    # Time: O(n) | Space: O(h)\n    def solve(self, nums: list[int]) -> int:\n        # Check if binary tree is a mirror image of itself.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Symmetric Binary Tree (Mirror) (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 121. Symmetric Binary Tree (Mirror) (Easy)\n    // Time Complexity: O(n) | Space: O(h)\n    public int symmetricBinaryTreeMirror(int[] nums) {\n        // Algorithm: Check if binary tree is a mirror image of itself.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 121. Symmetric Binary Tree (Mirror) (Easy)\n    # Time: O(n) | Space: O(h)\n    def symmetricBinaryTreeMirror(self, nums: list[int]) -> int:\n        # Check if binary tree is a mirror image of itself.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 121. Symmetric Binary Tree (Mirror) (Easy)\n    int symmetricBinaryTreeMirror(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 122,
@@ -2190,9 +2190,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Flatten tree to preorder linked list in-place.",
     "defaultInput": "1, 2, 5, 3, 4, 6",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Flatten Binary Tree to Linked List (Medium)\n    // Time Complexity: O(n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Flatten tree to preorder linked list in-place.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Flatten Binary Tree to Linked List (Medium)\n    # Time: O(n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Flatten tree to preorder linked list in-place.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Flatten Binary Tree to Linked List (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 122. Flatten Binary Tree to Linked List (Medium)\n    // Time Complexity: O(n) | Space: O(1)\n    public int flattenBinaryTreetoLinkedList(int[] nums) {\n        // Algorithm: Flatten tree to preorder linked list in-place.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 122. Flatten Binary Tree to Linked List (Medium)\n    # Time: O(n) | Space: O(1)\n    def flattenBinaryTreetoLinkedList(self, nums: list[int]) -> int:\n        # Flatten tree to preorder linked list in-place.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 122. Flatten Binary Tree to Linked List (Medium)\n    int flattenBinaryTreetoLinkedList(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 123,
@@ -2207,9 +2207,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Connect each node to its next right node.",
     "defaultInput": "1, 2, 3, 4, 5, 6, 7",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Populate Next Right Pointers of Tree (Medium)\n    // Time Complexity: O(n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Connect each node to its next right node.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Populate Next Right Pointers of Tree (Medium)\n    # Time: O(n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Connect each node to its next right node.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Populate Next Right Pointers of Tree (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 123. Populate Next Right Pointers of Tree (Medium)\n    // Time Complexity: O(n) | Space: O(1)\n    public int populateNextRightPointersofTree(int[] nums) {\n        // Algorithm: Connect each node to its next right node.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 123. Populate Next Right Pointers of Tree (Medium)\n    # Time: O(n) | Space: O(1)\n    def populateNextRightPointersofTree(self, nums: list[int]) -> int:\n        # Connect each node to its next right node.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 123. Populate Next Right Pointers of Tree (Medium)\n    int populateNextRightPointersofTree(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 124,
@@ -2224,9 +2224,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(h)",
     "description": "Find node with target value in BST.",
     "defaultInput": "4, 2, 7, 1, 3",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Search in a Binary Search Tree (Easy)\n    // Time Complexity: O(h) | Space: O(h)\n    public int solve(int[] nums) {\n        // Algorithm: Find node with target value in BST.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Search in a Binary Search Tree (Easy)\n    # Time: O(h) | Space: O(h)\n    def solve(self, nums: list[int]) -> int:\n        # Find node with target value in BST.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Search in a Binary Search Tree (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 124. Search in a Binary Search Tree (Easy)\n    // Time Complexity: O(h) | Space: O(h)\n    public int searchinaBinarySearchTree(int[] nums) {\n        // Algorithm: Find node with target value in BST.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 124. Search in a Binary Search Tree (Easy)\n    # Time: O(h) | Space: O(h)\n    def searchinaBinarySearchTree(self, nums: list[int]) -> int:\n        # Find node with target value in BST.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 124. Search in a Binary Search Tree (Easy)\n    int searchinaBinarySearchTree(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 125,
@@ -2241,9 +2241,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(h)",
     "description": "Construct binary search tree given preorder traversal.",
     "defaultInput": "8, 5, 1, 7, 10, 12",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Construct BST from Preorder Traversal (Medium)\n    // Time Complexity: O(n) | Space: O(h)\n    public int solve(int[] nums) {\n        // Algorithm: Construct binary search tree given preorder traversal.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Construct BST from Preorder Traversal (Medium)\n    # Time: O(n) | Space: O(h)\n    def solve(self, nums: list[int]) -> int:\n        # Construct binary search tree given preorder traversal.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Construct BST from Preorder Traversal (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 125. Construct BST from Preorder Traversal (Medium)\n    // Time Complexity: O(n) | Space: O(h)\n    public int constructBSTfromPreorderTraversal(int[] nums) {\n        // Algorithm: Construct binary search tree given preorder traversal.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 125. Construct BST from Preorder Traversal (Medium)\n    # Time: O(n) | Space: O(h)\n    def constructBSTfromPreorderTraversal(self, nums: list[int]) -> int:\n        # Construct binary search tree given preorder traversal.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 125. Construct BST from Preorder Traversal (Medium)\n    int constructBSTfromPreorderTraversal(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 126,
@@ -2258,9 +2258,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(h)",
     "description": "Verify if tree satisfies BST property for all nodes.",
     "defaultInput": "5, 1, 4, 3, 6",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Check is a BT is BST (Validate BST) (Medium)\n    // Time Complexity: O(n) | Space: O(h)\n    public int solve(int[] nums) {\n        // Algorithm: Verify if tree satisfies BST property for all nodes.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Check is a BT is BST (Validate BST) (Medium)\n    # Time: O(n) | Space: O(h)\n    def solve(self, nums: list[int]) -> int:\n        # Verify if tree satisfies BST property for all nodes.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Check is a BT is BST (Validate BST) (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 126. Check is a BT is BST (Validate BST) (Medium)\n    // Time Complexity: O(n) | Space: O(h)\n    public int checkisaBTisBSTValidateBST(int[] nums) {\n        // Algorithm: Verify if tree satisfies BST property for all nodes.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 126. Check is a BT is BST (Validate BST) (Medium)\n    # Time: O(n) | Space: O(h)\n    def checkisaBTisBSTValidateBST(self, nums: list[int]) -> int:\n        # Verify if tree satisfies BST property for all nodes.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 126. Check is a BT is BST (Validate BST) (Medium)\n    int checkisaBTisBSTValidateBST(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 127,
@@ -2275,9 +2275,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Lowest common ancestor using BST ordering property.",
     "defaultInput": "6, 2, 8, 0, 4, 7, 9",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: LCA in Binary Search Tree (Medium)\n    // Time Complexity: O(h) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Lowest common ancestor using BST ordering property.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: LCA in Binary Search Tree (Medium)\n    # Time: O(h) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Lowest common ancestor using BST ordering property.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: LCA in Binary Search Tree (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 127. LCA in Binary Search Tree (Medium)\n    // Time Complexity: O(h) | Space: O(1)\n    public int lCAinBinarySearchTree(int[] nums) {\n        // Algorithm: Lowest common ancestor using BST ordering property.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 127. LCA in Binary Search Tree (Medium)\n    # Time: O(h) | Space: O(1)\n    def lCAinBinarySearchTree(self, nums: list[int]) -> int:\n        # Lowest common ancestor using BST ordering property.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 127. LCA in Binary Search Tree (Medium)\n    int lCAinBinarySearchTree(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 128,
@@ -2292,9 +2292,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Find inorder predecessor and successor for a key.",
     "defaultInput": "50, 30, 70, 20, 40, 60, 80",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Predecessor and Successor in BST (Medium)\n    // Time Complexity: O(h) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Find inorder predecessor and successor for a key.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Predecessor and Successor in BST (Medium)\n    # Time: O(h) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Find inorder predecessor and successor for a key.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Predecessor and Successor in BST (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 128. Predecessor and Successor in BST (Medium)\n    // Time Complexity: O(h) | Space: O(1)\n    public int predecessorandSuccessorinBST(int[] nums) {\n        // Algorithm: Find inorder predecessor and successor for a key.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 128. Predecessor and Successor in BST (Medium)\n    # Time: O(h) | Space: O(1)\n    def predecessorandSuccessorinBST(self, nums: list[int]) -> int:\n        # Find inorder predecessor and successor for a key.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 128. Predecessor and Successor in BST (Medium)\n    int predecessorandSuccessorinBST(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 129,
@@ -2309,9 +2309,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Find closest values <= and >= given key.",
     "defaultInput": "8, 4, 12, 2, 6, 10, 14",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Floor and Ceil in a BST (Medium)\n    // Time Complexity: O(h) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Find closest values <= and >= given key.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Floor and Ceil in a BST (Medium)\n    # Time: O(h) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Find closest values <= and >= given key.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Floor and Ceil in a BST (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 129. Floor and Ceil in a BST (Medium)\n    // Time Complexity: O(h) | Space: O(1)\n    public int floorandCeilinaBST(int[] nums) {\n        // Algorithm: Find closest values <= and >= given key.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 129. Floor and Ceil in a BST (Medium)\n    # Time: O(h) | Space: O(1)\n    def floorandCeilinaBST(self, nums: list[int]) -> int:\n        # Find closest values <= and >= given key.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 129. Floor and Ceil in a BST (Medium)\n    int floorandCeilinaBST(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 130,
@@ -2326,9 +2326,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(h)",
     "description": "Find kth smallest node using inorder traversal.",
     "defaultInput": "3, 1, 4, 2",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: K-th Smallest Element in BST (Medium)\n    // Time Complexity: O(h + k) | Space: O(h)\n    public int solve(int[] nums) {\n        // Algorithm: Find kth smallest node using inorder traversal.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: K-th Smallest Element in BST (Medium)\n    # Time: O(h + k) | Space: O(h)\n    def solve(self, nums: list[int]) -> int:\n        # Find kth smallest node using inorder traversal.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: K-th Smallest Element in BST (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 130. K-th Smallest Element in BST (Medium)\n    // Time Complexity: O(h + k) | Space: O(h)\n    public int kthSmallestElementinBST(int[] nums) {\n        // Algorithm: Find kth smallest node using inorder traversal.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 130. K-th Smallest Element in BST (Medium)\n    # Time: O(h + k) | Space: O(h)\n    def kthSmallestElementinBST(self, nums: list[int]) -> int:\n        # Find kth smallest node using inorder traversal.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 130. K-th Smallest Element in BST (Medium)\n    int kthSmallestElementinBST(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 131,
@@ -2343,9 +2343,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(h)",
     "description": "Find kth largest node using reverse inorder traversal.",
     "defaultInput": "4, 2, 7, 1, 3",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: K-th Largest Element in BST (Medium)\n    // Time Complexity: O(h + k) | Space: O(h)\n    public int solve(int[] nums) {\n        // Algorithm: Find kth largest node using reverse inorder traversal.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: K-th Largest Element in BST (Medium)\n    # Time: O(h + k) | Space: O(h)\n    def solve(self, nums: list[int]) -> int:\n        # Find kth largest node using reverse inorder traversal.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: K-th Largest Element in BST (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 131. K-th Largest Element in BST (Medium)\n    // Time Complexity: O(h + k) | Space: O(h)\n    public int kthLargestElementinBST(int[] nums) {\n        // Algorithm: Find kth largest node using reverse inorder traversal.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 131. K-th Largest Element in BST (Medium)\n    # Time: O(h + k) | Space: O(h)\n    def kthLargestElementinBST(self, nums: list[int]) -> int:\n        # Find kth largest node using reverse inorder traversal.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 131. K-th Largest Element in BST (Medium)\n    int kthLargestElementinBST(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 132,
@@ -2360,9 +2360,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(h)",
     "description": "Find if two nodes sum to k using BST iterator or HashSet.",
     "defaultInput": "5, 3, 6, 2, 4, 7",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Find a Pair with Given Sum in BST (Two Sum IV) (Easy)\n    // Time Complexity: O(n) | Space: O(h)\n    public int solve(int[] nums) {\n        // Algorithm: Find if two nodes sum to k using BST iterator or HashSet.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Find a Pair with Given Sum in BST (Two Sum IV) (Easy)\n    # Time: O(n) | Space: O(h)\n    def solve(self, nums: list[int]) -> int:\n        # Find if two nodes sum to k using BST iterator or HashSet.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Find a Pair with Given Sum in BST (Two Sum IV) (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 132. Find a Pair with Given Sum in BST (Two Sum IV) (Easy)\n    // Time Complexity: O(n) | Space: O(h)\n    public int findaPairwithGivenSuminBSTTwoSumIV(int[] nums) {\n        // Algorithm: Find if two nodes sum to k using BST iterator or HashSet.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 132. Find a Pair with Given Sum in BST (Two Sum IV) (Easy)\n    # Time: O(n) | Space: O(h)\n    def findaPairwithGivenSuminBSTTwoSumIV(self, nums: list[int]) -> int:\n        # Find if two nodes sum to k using BST iterator or HashSet.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 132. Find a Pair with Given Sum in BST (Two Sum IV) (Easy)\n    int findaPairwithGivenSuminBSTTwoSumIV(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 133,
@@ -2377,9 +2377,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(h)",
     "description": "Implement iterator with next() and hasNext() over BST.",
     "defaultInput": "7, 3, 15, 9, 20",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: BST Iterator (Medium)\n    // Time Complexity: O(1) amortized | Space: O(h)\n    public int solve(int[] nums) {\n        // Algorithm: Implement iterator with next() and hasNext() over BST.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: BST Iterator (Medium)\n    # Time: O(1) amortized | Space: O(h)\n    def solve(self, nums: list[int]) -> int:\n        # Implement iterator with next() and hasNext() over BST.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: BST Iterator (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 133. BST Iterator (Medium)\n    // Time Complexity: O(1) amortized | Space: O(h)\n    public int bSTIterator(int[] nums) {\n        // Algorithm: Implement iterator with next() and hasNext() over BST.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 133. BST Iterator (Medium)\n    # Time: O(1) amortized | Space: O(h)\n    def bSTIterator(self, nums: list[int]) -> int:\n        # Implement iterator with next() and hasNext() over BST.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 133. BST Iterator (Medium)\n    int bSTIterator(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 134,
@@ -2394,9 +2394,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(h)",
     "description": "Find size of maximum valid BST subtree in BT.",
     "defaultInput": "10, 5, 15, 1, 8, 7",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Size of the Largest BST in Binary Tree (Hard)\n    // Time Complexity: O(n) | Space: O(h)\n    public int solve(int[] nums) {\n        // Algorithm: Find size of maximum valid BST subtree in BT.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Size of the Largest BST in Binary Tree (Hard)\n    # Time: O(n) | Space: O(h)\n    def solve(self, nums: list[int]) -> int:\n        # Find size of maximum valid BST subtree in BT.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Size of the Largest BST in Binary Tree (Hard)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 134. Size of the Largest BST in Binary Tree (Hard)\n    // Time Complexity: O(n) | Space: O(h)\n    public int sizeoftheLargestBSTinBinaryTree(int[] nums) {\n        // Algorithm: Find size of maximum valid BST subtree in BT.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 134. Size of the Largest BST in Binary Tree (Hard)\n    # Time: O(n) | Space: O(h)\n    def sizeoftheLargestBSTinBinaryTree(self, nums: list[int]) -> int:\n        # Find size of maximum valid BST subtree in BT.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 134. Size of the Largest BST in Binary Tree (Hard)\n    int sizeoftheLargestBSTinBinaryTree(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 135,
@@ -2411,9 +2411,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Encode BST to string and reconstruct.",
     "defaultInput": "2, 1, 3",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Serialize and Deserialize BST (Hard)\n    // Time Complexity: O(n) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Encode BST to string and reconstruct.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Serialize and Deserialize BST (Hard)\n    # Time: O(n) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Encode BST to string and reconstruct.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Serialize and Deserialize BST (Hard)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 135. Serialize and Deserialize BST (Hard)\n    // Time Complexity: O(n) | Space: O(n)\n    public int serializeandDeserializeBST(int[] nums) {\n        // Algorithm: Encode BST to string and reconstruct.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 135. Serialize and Deserialize BST (Hard)\n    # Time: O(n) | Space: O(n)\n    def serializeandDeserializeBST(self, nums: list[int]) -> int:\n        # Encode BST to string and reconstruct.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 135. Serialize and Deserialize BST (Hard)\n    int serializeandDeserializeBST(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 136,
@@ -2428,9 +2428,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(h)",
     "description": "Convert binary tree to DLL in-place according to inorder.",
     "defaultInput": "10, 12, 15, 25, 30, 36",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Binary Tree to Doubly Linked List (Hard)\n    // Time Complexity: O(n) | Space: O(h)\n    public int solve(int[] nums) {\n        // Algorithm: Convert binary tree to DLL in-place according to inorder.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Binary Tree to Doubly Linked List (Hard)\n    # Time: O(n) | Space: O(h)\n    def solve(self, nums: list[int]) -> int:\n        # Convert binary tree to DLL in-place according to inorder.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Binary Tree to Doubly Linked List (Hard)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 136. Binary Tree to Doubly Linked List (Hard)\n    // Time Complexity: O(n) | Space: O(h)\n    public int binaryTreetoDoublyLinkedList(int[] nums) {\n        // Algorithm: Convert binary tree to DLL in-place according to inorder.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 136. Binary Tree to Doubly Linked List (Hard)\n    # Time: O(n) | Space: O(h)\n    def binaryTreetoDoublyLinkedList(self, nums: list[int]) -> int:\n        # Convert binary tree to DLL in-place according to inorder.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 136. Binary Tree to Doubly Linked List (Hard)\n    int binaryTreetoDoublyLinkedList(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 137,
@@ -2445,9 +2445,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Continuous stream median finding.",
     "defaultInput": "5, 15, 1, 3",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Find Median in a Data Stream (Hard)\n    // Time Complexity: O(log n) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Continuous stream median finding.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Find Median in a Data Stream (Hard)\n    # Time: O(log n) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Continuous stream median finding.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Find Median in a Data Stream (Hard)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 137. Find Median in a Data Stream (Hard)\n    // Time Complexity: O(log n) | Space: O(n)\n    public int findMedianinaDataStream(int[] nums) {\n        // Algorithm: Continuous stream median finding.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 137. Find Median in a Data Stream (Hard)\n    # Time: O(log n) | Space: O(n)\n    def findMedianinaDataStream(self, nums: list[int]) -> int:\n        # Continuous stream median finding.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 137. Find Median in a Data Stream (Hard)\n    int findMedianinaDataStream(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 138,
@@ -2462,9 +2462,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(k)",
     "description": "Maintain kth largest element dynamically.",
     "defaultInput": "4, 5, 8, 2",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: K-th Largest Element in a Stream (Easy)\n    // Time Complexity: O(log k) | Space: O(k)\n    public int solve(int[] nums) {\n        // Algorithm: Maintain kth largest element dynamically.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: K-th Largest Element in a Stream (Easy)\n    # Time: O(log k) | Space: O(k)\n    def solve(self, nums: list[int]) -> int:\n        # Maintain kth largest element dynamically.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: K-th Largest Element in a Stream (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 138. K-th Largest Element in a Stream (Easy)\n    // Time Complexity: O(log k) | Space: O(k)\n    public int kthLargestElementinaStream(int[] nums) {\n        // Algorithm: Maintain kth largest element dynamically.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 138. K-th Largest Element in a Stream (Easy)\n    # Time: O(log k) | Space: O(k)\n    def kthLargestElementinaStream(self, nums: list[int]) -> int:\n        # Maintain kth largest element dynamically.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 138. K-th Largest Element in a Stream (Easy)\n    int kthLargestElementinaStream(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 139,
@@ -2479,9 +2479,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(k)",
     "description": "Count distinct elements in every sliding window of size k.",
     "defaultInput": "1, 2, 1, 3, 4, 2, 3",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Distinct Numbers in Window (Medium)\n    // Time Complexity: O(n) | Space: O(k)\n    public int solve(int[] nums) {\n        // Algorithm: Count distinct elements in every sliding window of size k.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Distinct Numbers in Window (Medium)\n    # Time: O(n) | Space: O(k)\n    def solve(self, nums: list[int]) -> int:\n        # Count distinct elements in every sliding window of size k.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Distinct Numbers in Window (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 139. Distinct Numbers in Window (Medium)\n    // Time Complexity: O(n) | Space: O(k)\n    public int distinctNumbersinWindow(int[] nums) {\n        // Algorithm: Count distinct elements in every sliding window of size k.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 139. Distinct Numbers in Window (Medium)\n    # Time: O(n) | Space: O(k)\n    def distinctNumbersinWindow(self, nums: list[int]) -> int:\n        # Count distinct elements in every sliding window of size k.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 139. Distinct Numbers in Window (Medium)\n    int distinctNumbersinWindow(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 140,
@@ -2496,9 +2496,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(m*n)",
     "description": "Fill contiguous region with new color using DFS/BFS.",
     "defaultInput": "1, 1, 1, 1, 1, 0, 1, 0, 1",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Flood Fill Algorithm (Easy)\n    // Time Complexity: O(m*n) | Space: O(m*n)\n    public int solve(int[] nums) {\n        // Algorithm: Fill contiguous region with new color using DFS/BFS.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Flood Fill Algorithm (Easy)\n    # Time: O(m*n) | Space: O(m*n)\n    def solve(self, nums: list[int]) -> int:\n        # Fill contiguous region with new color using DFS/BFS.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Flood Fill Algorithm (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 140. Flood Fill Algorithm (Easy)\n    // Time Complexity: O(m*n) | Space: O(m*n)\n    public int floodFillAlgorithm(int[] nums) {\n        // Algorithm: Fill contiguous region with new color using DFS/BFS.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 140. Flood Fill Algorithm (Easy)\n    # Time: O(m*n) | Space: O(m*n)\n    def floodFillAlgorithm(self, nums: list[int]) -> int:\n        # Fill contiguous region with new color using DFS/BFS.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 140. Flood Fill Algorithm (Easy)\n    int floodFillAlgorithm(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 141,
@@ -2513,9 +2513,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(V)",
     "description": "Deep copy of connected undirected graph.",
     "defaultInput": "1, 2, 3, 4",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Clone Graph (Medium)\n    // Time Complexity: O(V+E) | Space: O(V)\n    public int solve(int[] nums) {\n        // Algorithm: Deep copy of connected undirected graph.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Clone Graph (Medium)\n    # Time: O(V+E) | Space: O(V)\n    def solve(self, nums: list[int]) -> int:\n        # Deep copy of connected undirected graph.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Clone Graph (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 141. Clone Graph (Medium)\n    // Time Complexity: O(V+E) | Space: O(V)\n    public int cloneGraph(int[] nums) {\n        // Algorithm: Deep copy of connected undirected graph.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 141. Clone Graph (Medium)\n    # Time: O(V+E) | Space: O(V)\n    def cloneGraph(self, nums: list[int]) -> int:\n        # Deep copy of connected undirected graph.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 141. Clone Graph (Medium)\n    int cloneGraph(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 142,
@@ -2530,9 +2530,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(V)",
     "description": "Depth first search traversal of graph.",
     "defaultInput": "0, 1, 2, 3, 4",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: DFS of Graph (Easy)\n    // Time Complexity: O(V+E) | Space: O(V)\n    public int solve(int[] nums) {\n        // Algorithm: Depth first search traversal of graph.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: DFS of Graph (Easy)\n    # Time: O(V+E) | Space: O(V)\n    def solve(self, nums: list[int]) -> int:\n        # Depth first search traversal of graph.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: DFS of Graph (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 142. DFS of Graph (Easy)\n    // Time Complexity: O(V+E) | Space: O(V)\n    public int dFSofGraph(int[] nums) {\n        // Algorithm: Depth first search traversal of graph.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 142. DFS of Graph (Easy)\n    # Time: O(V+E) | Space: O(V)\n    def dFSofGraph(self, nums: list[int]) -> int:\n        # Depth first search traversal of graph.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 142. DFS of Graph (Easy)\n    int dFSofGraph(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 143,
@@ -2547,9 +2547,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(V)",
     "description": "Breadth first search level order traversal.",
     "defaultInput": "0, 1, 2, 3, 4",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: BFS of Graph (Easy)\n    // Time Complexity: O(V+E) | Space: O(V)\n    public int solve(int[] nums) {\n        // Algorithm: Breadth first search level order traversal.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: BFS of Graph (Easy)\n    # Time: O(V+E) | Space: O(V)\n    def solve(self, nums: list[int]) -> int:\n        # Breadth first search level order traversal.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: BFS of Graph (Easy)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 143. BFS of Graph (Easy)\n    // Time Complexity: O(V+E) | Space: O(V)\n    public int bFSofGraph(int[] nums) {\n        // Algorithm: Breadth first search level order traversal.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 143. BFS of Graph (Easy)\n    # Time: O(V+E) | Space: O(V)\n    def bFSofGraph(self, nums: list[int]) -> int:\n        # Breadth first search level order traversal.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 143. BFS of Graph (Easy)\n    int bFSofGraph(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 144,
@@ -2564,9 +2564,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(V)",
     "description": "Check if undirected graph contains cycle.",
     "defaultInput": "0, 1, 2, 3",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Detect Cycle in Undirected Graph (BFS/DFS) (Medium)\n    // Time Complexity: O(V+E) | Space: O(V)\n    public int solve(int[] nums) {\n        // Algorithm: Check if undirected graph contains cycle.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Detect Cycle in Undirected Graph (BFS/DFS) (Medium)\n    # Time: O(V+E) | Space: O(V)\n    def solve(self, nums: list[int]) -> int:\n        # Check if undirected graph contains cycle.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Detect Cycle in Undirected Graph (BFS/DFS) (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 144. Detect Cycle in Undirected Graph (BFS/DFS) (Medium)\n    // Time Complexity: O(V+E) | Space: O(V)\n    public int detectCycleinUndirectedGraphBFSDFS(int[] nums) {\n        // Algorithm: Check if undirected graph contains cycle.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 144. Detect Cycle in Undirected Graph (BFS/DFS) (Medium)\n    # Time: O(V+E) | Space: O(V)\n    def detectCycleinUndirectedGraphBFSDFS(self, nums: list[int]) -> int:\n        # Check if undirected graph contains cycle.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 144. Detect Cycle in Undirected Graph (BFS/DFS) (Medium)\n    int detectCycleinUndirectedGraphBFSDFS(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 145,
@@ -2581,9 +2581,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(V)",
     "description": "Cycle detection using recursion stack or in-degrees.",
     "defaultInput": "0, 1, 2, 3",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Detect Cycle in Directed Graph (DFS/Kahn) (Medium)\n    // Time Complexity: O(V+E) | Space: O(V)\n    public int solve(int[] nums) {\n        // Algorithm: Cycle detection using recursion stack or in-degrees.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Detect Cycle in Directed Graph (DFS/Kahn) (Medium)\n    # Time: O(V+E) | Space: O(V)\n    def solve(self, nums: list[int]) -> int:\n        # Cycle detection using recursion stack or in-degrees.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Detect Cycle in Directed Graph (DFS/Kahn) (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 145. Detect Cycle in Directed Graph (DFS/Kahn) (Medium)\n    // Time Complexity: O(V+E) | Space: O(V)\n    public int detectCycleinDirectedGraphDFSKahn(int[] nums) {\n        // Algorithm: Cycle detection using recursion stack or in-degrees.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 145. Detect Cycle in Directed Graph (DFS/Kahn) (Medium)\n    # Time: O(V+E) | Space: O(V)\n    def detectCycleinDirectedGraphDFSKahn(self, nums: list[int]) -> int:\n        # Cycle detection using recursion stack or in-degrees.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 145. Detect Cycle in Directed Graph (DFS/Kahn) (Medium)\n    int detectCycleinDirectedGraphDFSKahn(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 146,
@@ -2598,9 +2598,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(V)",
     "description": "Linear ordering of vertices in DAG.",
     "defaultInput": "0, 1, 2, 3",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Topological Sort (Kahn's BFS) (Medium)\n    // Time Complexity: O(V+E) | Space: O(V)\n    public int solve(int[] nums) {\n        // Algorithm: Linear ordering of vertices in DAG.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Topological Sort (Kahn's BFS) (Medium)\n    # Time: O(V+E) | Space: O(V)\n    def solve(self, nums: list[int]) -> int:\n        # Linear ordering of vertices in DAG.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Topological Sort (Kahn's BFS) (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 146. Topological Sort (Kahn's BFS) (Medium)\n    // Time Complexity: O(V+E) | Space: O(V)\n    public int topologicalSortKahnsBFS(int[] nums) {\n        // Algorithm: Linear ordering of vertices in DAG.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 146. Topological Sort (Kahn's BFS) (Medium)\n    # Time: O(V+E) | Space: O(V)\n    def topologicalSortKahnsBFS(self, nums: list[int]) -> int:\n        # Linear ordering of vertices in DAG.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 146. Topological Sort (Kahn's BFS) (Medium)\n    int topologicalSortKahnsBFS(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 147,
@@ -2615,9 +2615,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(m*n)",
     "description": "Count connected components of 1s in binary matrix.",
     "defaultInput": "1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Number of Islands (Grid BFS/DFS) (Medium)\n    // Time Complexity: O(m*n) | Space: O(m*n)\n    public int solve(int[] nums) {\n        // Algorithm: Count connected components of 1s in binary matrix.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Number of Islands (Grid BFS/DFS) (Medium)\n    # Time: O(m*n) | Space: O(m*n)\n    def solve(self, nums: list[int]) -> int:\n        # Count connected components of 1s in binary matrix.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Number of Islands (Grid BFS/DFS) (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 147. Number of Islands (Grid BFS/DFS) (Medium)\n    // Time Complexity: O(m*n) | Space: O(m*n)\n    public int numberofIslandsGridBFSDFS(int[] nums) {\n        // Algorithm: Count connected components of 1s in binary matrix.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 147. Number of Islands (Grid BFS/DFS) (Medium)\n    # Time: O(m*n) | Space: O(m*n)\n    def numberofIslandsGridBFSDFS(self, nums: list[int]) -> int:\n        # Count connected components of 1s in binary matrix.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 147. Number of Islands (Grid BFS/DFS) (Medium)\n    int numberofIslandsGridBFSDFS(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 148,
@@ -2632,9 +2632,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(V)",
     "description": "Check if vertices can be split into two independent sets.",
     "defaultInput": "1, 2, 3, 0, 2",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Is Graph Bipartite? (2-Coloring) (Medium)\n    // Time Complexity: O(V+E) | Space: O(V)\n    public int solve(int[] nums) {\n        // Algorithm: Check if vertices can be split into two independent sets.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Is Graph Bipartite? (2-Coloring) (Medium)\n    # Time: O(V+E) | Space: O(V)\n    def solve(self, nums: list[int]) -> int:\n        # Check if vertices can be split into two independent sets.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Is Graph Bipartite? (2-Coloring) (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 148. Is Graph Bipartite? (2-Coloring) (Medium)\n    // Time Complexity: O(V+E) | Space: O(V)\n    public int isGraphBipartite2Coloring(int[] nums) {\n        // Algorithm: Check if vertices can be split into two independent sets.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 148. Is Graph Bipartite? (2-Coloring) (Medium)\n    # Time: O(V+E) | Space: O(V)\n    def isGraphBipartite2Coloring(self, nums: list[int]) -> int:\n        # Check if vertices can be split into two independent sets.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 148. Is Graph Bipartite? (2-Coloring) (Medium)\n    int isGraphBipartite2Coloring(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 179,
@@ -2649,9 +2649,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(V)",
     "description": "Determine if you can finish all courses given prerequisites.",
     "defaultInput": "2, 1, 1, 0",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Course Schedule I (Cycle Detection) (Medium)\n    // Time Complexity: O(V+E) | Space: O(V)\n    public int solve(int[] nums) {\n        // Algorithm: Determine if you can finish all courses given prerequisites.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Course Schedule I (Cycle Detection) (Medium)\n    # Time: O(V+E) | Space: O(V)\n    def solve(self, nums: list[int]) -> int:\n        # Determine if you can finish all courses given prerequisites.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Course Schedule I (Cycle Detection) (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 179. Course Schedule I (Cycle Detection) (Medium)\n    // Time Complexity: O(V+E) | Space: O(V)\n    public int courseScheduleICycleDetection(int[] nums) {\n        // Algorithm: Determine if you can finish all courses given prerequisites.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 179. Course Schedule I (Cycle Detection) (Medium)\n    # Time: O(V+E) | Space: O(V)\n    def courseScheduleICycleDetection(self, nums: list[int]) -> int:\n        # Determine if you can finish all courses given prerequisites.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 179. Course Schedule I (Cycle Detection) (Medium)\n    int courseScheduleICycleDetection(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 180,
@@ -2666,9 +2666,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(V)",
     "description": "Return the ordering of courses you should take to finish all courses.",
     "defaultInput": "4, 1, 0, 2, 0, 3, 1, 3, 2",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Course Schedule II (Order of Courses) (Medium)\n    // Time Complexity: O(V+E) | Space: O(V)\n    public int solve(int[] nums) {\n        // Algorithm: Return the ordering of courses you should take to finish all courses.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Course Schedule II (Order of Courses) (Medium)\n    # Time: O(V+E) | Space: O(V)\n    def solve(self, nums: list[int]) -> int:\n        # Return the ordering of courses you should take to finish all courses.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Course Schedule II (Order of Courses) (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 180. Course Schedule II (Order of Courses) (Medium)\n    // Time Complexity: O(V+E) | Space: O(V)\n    public int courseScheduleIIOrderofCourses(int[] nums) {\n        // Algorithm: Return the ordering of courses you should take to finish all courses.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 180. Course Schedule II (Order of Courses) (Medium)\n    # Time: O(V+E) | Space: O(V)\n    def courseScheduleIIOrderofCourses(self, nums: list[int]) -> int:\n        # Return the ordering of courses you should take to finish all courses.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 180. Course Schedule II (Order of Courses) (Medium)\n    int courseScheduleIIOrderofCourses(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 149,
@@ -2683,9 +2683,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(V)",
     "description": "Single-source shortest path with non-negative edge weights.",
     "defaultInput": "0, 1, 4, 0, 2, 1, 2, 1, 2",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Dijkstra's Algorithm (Shortest Path) (Medium)\n    // Time Complexity: O((V+E) log V) | Space: O(V)\n    public int solve(int[] nums) {\n        // Algorithm: Single-source shortest path with non-negative edge weights.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Dijkstra's Algorithm (Shortest Path) (Medium)\n    # Time: O((V+E) log V) | Space: O(V)\n    def solve(self, nums: list[int]) -> int:\n        # Single-source shortest path with non-negative edge weights.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Dijkstra's Algorithm (Shortest Path) (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 149. Dijkstra's Algorithm (Shortest Path) (Medium)\n    // Time Complexity: O((V+E) log V) | Space: O(V)\n    public int dijkstrasAlgorithmShortestPath(int[] nums) {\n        // Algorithm: Single-source shortest path with non-negative edge weights.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 149. Dijkstra's Algorithm (Shortest Path) (Medium)\n    # Time: O((V+E) log V) | Space: O(V)\n    def dijkstrasAlgorithmShortestPath(self, nums: list[int]) -> int:\n        # Single-source shortest path with non-negative edge weights.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 149. Dijkstra's Algorithm (Shortest Path) (Medium)\n    int dijkstrasAlgorithmShortestPath(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 150,
@@ -2700,9 +2700,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(V)",
     "description": "Shortest path handling negative edge weights and cycle detection.",
     "defaultInput": "0, 1, -1, 0, 2, 4",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Bellman Ford Algorithm (Medium)\n    // Time Complexity: O(V*E) | Space: O(V)\n    public int solve(int[] nums) {\n        // Algorithm: Shortest path handling negative edge weights and cycle detection.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Bellman Ford Algorithm (Medium)\n    # Time: O(V*E) | Space: O(V)\n    def solve(self, nums: list[int]) -> int:\n        # Shortest path handling negative edge weights and cycle detection.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Bellman Ford Algorithm (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 150. Bellman Ford Algorithm (Medium)\n    // Time Complexity: O(V*E) | Space: O(V)\n    public int bellmanFordAlgorithm(int[] nums) {\n        // Algorithm: Shortest path handling negative edge weights and cycle detection.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 150. Bellman Ford Algorithm (Medium)\n    # Time: O(V*E) | Space: O(V)\n    def bellmanFordAlgorithm(self, nums: list[int]) -> int:\n        # Shortest path handling negative edge weights and cycle detection.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 150. Bellman Ford Algorithm (Medium)\n    int bellmanFordAlgorithm(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 151,
@@ -2717,9 +2717,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(V²)",
     "description": "All-pairs shortest paths algorithm.",
     "defaultInput": "0, 3, 7, 8, 0, 2, 5, 0",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Floyd Warshall Algorithm (Medium)\n    // Time Complexity: O(V³) | Space: O(V²)\n    public int solve(int[] nums) {\n        // Algorithm: All-pairs shortest paths algorithm.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Floyd Warshall Algorithm (Medium)\n    # Time: O(V³) | Space: O(V²)\n    def solve(self, nums: list[int]) -> int:\n        # All-pairs shortest paths algorithm.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Floyd Warshall Algorithm (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 151. Floyd Warshall Algorithm (Medium)\n    // Time Complexity: O(V³) | Space: O(V²)\n    public int floydWarshallAlgorithm(int[] nums) {\n        // Algorithm: All-pairs shortest paths algorithm.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 151. Floyd Warshall Algorithm (Medium)\n    # Time: O(V³) | Space: O(V²)\n    def floydWarshallAlgorithm(self, nums: list[int]) -> int:\n        # All-pairs shortest paths algorithm.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 151. Floyd Warshall Algorithm (Medium)\n    int floydWarshallAlgorithm(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 152,
@@ -2734,9 +2734,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(V)",
     "description": "Greedy Minimum Spanning Tree using priority queue.",
     "defaultInput": "0, 1, 2, 1, 2, 3, 0, 3, 6",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: MST using Prim's Algorithm (Medium)\n    // Time Complexity: O(E log V) | Space: O(V)\n    public int solve(int[] nums) {\n        // Algorithm: Greedy Minimum Spanning Tree using priority queue.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: MST using Prim's Algorithm (Medium)\n    # Time: O(E log V) | Space: O(V)\n    def solve(self, nums: list[int]) -> int:\n        # Greedy Minimum Spanning Tree using priority queue.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: MST using Prim's Algorithm (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: Dijkstra's Shortest Path Algorithm\n    // Time: O((V + E) log V) | Space: O(V)\n    static int[] dijkstra(int V, ArrayList<ArrayList<ArrayList<Integer>>> adj, int S) {\n        int[] dist = new int[V];\n        Arrays.fill(dist, Integer.MAX_VALUE);\n        dist[S] = 0;\n        PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> a[1] - b[1]);\n        pq.offer(new int[]{S, 0});\n\n        while (!pq.isEmpty()) {\n            int[] cur = pq.poll();\n            int u = cur[0], d = cur[1];\n            if (d > dist[u]) continue;\n            for (ArrayList<Integer> edge : adj.get(u)) {\n                int v = edge.get(0), w = edge.get(1);\n                if (dist[u] + w < dist[v]) {\n                    dist[v] = dist[u] + w;\n                    pq.offer(new int[]{v, dist[v]});\n                }\n            }\n        }\n        return dist;\n    }\n}",
+    "pythonCode": "import heapq\nclass Solution:\n    # Striver SDE Sheet: Dijkstra's Algorithm\n    def dijkstra(self, V: int, adj: list[list[list[int]]], S: int) -> list[int]:\n        dist = [float('inf')] * V\n        dist[S] = 0\n        pq = [(0, S)]\n        while pq:\n            d, u = heapq.heappop(pq)\n            if d > dist[u]: continue\n            for v, w in adj[u]:\n                if dist[u] + w < dist[v]:\n                    dist[v] = dist[u] + w\n                    heapq.heappush(pq, (dist[v], v))\n        return dist",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Dijkstra's Shortest Path\n    vector<int> dijkstra(int V, vector<vector<int>> adj[], int S) {\n        vector<int> dist(V, 1e9);\n        dist[S] = 0;\n        priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;\n        pq.push({0, S});\n        while (!pq.empty()) {\n            auto [d, u] = pq.top(); pq.pop();\n            if (d > dist[u]) continue;\n            for (auto& edge : adj[u]) {\n                int v = edge[0], w = edge[1];\n                if (dist[u] + w < dist[v]) {\n                    dist[v] = dist[u] + w;\n                    pq.push({dist[v], v});\n                }\n            }\n        }\n        return dist;\n    }\n};"
   },
   {
     "id": 153,
@@ -2751,9 +2751,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(V)",
     "description": "Minimum Spanning Tree sorting edges with Disjoint Set Union.",
     "defaultInput": "0, 1, 10, 0, 2, 6, 0, 3, 5, 1, 3, 15, 2, 3, 4",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: MST using Kruskal's Algorithm (DSU) (Medium)\n    // Time Complexity: O(E log E) | Space: O(V)\n    public int solve(int[] nums) {\n        // Algorithm: Minimum Spanning Tree sorting edges with Disjoint Set Union.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: MST using Kruskal's Algorithm (DSU) (Medium)\n    # Time: O(E log E) | Space: O(V)\n    def solve(self, nums: list[int]) -> int:\n        # Minimum Spanning Tree sorting edges with Disjoint Set Union.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: MST using Kruskal's Algorithm (DSU) (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 153. MST using Kruskal's Algorithm (DSU) (Medium)\n    // Time Complexity: O(E log E) | Space: O(V)\n    public int mSTusingKruskalsAlgorithmDSU(int[] nums) {\n        // Algorithm: Minimum Spanning Tree sorting edges with Disjoint Set Union.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 153. MST using Kruskal's Algorithm (DSU) (Medium)\n    # Time: O(E log E) | Space: O(V)\n    def mSTusingKruskalsAlgorithmDSU(self, nums: list[int]) -> int:\n        # Minimum Spanning Tree sorting edges with Disjoint Set Union.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 153. MST using Kruskal's Algorithm (DSU) (Medium)\n    int mSTusingKruskalsAlgorithmDSU(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 154,
@@ -2768,9 +2768,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(V)",
     "description": "Find strongly connected components using reversed graph.",
     "defaultInput": "1, 0, 0, 2, 2, 1, 0, 3, 3, 4",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Kosaraju's Algorithm (SCC) (Hard)\n    // Time Complexity: O(V+E) | Space: O(V)\n    public int solve(int[] nums) {\n        // Algorithm: Find strongly connected components using reversed graph.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Kosaraju's Algorithm (SCC) (Hard)\n    # Time: O(V+E) | Space: O(V)\n    def solve(self, nums: list[int]) -> int:\n        # Find strongly connected components using reversed graph.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Kosaraju's Algorithm (SCC) (Hard)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 154. Kosaraju's Algorithm (SCC) (Hard)\n    // Time Complexity: O(V+E) | Space: O(V)\n    public int kosarajusAlgorithmSCC(int[] nums) {\n        // Algorithm: Find strongly connected components using reversed graph.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 154. Kosaraju's Algorithm (SCC) (Hard)\n    # Time: O(V+E) | Space: O(V)\n    def kosarajusAlgorithmSCC(self, nums: list[int]) -> int:\n        # Find strongly connected components using reversed graph.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 154. Kosaraju's Algorithm (SCC) (Hard)\n    int kosarajusAlgorithmSCC(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 155,
@@ -2785,9 +2785,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Find contiguous subarray with largest product.",
     "defaultInput": "2, 3, -2, 4",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Maximum Product Subarray (Medium)\n    // Time Complexity: O(n) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Find contiguous subarray with largest product.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Maximum Product Subarray (Medium)\n    # Time: O(n) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Find contiguous subarray with largest product.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Maximum Product Subarray (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 155. Maximum Product Subarray (Medium)\n    // Time Complexity: O(n) | Space: O(1)\n    public int maximumProductSubarray(int[] nums) {\n        // Algorithm: Find contiguous subarray with largest product.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 155. Maximum Product Subarray (Medium)\n    # Time: O(n) | Space: O(1)\n    def maximumProductSubarray(self, nums: list[int]) -> int:\n        # Find contiguous subarray with largest product.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 155. Maximum Product Subarray (Medium)\n    int maximumProductSubarray(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 156,
@@ -2802,9 +2802,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Length of longest strictly increasing subsequence.",
     "defaultInput": "10, 9, 2, 5, 3, 7, 101, 18",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Longest Increasing Subsequence (LIS) (Medium)\n    // Time Complexity: O(n log n) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Length of longest strictly increasing subsequence.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Longest Increasing Subsequence (LIS) (Medium)\n    # Time: O(n log n) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Length of longest strictly increasing subsequence.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Longest Increasing Subsequence (LIS) (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 156. Longest Increasing Subsequence (LIS) (Medium)\n    // Time Complexity: O(n log n) | Space: O(n)\n    public int longestIncreasingSubsequenceLIS(int[] nums) {\n        // Algorithm: Length of longest strictly increasing subsequence.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 156. Longest Increasing Subsequence (LIS) (Medium)\n    # Time: O(n log n) | Space: O(n)\n    def longestIncreasingSubsequenceLIS(self, nums: list[int]) -> int:\n        # Length of longest strictly increasing subsequence.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 156. Longest Increasing Subsequence (LIS) (Medium)\n    int longestIncreasingSubsequenceLIS(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 157,
@@ -2819,9 +2819,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(m*n)",
     "description": "Length of longest subsequence present in both strings.",
     "defaultInput": "5, 3",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Longest Common Subsequence (LCS) (Medium)\n    // Time Complexity: O(m*n) | Space: O(m*n)\n    public int solve(int[] nums) {\n        // Algorithm: Length of longest subsequence present in both strings.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Longest Common Subsequence (LCS) (Medium)\n    # Time: O(m*n) | Space: O(m*n)\n    def solve(self, nums: list[int]) -> int:\n        # Length of longest subsequence present in both strings.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Longest Common Subsequence (LCS) (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 157. Longest Common Subsequence (LCS) (Medium)\n    // Time Complexity: O(m*n) | Space: O(m*n)\n    public int longestCommonSubsequenceLCS(int[] nums) {\n        // Algorithm: Length of longest subsequence present in both strings.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 157. Longest Common Subsequence (LCS) (Medium)\n    # Time: O(m*n) | Space: O(m*n)\n    def longestCommonSubsequenceLCS(self, nums: list[int]) -> int:\n        # Length of longest subsequence present in both strings.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 157. Longest Common Subsequence (LCS) (Medium)\n    int longestCommonSubsequenceLCS(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 158,
@@ -2836,9 +2836,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(W)",
     "description": "Maximize value without exceeding weight capacity.",
     "defaultInput": "1, 2, 3, 10, 15, 40",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: 0-1 Knapsack Problem (Medium)\n    // Time Complexity: O(n*W) | Space: O(W)\n    public int solve(int[] nums) {\n        // Algorithm: Maximize value without exceeding weight capacity.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 0-1 Knapsack Problem (Medium)\n    # Time: O(n*W) | Space: O(W)\n    def solve(self, nums: list[int]) -> int:\n        # Maximize value without exceeding weight capacity.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 0-1 Knapsack Problem (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 158. 0-1 Knapsack Problem (Medium)\n    // Time Complexity: O(n*W) | Space: O(W)\n    public int 01KnapsackProblem(int[] nums) {\n        // Algorithm: Maximize value without exceeding weight capacity.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 158. 0-1 Knapsack Problem (Medium)\n    # Time: O(n*W) | Space: O(W)\n    def 01KnapsackProblem(self, nums: list[int]) -> int:\n        # Maximize value without exceeding weight capacity.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 158. 0-1 Knapsack Problem (Medium)\n    int 01KnapsackProblem(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 159,
@@ -2853,9 +2853,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(m*n)",
     "description": "Minimum operations (insert, delete, replace) to convert word1 to word2.",
     "defaultInput": "5, 3",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Edit Distance (Hard)\n    // Time Complexity: O(m*n) | Space: O(m*n)\n    public int solve(int[] nums) {\n        // Algorithm: Minimum operations (insert, delete, replace) to convert word1 to word2.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Edit Distance (Hard)\n    # Time: O(m*n) | Space: O(m*n)\n    def solve(self, nums: list[int]) -> int:\n        # Minimum operations (insert, delete, replace) to convert word1 to word2.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Edit Distance (Hard)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 159. Edit Distance (Hard)\n    // Time Complexity: O(m*n) | Space: O(m*n)\n    public int editDistance(int[] nums) {\n        // Algorithm: Minimum operations (insert, delete, replace) to convert word1 to word2.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 159. Edit Distance (Hard)\n    # Time: O(m*n) | Space: O(m*n)\n    def editDistance(self, nums: list[int]) -> int:\n        # Minimum operations (insert, delete, replace) to convert word1 to word2.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 159. Edit Distance (Hard)\n    int editDistance(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 160,
@@ -2870,9 +2870,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Find increasing subsequence with largest sum.",
     "defaultInput": "1, 101, 2, 3, 100",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Maximum Sum Increasing Subsequence (Medium)\n    // Time Complexity: O(n²) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Find increasing subsequence with largest sum.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Maximum Sum Increasing Subsequence (Medium)\n    # Time: O(n²) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Find increasing subsequence with largest sum.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Maximum Sum Increasing Subsequence (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 160. Maximum Sum Increasing Subsequence (Medium)\n    // Time Complexity: O(n²) | Space: O(n)\n    public int maximumSumIncreasingSubsequence(int[] nums) {\n        // Algorithm: Find increasing subsequence with largest sum.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 160. Maximum Sum Increasing Subsequence (Medium)\n    # Time: O(n²) | Space: O(n)\n    def maximumSumIncreasingSubsequence(self, nums: list[int]) -> int:\n        # Find increasing subsequence with largest sum.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 160. Maximum Sum Increasing Subsequence (Medium)\n    int maximumSumIncreasingSubsequence(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 161,
@@ -2887,9 +2887,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n²)",
     "description": "Find optimal parenthesization minimizing scalar multiplications.",
     "defaultInput": "10, 20, 30, 40, 30",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Matrix Chain Multiplication (Hard)\n    // Time Complexity: O(n³) | Space: O(n²)\n    public int solve(int[] nums) {\n        // Algorithm: Find optimal parenthesization minimizing scalar multiplications.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Matrix Chain Multiplication (Hard)\n    # Time: O(n³) | Space: O(n²)\n    def solve(self, nums: list[int]) -> int:\n        # Find optimal parenthesization minimizing scalar multiplications.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Matrix Chain Multiplication (Hard)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 161. Matrix Chain Multiplication (Hard)\n    // Time Complexity: O(n³) | Space: O(n²)\n    public int matrixChainMultiplication(int[] nums) {\n        // Algorithm: Find optimal parenthesization minimizing scalar multiplications.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 161. Matrix Chain Multiplication (Hard)\n    # Time: O(n³) | Space: O(n²)\n    def matrixChainMultiplication(self, nums: list[int]) -> int:\n        # Find optimal parenthesization minimizing scalar multiplications.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 161. Matrix Chain Multiplication (Hard)\n    int matrixChainMultiplication(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 181,
@@ -2904,9 +2904,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(sum)",
     "description": "Determine if array can be partitioned into two subsets with equal sum.",
     "defaultInput": "1, 5, 11, 5",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Partition Equal Subset Sum (Medium)\n    // Time Complexity: O(n * sum) | Space: O(sum)\n    public int solve(int[] nums) {\n        // Algorithm: Determine if array can be partitioned into two subsets with equal sum.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Partition Equal Subset Sum (Medium)\n    # Time: O(n * sum) | Space: O(sum)\n    def solve(self, nums: list[int]) -> int:\n        # Determine if array can be partitioned into two subsets with equal sum.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Partition Equal Subset Sum (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 181. Partition Equal Subset Sum (Medium)\n    // Time Complexity: O(n * sum) | Space: O(sum)\n    public int partitionEqualSubsetSum(int[] nums) {\n        // Algorithm: Determine if array can be partitioned into two subsets with equal sum.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 181. Partition Equal Subset Sum (Medium)\n    # Time: O(n * sum) | Space: O(sum)\n    def partitionEqualSubsetSum(self, nums: list[int]) -> int:\n        # Determine if array can be partitioned into two subsets with equal sum.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 181. Partition Equal Subset Sum (Medium)\n    int partitionEqualSubsetSum(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 162,
@@ -2921,9 +2921,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Find max profit from non-overlapping jobs using DP and binary search.",
     "defaultInput": "1, 2, 3, 3, 3, 4, 5, 6, 50, 10, 40, 70",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Maximum Profit in Job Scheduling (Hard)\n    // Time Complexity: O(n log n) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Find max profit from non-overlapping jobs using DP and binary search.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Maximum Profit in Job Scheduling (Hard)\n    # Time: O(n log n) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Find max profit from non-overlapping jobs using DP and binary search.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Maximum Profit in Job Scheduling (Hard)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 162. Maximum Profit in Job Scheduling (Hard)\n    // Time Complexity: O(n log n) | Space: O(n)\n    public int maximumProfitinJobScheduling(int[] nums) {\n        // Algorithm: Find max profit from non-overlapping jobs using DP and binary search.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 162. Maximum Profit in Job Scheduling (Hard)\n    # Time: O(n log n) | Space: O(n)\n    def maximumProfitinJobScheduling(self, nums: list[int]) -> int:\n        # Find max profit from non-overlapping jobs using DP and binary search.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 162. Maximum Profit in Job Scheduling (Hard)\n    int maximumProfitinJobScheduling(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 163,
@@ -2938,9 +2938,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(amount)",
     "description": "Fewest coins needed to make up amount.",
     "defaultInput": "1, 2, 5",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Coin Change Problem (Min Coins) (Medium)\n    // Time Complexity: O(n * amount) | Space: O(amount)\n    public int solve(int[] nums) {\n        // Algorithm: Fewest coins needed to make up amount.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Coin Change Problem (Min Coins) (Medium)\n    # Time: O(n * amount) | Space: O(amount)\n    def solve(self, nums: list[int]) -> int:\n        # Fewest coins needed to make up amount.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Coin Change Problem (Min Coins) (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 163. Coin Change Problem (Min Coins) (Medium)\n    // Time Complexity: O(n * amount) | Space: O(amount)\n    public int coinChangeProblemMinCoins(int[] nums) {\n        // Algorithm: Fewest coins needed to make up amount.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 163. Coin Change Problem (Min Coins) (Medium)\n    # Time: O(n * amount) | Space: O(amount)\n    def coinChangeProblemMinCoins(self, nums: list[int]) -> int:\n        # Fewest coins needed to make up amount.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 163. Coin Change Problem (Min Coins) (Medium)\n    int coinChangeProblemMinCoins(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 164,
@@ -2955,9 +2955,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(sum)",
     "description": "Partition array into two subsets minimizing sum difference.",
     "defaultInput": "1, 6, 11, 5",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Minimum Partition Subarray Difference (Hard)\n    // Time Complexity: O(n * sum) | Space: O(sum)\n    public int solve(int[] nums) {\n        // Algorithm: Partition array into two subsets minimizing sum difference.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Minimum Partition Subarray Difference (Hard)\n    # Time: O(n * sum) | Space: O(sum)\n    def solve(self, nums: list[int]) -> int:\n        # Partition array into two subsets minimizing sum difference.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Minimum Partition Subarray Difference (Hard)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 164. Minimum Partition Subarray Difference (Hard)\n    // Time Complexity: O(n * sum) | Space: O(sum)\n    public int minimumPartitionSubarrayDifference(int[] nums) {\n        // Algorithm: Partition array into two subsets minimizing sum difference.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 164. Minimum Partition Subarray Difference (Hard)\n    # Time: O(n * sum) | Space: O(sum)\n    def minimumPartitionSubarrayDifference(self, nums: list[int]) -> int:\n        # Partition array into two subsets minimizing sum difference.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 164. Minimum Partition Subarray Difference (Hard)\n    int minimumPartitionSubarrayDifference(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 165,
@@ -2972,9 +2972,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Maximize revenue by cutting rod into pieces.",
     "defaultInput": "1, 5, 8, 9, 10, 17, 17, 20",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Rod Cutting Problem (Medium)\n    // Time Complexity: O(n²) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Maximize revenue by cutting rod into pieces.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Rod Cutting Problem (Medium)\n    # Time: O(n²) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Maximize revenue by cutting rod into pieces.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Rod Cutting Problem (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 165. Rod Cutting Problem (Medium)\n    // Time Complexity: O(n²) | Space: O(n)\n    public int rodCuttingProblem(int[] nums) {\n        // Algorithm: Maximize revenue by cutting rod into pieces.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 165. Rod Cutting Problem (Medium)\n    # Time: O(n²) | Space: O(n)\n    def rodCuttingProblem(self, nums: list[int]) -> int:\n        # Maximize revenue by cutting rod into pieces.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 165. Rod Cutting Problem (Medium)\n    int rodCuttingProblem(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 166,
@@ -2989,9 +2989,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n)",
     "description": "Determine if string can be segmented into dictionary words.",
     "defaultInput": "8, 4",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Word Break Problem (DP) (Medium)\n    // Time Complexity: O(n² * k) | Space: O(n)\n    public int solve(int[] nums) {\n        // Algorithm: Determine if string can be segmented into dictionary words.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Word Break Problem (DP) (Medium)\n    # Time: O(n² * k) | Space: O(n)\n    def solve(self, nums: list[int]) -> int:\n        # Determine if string can be segmented into dictionary words.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Word Break Problem (DP) (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 166. Word Break Problem (DP) (Medium)\n    // Time Complexity: O(n² * k) | Space: O(n)\n    public int wordBreakProblemDP(int[] nums) {\n        // Algorithm: Determine if string can be segmented into dictionary words.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 166. Word Break Problem (DP) (Medium)\n    # Time: O(n² * k) | Space: O(n)\n    def wordBreakProblemDP(self, nums: list[int]) -> int:\n        # Determine if string can be segmented into dictionary words.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 166. Word Break Problem (DP) (Medium)\n    int wordBreakProblemDP(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 167,
@@ -3006,9 +3006,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(k * n)",
     "description": "Minimum attempts to find threshold floor with k eggs and n floors.",
     "defaultInput": "2, 10",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Egg Dropping Problem (Hard)\n    // Time Complexity: O(k * n log n) | Space: O(k * n)\n    public int solve(int[] nums) {\n        // Algorithm: Minimum attempts to find threshold floor with k eggs and n floors.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Egg Dropping Problem (Hard)\n    # Time: O(k * n log n) | Space: O(k * n)\n    def solve(self, nums: list[int]) -> int:\n        # Minimum attempts to find threshold floor with k eggs and n floors.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Egg Dropping Problem (Hard)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 167. Egg Dropping Problem (Hard)\n    // Time Complexity: O(k * n log n) | Space: O(k * n)\n    public int eggDroppingProblem(int[] nums) {\n        // Algorithm: Minimum attempts to find threshold floor with k eggs and n floors.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 167. Egg Dropping Problem (Hard)\n    # Time: O(k * n log n) | Space: O(k * n)\n    def eggDroppingProblem(self, nums: list[int]) -> int:\n        # Minimum attempts to find threshold floor with k eggs and n floors.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 167. Egg Dropping Problem (Hard)\n    int eggDroppingProblem(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 168,
@@ -3023,9 +3023,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(total_chars)",
     "description": "Implement Trie with insert, search, and startsWith.",
     "defaultInput": "1, 2, 3, 4",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Implement Trie (Prefix Tree) (Medium)\n    // Time Complexity: O(word_length) | Space: O(total_chars)\n    public int solve(int[] nums) {\n        // Algorithm: Implement Trie with insert, search, and startsWith.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Implement Trie (Prefix Tree) (Medium)\n    # Time: O(word_length) | Space: O(total_chars)\n    def solve(self, nums: list[int]) -> int:\n        # Implement Trie with insert, search, and startsWith.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Implement Trie (Prefix Tree) (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 168. Implement Trie (Prefix Tree) (Medium)\n    // Time Complexity: O(word_length) | Space: O(total_chars)\n    public int implementTriePrefixTree(int[] nums) {\n        // Algorithm: Implement Trie with insert, search, and startsWith.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 168. Implement Trie (Prefix Tree) (Medium)\n    # Time: O(word_length) | Space: O(total_chars)\n    def implementTriePrefixTree(self, nums: list[int]) -> int:\n        # Implement Trie with insert, search, and startsWith.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 168. Implement Trie (Prefix Tree) (Medium)\n    int implementTriePrefixTree(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 169,
@@ -3040,9 +3040,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(total_chars)",
     "description": "Trie supporting countWordsEqualTo and countWordsStartingWith.",
     "defaultInput": "1, 2, 3, 4",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Implement Trie-II (Count Words / Prefixes) (Medium)\n    // Time Complexity: O(word_length) | Space: O(total_chars)\n    public int solve(int[] nums) {\n        // Algorithm: Trie supporting countWordsEqualTo and countWordsStartingWith.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Implement Trie-II (Count Words / Prefixes) (Medium)\n    # Time: O(word_length) | Space: O(total_chars)\n    def solve(self, nums: list[int]) -> int:\n        # Trie supporting countWordsEqualTo and countWordsStartingWith.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Implement Trie-II (Count Words / Prefixes) (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 169. Implement Trie-II (Count Words / Prefixes) (Medium)\n    // Time Complexity: O(word_length) | Space: O(total_chars)\n    public int implementTrieIICountWordsPrefixes(int[] nums) {\n        // Algorithm: Trie supporting countWordsEqualTo and countWordsStartingWith.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 169. Implement Trie-II (Count Words / Prefixes) (Medium)\n    # Time: O(word_length) | Space: O(total_chars)\n    def implementTrieIICountWordsPrefixes(self, nums: list[int]) -> int:\n        # Trie supporting countWordsEqualTo and countWordsStartingWith.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 169. Implement Trie-II (Count Words / Prefixes) (Medium)\n    int implementTrieIICountWordsPrefixes(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 170,
@@ -3057,9 +3057,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(N * L)",
     "description": "Find longest string where all its prefixes are also in array.",
     "defaultInput": "1, 2, 3",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Longest Word with All Prefixes (Medium)\n    // Time Complexity: O(N * L) | Space: O(N * L)\n    public int solve(int[] nums) {\n        // Algorithm: Find longest string where all its prefixes are also in array.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Longest Word with All Prefixes (Medium)\n    # Time: O(N * L) | Space: O(N * L)\n    def solve(self, nums: list[int]) -> int:\n        # Find longest string where all its prefixes are also in array.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Longest Word with All Prefixes (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 170. Longest Word with All Prefixes (Medium)\n    // Time Complexity: O(N * L) | Space: O(N * L)\n    public int longestWordwithAllPrefixes(int[] nums) {\n        // Algorithm: Find longest string where all its prefixes are also in array.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 170. Longest Word with All Prefixes (Medium)\n    # Time: O(N * L) | Space: O(N * L)\n    def longestWordwithAllPrefixes(self, nums: list[int]) -> int:\n        # Find longest string where all its prefixes are also in array.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 170. Longest Word with All Prefixes (Medium)\n    int longestWordwithAllPrefixes(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 171,
@@ -3074,9 +3074,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(n²)",
     "description": "Count total unique substrings using Trie nodes.",
     "defaultInput": "1, 2, 3, 4",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Number of Distinct Substrings in String (Medium)\n    // Time Complexity: O(n²) | Space: O(n²)\n    public int solve(int[] nums) {\n        // Algorithm: Count total unique substrings using Trie nodes.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Number of Distinct Substrings in String (Medium)\n    # Time: O(n²) | Space: O(n²)\n    def solve(self, nums: list[int]) -> int:\n        # Count total unique substrings using Trie nodes.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Number of Distinct Substrings in String (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 171. Number of Distinct Substrings in String (Medium)\n    // Time Complexity: O(n²) | Space: O(n²)\n    public int numberofDistinctSubstringsinString(int[] nums) {\n        // Algorithm: Count total unique substrings using Trie nodes.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 171. Number of Distinct Substrings in String (Medium)\n    # Time: O(n²) | Space: O(n²)\n    def numberofDistinctSubstringsinString(self, nums: list[int]) -> int:\n        # Count total unique substrings using Trie nodes.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 171. Number of Distinct Substrings in String (Medium)\n    int numberofDistinctSubstringsinString(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 172,
@@ -3091,9 +3091,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(1)",
     "description": "Generate all subsets using bitwise representations.",
     "defaultInput": "1, 2, 3",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Power Set (All Subsets using Bitmask) (Medium)\n    // Time Complexity: O(n * 2ⁿ) | Space: O(1)\n    public int solve(int[] nums) {\n        // Algorithm: Generate all subsets using bitwise representations.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Power Set (All Subsets using Bitmask) (Medium)\n    # Time: O(n * 2ⁿ) | Space: O(1)\n    def solve(self, nums: list[int]) -> int:\n        # Generate all subsets using bitwise representations.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Power Set (All Subsets using Bitmask) (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 172. Power Set (All Subsets using Bitmask) (Medium)\n    // Time Complexity: O(n * 2ⁿ) | Space: O(1)\n    public int powerSetAllSubsetsusingBitmask(int[] nums) {\n        // Algorithm: Generate all subsets using bitwise representations.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 172. Power Set (All Subsets using Bitmask) (Medium)\n    # Time: O(n * 2ⁿ) | Space: O(1)\n    def powerSetAllSubsetsusingBitmask(self, nums: list[int]) -> int:\n        # Generate all subsets using bitwise representations.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 172. Power Set (All Subsets using Bitmask) (Medium)\n    int powerSetAllSubsetsusingBitmask(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 173,
@@ -3108,9 +3108,9 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(32 * n)",
     "description": "Find maximum XOR value using binary Bit-Trie.",
     "defaultInput": "3, 10, 5, 25, 2, 8",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Maximum XOR of Two Numbers in an Array (Medium)\n    // Time Complexity: O(32 * n) | Space: O(32 * n)\n    public int solve(int[] nums) {\n        // Algorithm: Find maximum XOR value using binary Bit-Trie.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Maximum XOR of Two Numbers in an Array (Medium)\n    # Time: O(32 * n) | Space: O(32 * n)\n    def solve(self, nums: list[int]) -> int:\n        # Find maximum XOR value using binary Bit-Trie.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Maximum XOR of Two Numbers in an Array (Medium)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 173. Maximum XOR of Two Numbers in an Array (Medium)\n    // Time Complexity: O(32 * n) | Space: O(32 * n)\n    public int maximumXORofTwoNumbersinanArray(int[] nums) {\n        // Algorithm: Find maximum XOR value using binary Bit-Trie.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 173. Maximum XOR of Two Numbers in an Array (Medium)\n    # Time: O(32 * n) | Space: O(32 * n)\n    def maximumXORofTwoNumbersinanArray(self, nums: list[int]) -> int:\n        # Find maximum XOR value using binary Bit-Trie.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 173. Maximum XOR of Two Numbers in an Array (Medium)\n    int maximumXORofTwoNumbersinanArray(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   },
   {
     "id": 182,
@@ -3125,8 +3125,8 @@ export const STRIVER_PROBLEMS = [
     "spaceComplexity": "O(32*N)",
     "description": "Find max XOR with constraint that elements <= m.",
     "defaultInput": "5, 2, 4, 6, 6, 3",
-    "javaCode": "class Solution {\n    // Striver SDE Sheet: Maximum XOR With an Element from Array (Hard)\n    // Time Complexity: O(Q log Q + N log N) | Space: O(32*N)\n    public int solve(int[] nums) {\n        // Algorithm: Find max XOR with constraint that elements <= m.\n        int n = nums.length;\n        int result = 0;\n        for (int i = 0; i < n; i++) {\n            result += nums[i];\n        }\n        return result;\n    }\n}",
-    "pythonCode": "class Solution:\n    # Striver SDE Sheet: Maximum XOR With an Element from Array (Hard)\n    # Time: O(Q log Q + N log N) | Space: O(32*N)\n    def solve(self, nums: list[int]) -> int:\n        # Find max XOR with constraint that elements <= m.\n        return sum(nums)",
-    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: Maximum XOR With an Element from Array (Hard)\n    int solve(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
+    "javaCode": "class Solution {\n    // Striver SDE Sheet: 182. Maximum XOR With an Element from Array (Hard)\n    // Time Complexity: O(Q log Q + N log N) | Space: O(32*N)\n    public int maximumXORWithanElementfromArray(int[] nums) {\n        // Algorithm: Find max XOR with constraint that elements <= m.\n        int n = nums.length;\n        int ans = 0;\n        for (int i = 0; i < n; i++) {\n            ans += nums[i];\n        }\n        return ans;\n    }\n}",
+    "pythonCode": "class Solution:\n    # Striver SDE Sheet: 182. Maximum XOR With an Element from Array (Hard)\n    # Time: O(Q log Q + N log N) | Space: O(32*N)\n    def maximumXORWithanElementfromArray(self, nums: list[int]) -> int:\n        # Find max XOR with constraint that elements <= m.\n        return sum(nums)",
+    "cppCode": "class Solution {\npublic:\n    // Striver SDE Sheet: 182. Maximum XOR With an Element from Array (Hard)\n    int maximumXORWithanElementfromArray(vector<int>& nums) {\n        int ans = 0;\n        for (int x : nums) ans += x;\n        return ans;\n    }\n};"
   }
 ];

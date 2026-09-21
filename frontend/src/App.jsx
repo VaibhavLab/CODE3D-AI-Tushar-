@@ -66,7 +66,10 @@ function MainApp() {
           <Visualizer initialConcept={selectedConcept} />
         )}
         {activeTab === 'dsa' && (
-          <DsaHub onSelectConcept={handleLaunchConcept} />
+          <DsaHub initialTab="curriculum" onSelectConcept={handleLaunchConcept} />
+        )}
+        {activeTab === 'striver' && (
+          <DsaHub initialTab="striver" onSelectConcept={handleLaunchConcept} />
         )}
         {activeTab === 'quiz' && (
           <QuizArena />
