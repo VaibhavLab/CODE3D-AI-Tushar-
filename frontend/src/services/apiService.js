@@ -50,12 +50,12 @@ export async function fetchDsaConcepts() {
   }
 }
 
-export async function executeProgram(code, conceptId = null, language = 'java') {
+export async function executeProgram(code, conceptId = null, language = 'java', input = null) {
   try {
     const res = await smartFetch('/execute', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code, conceptId, language }),
+      body: JSON.stringify({ code, conceptId, language, input }),
     });
     if (!res.ok) throw new Error('Execution failed on backend');
     return await res.json();

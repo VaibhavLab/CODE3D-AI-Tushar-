@@ -22,8 +22,14 @@ public class MultiLanguageExecutionService {
             language = UniversalCodeAnalyzer.detectLanguage(code);
         }
 
-        // 1. Extract user-specified numbers/array values from any language
-        List<Integer> values = extractArrayValues(code, language);
+        // 1. Extract user-specified numbers/array values from input or code
+        List<Integer> values = new ArrayList<>();
+        if (request.getInput() != null && !request.getInput().isBlank()) {
+            values = extractArrayValues(request.getInput(), language);
+        }
+        if (values.isEmpty()) {
+            values = extractArrayValues(code, language);
+        }
         if (values.isEmpty()) {
             values = List.of(10, 20, 30, 40);
         }
@@ -326,7 +332,44 @@ public class MultiLanguageExecutionService {
             } catch (NumberFormatException ignored) {}
         }
 
-        // 4. Match individual numbers in the string
+        // 4. Intelligent LeetCode Function Signature Detection
+        String lower = code.toLowerCase();
+        boolean isLeetCodeOrFunction =
+            lower.contains("class solution") ||
+            lower.contains("public int") ||
+            lower.contains("public boolean") ||
+            lower.contains("public void") ||
+            lower.contains("public list") ||
+            lower.contains("def ") ||
+            lower.contains("vector<int>") ||
+            lower.contains("twosum") ||
+            lower.contains("maxprofit") ||
+            lower.contains("maxsubarray") ||
+            lower.contains("reverselist") ||
+            lower.contains("isvalid");
+
+        if (isLeetCodeOrFunction) {
+            if (lower.contains("twosum") || lower.contains("two_sum")) return List.of(2, 7, 11, 15);
+            if (lower.contains("maxprofit") || (lower.contains("buy") && lower.contains("sell"))) return List.of(7, 1, 5, 3, 6, 4);
+            if (lower.contains("maxsubarray") || lower.contains("kadane")) return List.of(-2, 1, -3, 4, -1, 2, 1, -5, 4);
+            if (lower.contains("search") || lower.contains("binary")) return List.of(-1, 0, 3, 5, 9, 12);
+            if (lower.contains("trap") || lower.contains("rain")) return List.of(0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1);
+            if (lower.contains("container") || lower.contains("mostwater")) return List.of(1, 8, 6, 2, 5, 4, 8, 3, 7);
+            if (lower.contains("sortcolors") || lower.contains("dutch")) return List.of(2, 0, 2, 1, 1, 0);
+            if (lower.contains("movezero") || lower.contains("move_zero")) return List.of(0, 1, 0, 3, 12);
+            if (lower.contains("containsduplicate") || lower.contains("duplicate")) return List.of(1, 2, 3, 1);
+            if (lower.contains("majority") || lower.contains("boyer")) return List.of(2, 2, 1, 1, 1, 2, 2);
+            if (lower.contains("removeduplicate")) return List.of(0, 0, 1, 1, 1, 2, 2, 3, 3, 4);
+            if (lower.contains("reverselist") || (lower.contains("reverse") && lower.contains("node"))) return List.of(1, 2, 3, 4, 5);
+            if (lower.contains("rotate") && lower.contains("image")) return List.of(1, 2, 3, 4, 5, 6, 7, 8, 9);
+            if (lower.contains("rotate")) return List.of(1, 2, 3, 4, 5, 6, 7);
+            if (lower.contains("climbstairs")) return List.of(1, 2, 3, 5, 8);
+            if (lower.contains("productexceptself")) return List.of(1, 2, 3, 4);
+
+            return List.of(15, 42, 8, 99, 23, 67);
+        }
+
+        // 5. Match individual numbers in the string
         Pattern numPat = Pattern.compile("-?\\b\\d+\\b");
         Matcher numMatcher = numPat.matcher(code);
         while (numMatcher.find() && list.size() < 12) {

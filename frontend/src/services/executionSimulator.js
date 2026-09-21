@@ -480,7 +480,46 @@ export function extractNumbersFromCode(code) {
     return loopVals;
   }
 
-  // 4. Otherwise match individual numbers in the string
+  // 4. Intelligent LeetCode Function Signature Detection
+  // When a user pastes a LeetCode method without an array literal, DO NOT pick up loop counters (i = 0, j = i + 1)!
+  const lowerCode = code.toLowerCase();
+  const isLeetCodeOrFunction =
+    lowerCode.includes('class solution') ||
+    lowerCode.includes('public int') ||
+    lowerCode.includes('public boolean') ||
+    lowerCode.includes('public void') ||
+    lowerCode.includes('public list') ||
+    lowerCode.includes('def ') ||
+    lowerCode.includes('vector<int>') ||
+    lowerCode.includes('twosum') ||
+    lowerCode.includes('maxprofit') ||
+    lowerCode.includes('maxsubarray') ||
+    lowerCode.includes('reverselist') ||
+    lowerCode.includes('isvalid');
+
+  if (isLeetCodeOrFunction) {
+    if (lowerCode.includes('twosum') || lowerCode.includes('two_sum')) return [2, 7, 11, 15];
+    if (lowerCode.includes('maxprofit') || (lowerCode.includes('buy') && lowerCode.includes('sell'))) return [7, 1, 5, 3, 6, 4];
+    if (lowerCode.includes('maxsubarray') || lowerCode.includes('kadane')) return [-2, 1, -3, 4, -1, 2, 1, -5, 4];
+    if (lowerCode.includes('search') || lowerCode.includes('binary')) return [-1, 0, 3, 5, 9, 12];
+    if (lowerCode.includes('trap') || lowerCode.includes('rain')) return [0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1];
+    if (lowerCode.includes('container') || lowerCode.includes('mostwater')) return [1, 8, 6, 2, 5, 4, 8, 3, 7];
+    if (lowerCode.includes('sortcolors') || lowerCode.includes('dutch')) return [2, 0, 2, 1, 1, 0];
+    if (lowerCode.includes('movezero') || lowerCode.includes('move_zero')) return [0, 1, 0, 3, 12];
+    if (lowerCode.includes('containsduplicate') || lowerCode.includes('duplicate')) return [1, 2, 3, 1];
+    if (lowerCode.includes('majority') || lowerCode.includes('boyer')) return [2, 2, 1, 1, 1, 2, 2];
+    if (lowerCode.includes('removeduplicate')) return [0, 0, 1, 1, 1, 2, 2, 3, 3, 4];
+    if (lowerCode.includes('reverselist') || (lowerCode.includes('reverse') && lowerCode.includes('node'))) return [1, 2, 3, 4, 5];
+    if (lowerCode.includes('rotate') && lowerCode.includes('image')) return [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    if (lowerCode.includes('rotate')) return [1, 2, 3, 4, 5, 6, 7];
+    if (lowerCode.includes('climbstairs')) return [1, 2, 3, 5, 8];
+    if (lowerCode.includes('productexceptself')) return [1, 2, 3, 4];
+
+    // Generic LeetCode array function fallback
+    return [15, 42, 8, 99, 23, 67];
+  }
+
+  // 5. Otherwise match individual numbers in the string
   const allNums = (code.match(/-?\b\d+\b/g) || [])
     .map((s) => parseInt(s, 10))
     .filter((n) => !isNaN(n) && Math.abs(n) < 10000);
@@ -823,6 +862,380 @@ export function generateDynamicLinkedListTrace(values = [10, 20, 30, 40], langua
       aiHint: `O(n) sequential pointer traversal.`
     });
   });
+
+  return steps;
+}
+
+/**
+ * LeetCode #206: Reverse Linked List Trace Generator
+ */
+export function generateDynamicReverseLinkedListTrace(values = [1, 2, 3, 4, 5], language = 'java') {
+  const nums = values.length >= 2 ? values : [1, 2, 3, 4, 5];
+  const steps = [];
+  let step = 1;
+
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 2,
+    eventType: 'LIST_INIT',
+    variables: { prev: 'null', curr: `Node(${nums[0]})` },
+    output: [],
+    dataStructureState: {
+      type: 'linked-list',
+      values: [...nums],
+      activeIndex: 0,
+      pointers: { CURR: 0 },
+      label: `Reversal Initialized: Head = ${nums[0]}`,
+      focusInfo: `prev = null, curr = Node(${nums[0]})`
+    },
+    explanation: `Initialized pointers for linked list reversal: prev = null, curr = head.`,
+    aiHint: 'Reversing references in-place requires O(n) time and O(1) auxiliary space.'
+  });
+
+  for (let i = 0; i < nums.length; i++) {
+    const nextIdx = i < nums.length - 1 ? i + 1 : null;
+
+    steps.push({
+      stepNumber: step++,
+      lineNumber: 4,
+      eventType: 'POINTER_REVERSE',
+      variables: {
+        prev: i > 0 ? nums[i - 1] : 'null',
+        curr: nums[i],
+        next: nextIdx !== null ? nums[nextIdx] : 'null'
+      },
+      output: [`Node(${nums[i]}).next reversed to ${i > 0 ? nums[i - 1] : 'null'}`],
+      dataStructureState: {
+        type: 'linked-list',
+        values: [...nums],
+        activeIndex: i,
+        pointers: {
+          PREV: i > 0 ? i - 1 : null,
+          CURR: i,
+          ...(nextIdx !== null ? { NEXT: nextIdx } : {})
+        },
+        label: `Reversing Pointer: Node(${nums[i]}) -> ${i > 0 ? nums[i - 1] : 'null'}`,
+        focusInfo: `curr.next = prev; prev advances to ${nums[i]}`
+      },
+      explanation: `Reversed pointer link: Node ${nums[i]}'s next pointer now points backward to ${i > 0 ? nums[i - 1] : 'null'}.`,
+      aiHint: 'Save next pointer before breaking reference!'
+    });
+  }
+
+  const reversed = [...nums].reverse();
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 8,
+    eventType: 'PROGRAM_END',
+    variables: { newHead: reversed[0], list: `[${reversed.join(' -> ')}]` },
+    output: [`Reversed List: ${reversed.join(' -> ')} -> null`],
+    dataStructureState: {
+      type: 'linked-list',
+      values: [...reversed],
+      activeIndex: 0,
+      pointers: { HEAD: 0 },
+      label: `Reversal Complete! New Head = ${reversed[0]}`,
+      focusInfo: `All ${reversed.length} node references reversed`
+    },
+    explanation: `Linked list reversal complete! New head is Node(${reversed[0]}). List is fully inverted.`,
+    aiHint: 'Time Complexity: O(n); Space Complexity: O(1).'
+  });
+
+  return steps;
+}
+
+/**
+ * LeetCode #283: Move Zeroes Trace Generator
+ */
+export function generateDynamicMoveZeroesTrace(values = [0, 1, 0, 3, 12], language = 'java') {
+  const arr = values.length >= 2 ? [...values] : [0, 1, 0, 3, 12];
+  const steps = [];
+  let step = 1;
+  let slow = 0;
+
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 2,
+    eventType: 'POINTER_INIT',
+    variables: { slow: 0, fast: 0, arr: `[${arr.join(', ')}]` },
+    output: [],
+    dataStructureState: {
+      type: 'array',
+      values: [...arr],
+      pointers: { SLOW: 0, FAST: 0 },
+      label: 'Move Zeroes Initialized',
+      focusInfo: 'slow points to next non-zero position; fast scans array'
+    },
+    explanation: 'Initialized slow and fast pointers at index 0 for in-place zero migration.',
+    aiHint: 'Two-pointer partitioning moves all zeros to back in a single pass O(n).'
+  });
+
+  for (let fast = 0; fast < arr.length; fast++) {
+    if (arr[fast] !== 0) {
+      if (slow !== fast) {
+        const tmp = arr[slow];
+        arr[slow] = arr[fast];
+        arr[fast] = tmp;
+
+        steps.push({
+          stepNumber: step++,
+          lineNumber: 5,
+          eventType: 'SWAP_ELEMENTS',
+          variables: { slow, fast, 'arr[slow]': arr[slow], 'arr[fast]': arr[fast] },
+          output: [`Swapped arr[${slow}] (${arr[slow]}) with zero at arr[${fast}] (${arr[fast]})`],
+          dataStructureState: {
+            type: 'array',
+            values: [...arr],
+            activeIndex: slow,
+            comparedIndices: [slow, fast],
+            pointers: { SLOW: slow, FAST: fast },
+            label: `Swapped: ${arr[slow]} with ${arr[fast]}`,
+            focusInfo: `Zero bubbled toward right`
+          },
+          explanation: `Non-zero value ${arr[slow]} placed at slow pointer index ${slow}.`,
+          aiHint: 'Zeroes naturally bubble to the right without losing order of non-zero elements.'
+        });
+      }
+      slow++;
+    }
+  }
+
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 8,
+    eventType: 'PROGRAM_END',
+    variables: { result: `[${arr.join(', ')}]`, slow },
+    output: [`Final Array: [${arr.join(', ')}]`],
+    dataStructureState: {
+      type: 'array',
+      values: [...arr],
+      label: `Zero Migration Complete: [${arr.join(', ')}]`,
+      focusInfo: `All zeroes placed at end while preserving order`
+    },
+    explanation: `Move Zeroes complete! Result: [${arr.join(', ')}].`,
+    aiHint: 'Time Complexity: O(n); Space Complexity: O(1) in-place.'
+  });
+
+  return steps;
+}
+
+/**
+ * LeetCode #75: Sort Colors (Dutch National Flag) Trace Generator
+ */
+export function generateDynamicSortColorsTrace(values = [2, 0, 2, 1, 1, 0], language = 'java') {
+  const arr = values.length >= 3 ? [...values] : [2, 0, 2, 1, 1, 0];
+  const steps = [];
+  let step = 1;
+  let low = 0, mid = 0, high = arr.length - 1;
+
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 2,
+    eventType: 'POINTER_INIT',
+    variables: { low, mid, high, arr: `[${arr.join(', ')}]` },
+    output: [],
+    dataStructureState: {
+      type: 'array',
+      values: [...arr],
+      pointers: { LOW: low, MID: mid, HIGH: high },
+      label: 'Dutch National Flag Initialized',
+      focusInfo: '0s to [0..low-1], 1s to [low..mid-1], 2s to [high+1..n-1]'
+    },
+    explanation: 'Initialized Dutch National Flag 3-way partition pointers: low=0, mid=0, high=n-1.',
+    aiHint: '3-way partition sorts 0s, 1s, and 2s in a single pass O(n).'
+  });
+
+  while (mid <= high) {
+    if (arr[mid] === 0) {
+      const tmp = arr[low]; arr[low] = arr[mid]; arr[mid] = tmp;
+      steps.push({
+        stepNumber: step++,
+        lineNumber: 5,
+        eventType: 'SWAP_ELEMENTS',
+        variables: { low, mid, 'arr[low]': arr[low], 'arr[mid]': arr[mid] },
+        output: [`Placed 0 at low index ${low}`],
+        dataStructureState: {
+          type: 'array',
+          values: [...arr],
+          comparedIndices: [low, mid],
+          pointers: { LOW: low, MID: mid, HIGH: high },
+          label: `Swapped 0 to Low: arr[${low}]=0`,
+          focusInfo: `Low increments to ${low + 1}`
+        },
+        explanation: `Found 0 at mid. Swapped arr[${low}] with arr[${mid}]. Incremented low and mid.`,
+        aiHint: '0 belongs in the left partition.'
+      });
+      low++; mid++;
+    } else if (arr[mid] === 1) {
+      mid++;
+    } else {
+      const tmp = arr[mid]; arr[mid] = arr[high]; arr[high] = tmp;
+      steps.push({
+        stepNumber: step++,
+        lineNumber: 9,
+        eventType: 'SWAP_ELEMENTS',
+        variables: { mid, high, 'arr[mid]': arr[mid], 'arr[high]': arr[high] },
+        output: [`Placed 2 at high index ${high}`],
+        dataStructureState: {
+          type: 'array',
+          values: [...arr],
+          comparedIndices: [mid, high],
+          pointers: { LOW: low, MID: mid, HIGH: high },
+          label: `Swapped 2 to High: arr[${high}]=2`,
+          focusInfo: `High decrements to ${high - 1}`
+        },
+        explanation: `Found 2 at mid. Swapped arr[${mid}] with arr[${high}]. Decremented high.`,
+        aiHint: '2 belongs in the right partition.'
+      });
+      high--;
+    }
+  }
+
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 13,
+    eventType: 'PROGRAM_END',
+    variables: { sorted: `[${arr.join(', ')}]` },
+    output: [`Sort Colors Complete: [${arr.join(', ')}]`],
+    dataStructureState: {
+      type: 'array',
+      values: [...arr],
+      label: `Colors Sorted: [${arr.join(', ')}]`,
+      focusInfo: 'Red (0), White (1), Blue (2) sorted in O(n)'
+    },
+    explanation: `Dutch National Flag complete! Array is sorted: [${arr.join(', ')}].`,
+    aiHint: 'Time Complexity: O(n) single pass; Space Complexity: O(1).'
+  });
+
+  return steps;
+}
+
+/**
+ * LeetCode #169: Majority Element (Boyer-Moore Voting) Trace Generator
+ */
+export function generateDynamicMajorityElementTrace(values = [2, 2, 1, 1, 1, 2, 2], language = 'java') {
+  const arr = values.length >= 2 ? [...values] : [2, 2, 1, 1, 1, 2, 2];
+  const steps = [];
+  let step = 1;
+  let candidate = arr[0], count = 0;
+
+  for (let i = 0; i < arr.length; i++) {
+    if (count === 0) {
+      candidate = arr[i];
+    }
+    count += (arr[i] === candidate) ? 1 : -1;
+
+    steps.push({
+      stepNumber: step++,
+      lineNumber: 4,
+      eventType: 'VOTE_UPDATE',
+      variables: { i, 'arr[i]': arr[i], candidate, count },
+      output: [`Step ${i + 1}: Element ${arr[i]} | Candidate = ${candidate}, Count = ${count}`],
+      dataStructureState: {
+        type: 'array',
+        values: [...arr],
+        activeIndex: i,
+        pointers: { i },
+        label: `Candidate: ${candidate} (Count = ${count})`,
+        focusInfo: `Boyer-Moore vote balance: ${count}`
+      },
+      explanation: `At index ${i} (${arr[i]}): Candidate is ${candidate} with vote count ${count}.`,
+      aiHint: 'Boyer-Moore cancels out non-majority elements in O(n) time and O(1) space.'
+    });
+  }
+
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 8,
+    eventType: 'TARGET_FOUND',
+    variables: { majorityElement: candidate },
+    output: [`Majority Element = ${candidate}`],
+    dataStructureState: {
+      type: 'array',
+      values: [...arr],
+      targetFound: true,
+      label: `MAJORITY ELEMENT: ${candidate}`,
+      focusInfo: `Element ${candidate} occurs > n/2 times`
+    },
+    explanation: `Boyer-Moore voting complete! Majority element is ${candidate}.`,
+    aiHint: 'Time Complexity: O(n); Space Complexity: O(1).'
+  });
+
+  return steps;
+}
+
+/**
+ * LeetCode #217: Contains Duplicate Trace Generator
+ */
+export function generateDynamicContainsDuplicateTrace(values = [1, 2, 3, 1], language = 'java') {
+  const arr = values.length >= 2 ? [...values] : [1, 2, 3, 1];
+  const steps = [];
+  let step = 1;
+  const set = new Set();
+  let duplicateFound = false;
+
+  for (let i = 0; i < arr.length; i++) {
+    const val = arr[i];
+    if (set.has(val)) {
+      duplicateFound = true;
+      steps.push({
+        stepNumber: step++,
+        lineNumber: 5,
+        eventType: 'TARGET_FOUND',
+        variables: { i, val, duplicate: true },
+        output: [`Duplicate found: ${val} at index ${i}`],
+        dataStructureState: {
+          type: 'array',
+          values: [...arr],
+          activeIndex: i,
+          targetFound: true,
+          laserBeaconIndex: i,
+          label: `DUPLICATE FOUND: ${val}`,
+          focusInfo: `Value ${val} previously inserted into Set`
+        },
+        explanation: `Duplicate detected! ${val} is already present in Hash Set.`,
+        aiHint: 'HashSet lookup confirms duplicate in O(1) time.'
+      });
+      break;
+    } else {
+      set.add(val);
+      steps.push({
+        stepNumber: step++,
+        lineNumber: 4,
+        eventType: 'SET_INSERT',
+        variables: { i, val, setSize: set.size },
+        output: [`Inserted ${val} into Set`],
+        dataStructureState: {
+          type: 'array',
+          values: [...arr],
+          activeIndex: i,
+          pointers: { i },
+          label: `Set: {${Array.from(set).join(', ')}}`,
+          focusInfo: `Unique element ${val} recorded`
+        },
+        explanation: `Element ${val} added to Hash Set. Set size is now ${set.size}.`,
+        aiHint: 'No duplicate yet. Moving forward.'
+      });
+    }
+  }
+
+  if (!duplicateFound) {
+    steps.push({
+      stepNumber: step++,
+      lineNumber: 8,
+      eventType: 'PROGRAM_END',
+      variables: { hasDuplicate: false },
+      output: ['All elements are distinct (No duplicates).'],
+      dataStructureState: {
+        type: 'array',
+        values: [...arr],
+        label: 'No Duplicates Found',
+        focusInfo: 'All elements in array are unique'
+      },
+      explanation: 'Array scan complete. All elements are distinct.',
+      aiHint: 'Time Complexity: O(n); Space Complexity: O(n).'
+    });
+  }
 
   return steps;
 }
@@ -3775,13 +4188,14 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code') {
  * Dynamically synthesizes an execution trace for ANY custom user code or program ID.
  * Parses user numbers, detects algorithms & data structures, and provides real 3D steps.
  */
-export function getExecutionTrace(code, language = 'java') {
+export function getExecutionTrace(code, language = 'java', customInput = null) {
   if (!code || typeof code !== 'string') {
     return ARRAY_LOOP_EXECUTION_TRACE;
   }
 
   const cleanCode = code.toLowerCase();
-  const values = extractNumbersFromCode(code);
+  const inputVals = customInput ? extractNumbersFromCode(customInput) : [];
+  const values = inputVals.length > 0 ? inputVals : extractNumbersFromCode(code);
 
   // 1. Trapping Rain Water
   const isTrappingWater = cleanCode.includes('trapping') ||
@@ -3948,52 +4362,77 @@ export function getExecutionTrace(code, language = 'java') {
     return generateDynamicDpTrace(dpVals, language);
   }
 
-  // 18. Linked List
+  // 18. LeetCode #206: Reverse Linked List
+  if (cleanCode.includes('reverselist') || (cleanCode.includes('reverse') && cleanCode.includes('node')) || (cleanCode.includes('prev') && cleanCode.includes('curr') && cleanCode.includes('next'))) {
+    return generateDynamicReverseLinkedListTrace(values, language);
+  }
+
+  // 19. General Linked List Traversal
   if (cleanCode.includes('node') || cleanCode.includes('head') || cleanCode.includes('next') || cleanCode.includes('linkedlist')) {
     return generateDynamicLinkedListTrace(values, language);
   }
 
-  // 19. Stack
+  // 20. LeetCode #283: Move Zeroes
+  if (cleanCode.includes('movezero') || cleanCode.includes('move_zero')) {
+    return generateDynamicMoveZeroesTrace(values, language);
+  }
+
+  // 21. LeetCode #75: Sort Colors (Dutch National Flag)
+  if (cleanCode.includes('sortcolors') || cleanCode.includes('sort_colors') || cleanCode.includes('dutch')) {
+    return generateDynamicSortColorsTrace(values, language);
+  }
+
+  // 22. LeetCode #169: Majority Element (Boyer-Moore)
+  if (cleanCode.includes('majorityelement') || cleanCode.includes('majority_element') || cleanCode.includes('majority') || cleanCode.includes('boyer')) {
+    return generateDynamicMajorityElementTrace(values, language);
+  }
+
+  // 23. LeetCode #217: Contains Duplicate
+  if (cleanCode.includes('containsduplicate') || cleanCode.includes('contains_duplicate')) {
+    return generateDynamicContainsDuplicateTrace(values, language);
+  }
+
+  // 24. Stack (LIFO)
   if (cleanCode.includes('stack') || (cleanCode.includes('push') && cleanCode.includes('pop'))) {
     return generateDynamicStackTrace(values, language);
   }
 
-  // 20. Queue / Deque
+  // 25. Queue / Deque
   if (cleanCode.includes('queue') || cleanCode.includes('deque') || cleanCode.includes('poll') || cleanCode.includes('enqueue')) {
     return generateDynamicQueueTrace(values, language);
   }
 
-  // 21. Tree / BST
+  // 26. Tree / BST
   if (cleanCode.includes('tree') || cleanCode.includes('root') || (cleanCode.includes('left') && cleanCode.includes('right'))) {
     return generateDynamicTreeTrace(values, language);
   }
 
-  // 22. 2D Matrix
+  // 27. 2D Matrix
   if (cleanCode.includes('[][]') || cleanCode.includes('matrix') || cleanCode.includes('grid') || (cleanCode.includes('row') && cleanCode.includes('col'))) {
     return generateDynamicMatrixTrace(values, language);
   }
 
-  // 23. Recursion / Call Stack
+  // 28. Recursion / Call Stack
   if (cleanCode.includes('factorial') || cleanCode.includes('fib') || cleanCode.includes('recur')) {
     return generateDynamicRecursionTrace(values, language);
   }
 
-  // 24. Graph BFS / DFS / Dijkstra
+  // 29. Graph BFS / DFS / Dijkstra
   if (cleanCode.includes('graph') || cleanCode.includes('dfs') || cleanCode.includes('bfs') || cleanCode.includes('dijkstra')) {
     return generateDynamicGraphTrace(values, language);
   }
 
-  // 25. Two-Pointer Reverse
+  // 30. Two-Pointer Reverse
   if (cleanCode.includes('reverse') || (cleanCode.includes('left') && cleanCode.includes('right')) || (cleanCode.includes('start') && cleanCode.includes('end'))) {
     return generateDynamicReverseTrace(values, language);
   }
 
-  // 26. Binary Search
-  if (cleanCode.includes('binary') || (cleanCode.includes('mid') && cleanCode.includes('high'))) {
+  // 31. Binary Search (LeetCode #704, #33, #35)
+  if (cleanCode.includes('binary') || cleanCode.includes('searchinsert') || (cleanCode.includes('mid') && (cleanCode.includes('high') || cleanCode.includes('right') || cleanCode.includes('r')))) {
     return generateDynamicBinarySearchTrace(values, language);
   }
 
-  // 27. Sorting
+  // 32. Sorting
   const isSort = cleanCode.includes('sort') ||
     cleanCode.includes('swap') ||
     (cleanCode.includes('>') && cleanCode.includes('temp')) ||

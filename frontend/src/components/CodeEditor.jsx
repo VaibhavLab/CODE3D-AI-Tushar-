@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import Editor from '@monaco-editor/react';
-import { Play, Pause, SkipBack, SkipForward, RotateCcw, FileCode, CheckCircle2, Code2, Sparkles } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, RotateCcw, FileCode, CheckCircle2, Code2, Sparkles, Trophy } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 
 const LANGUAGE_CONFIG = {
@@ -44,6 +44,7 @@ export default function CodeEditor({
   onChangeLanguage,
   onOpenCustomCode,
   onOpenCodeDoctor,
+  onOpenLeetCode,
   isPlaying,
   onPlay,
   onPause,
@@ -195,6 +196,22 @@ export default function CodeEditor({
         </div>
 
         <div className="flex items-center gap-1.5">
+          {/* LeetCode 1-300 Button */}
+          {onOpenLeetCode && (
+            <button
+              onClick={onOpenLeetCode}
+              className={`flex items-center gap-1 text-[11px] px-2 py-0.5 rounded border transition font-mono font-medium shadow-sm ${
+                isBright
+                  ? 'bg-amber-100 text-amber-800 border-amber-300 hover:bg-amber-200'
+                  : 'bg-gradient-to-r from-amber-500/20 to-orange-500/20 hover:from-amber-500/30 hover:to-orange-500/30 text-amber-300 border-amber-500/40'
+              }`}
+              title="Explore LeetCode 1 to 300 Questions in 3D"
+            >
+              <Trophy size={11} className="text-amber-400" />
+              <span>LeetCode 🏆</span>
+            </button>
+          )}
+
           {/* AI Code Doctor Button */}
           {onOpenCodeDoctor && (
             <button

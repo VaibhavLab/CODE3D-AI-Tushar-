@@ -9,6 +9,7 @@ import AiAssistantModal from '../components/AiAssistantModal';
 import QuizModal from '../components/QuizModal';
 import CustomCodeModal from '../components/CustomCodeModal';
 import CodeDoctorModal from '../components/CodeDoctorModal';
+import LeetCodeModal from '../components/LeetCodeModal';
 import { useExecutionTimeline } from '../hooks/useExecutionTimeline';
 import { getExecutionTrace, extractNumbersFromCode } from '../services/executionSimulator';
 import { DEFAULT_JAVA_CODE, SAMPLE_PROGRAMS, LANGUAGE_DEFAULTS, CURRICULUM_CATEGORIES } from '../utils/sampleCodes';
@@ -28,7 +29,8 @@ import {
   SlidersHorizontal,
   Eye,
   EyeOff,
-  Play
+  Play,
+  Trophy
 } from 'lucide-react';
 
 export default function Visualizer({ initialConcept }) {
@@ -63,6 +65,8 @@ export default function Visualizer({ initialConcept }) {
   const [isQuizOpen, setIsQuizOpen] = useState(false);
   const [isCustomCodeOpen, setIsCustomCodeOpen] = useState(false);
   const [isCodeDoctorOpen, setIsCodeDoctorOpen] = useState(false);
+  const [isLeetCodeOpen, setIsLeetCodeOpen] = useState(false);
+  const [activeLeetCodeProblem, setActiveLeetCodeProblem] = useState(null);
   const [mobileTab, setMobileTab] = useState('3d'); // '3d' | 'code' | 'state'
 
   const {
@@ -364,6 +368,56 @@ export default function Visualizer({ initialConcept }) {
     }
   };
 
+  // Handle user selecting a LeetCode question from modal
+  const handleSelectLeetCodeProblem = async (problem) => {
+    setActiveLeetCodeProblem(problem);
+    const sampleObj = {
+      id: `leetcode-${problem.leetcodeId || problem.id}`,
+      title: problem.title,
+      category: problem.category,
+      description: `LeetCode #${problem.leetcodeId || problem.id}: ${problem.title}`,
+      difficulty: problem.difficulty,
+      timeComplexity: problem.timeComplexity,
+      spaceComplexity: problem.spaceComplexity,
+      code: problem.code,
+    };
+    setSelectedSample(sampleObj);
+    setCode(problem.code);
+    setLastExecutedCode(problem.code);
+    if (problem.language) setLanguage(problem.language);
+    setTimeComplexity(problem.timeComplexity);
+    setSpaceComplexity(problem.spaceComplexity);
+
+    if (problem.defaultInput) {
+      setFormInputValues(problem.defaultInput);
+    }
+
+    let newSteps = null;
+    if (backendOnline) {
+      try {
+        const [execRes, astRes] = await Promise.all([
+          executeProgram(problem.code, `leetcode-${problem.leetcodeId || problem.id}`, problem.language || language, problem.defaultInput),
+          analyzeCode(problem.code, problem.language || language),
+        ]);
+        if (execRes?.steps?.length > 0) newSteps = execRes.steps;
+        if (astRes?.timeComplexity) setTimeComplexity(astRes.timeComplexity);
+        if (astRes?.spaceComplexity) setSpaceComplexity(astRes.spaceComplexity);
+      } catch (err) {
+        console.warn('Backend LeetCode execution failed, fallback to simulator:', err);
+      }
+    }
+
+    if (!newSteps || newSteps.length === 0) {
+      newSteps = getExecutionTrace(problem.code, problem.language || language, problem.defaultInput);
+    }
+
+    if (newSteps && newSteps.length > 0) {
+      setTrace(newSteps);
+      reset();
+      setTimeout(() => play(), 80);
+    }
+  };
+
   // Run user code dynamically against backend or simulator
   const handleRunCode = async () => {
     setLastExecutedCode(code);
@@ -377,8 +431,9 @@ export default function Visualizer({ initialConcept }) {
 
     if (backendOnline) {
       try {
+        const conceptId = activeLeetCodeProblem ? `leetcode-${activeLeetCodeProblem.leetcodeId || activeLeetCodeProblem.id}` : 'custom';
         const [execRes, astRes] = await Promise.all([
-          executeProgram(code, 'custom', language),
+          executeProgram(code, conceptId, language, formInputValues),
           analyzeCode(code, language),
         ]);
 
@@ -395,7 +450,7 @@ export default function Visualizer({ initialConcept }) {
     }
 
     if (!newSteps || newSteps.length === 0) {
-      newSteps = getExecutionTrace(code, language);
+      newSteps = getExecutionTrace(code, language, formInputValues);
     }
 
     if (newSteps && newSteps.length > 0) {
@@ -506,6 +561,20 @@ export default function Visualizer({ initialConcept }) {
           >
             <Code2 size={13} className={isBright ? 'text-cyan-700' : 'text-cyan-400'} />
             <span>Input Code ⚡</span>
+          </button>
+
+          {/* Prominent LeetCode 1-300 Hub Button */}
+          <button
+            onClick={() => setIsLeetCodeOpen(true)}
+            className={`flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-semibold transition shadow-sm shrink-0 border ${
+              isBright
+                ? 'bg-amber-100 text-amber-900 border-amber-300 hover:bg-amber-200'
+                : 'bg-gradient-to-r from-amber-500/20 to-orange-500/20 hover:from-amber-500/30 hover:to-orange-500/30 text-amber-300 border-amber-500/40 shadow-amber-500/10'
+            }`}
+            title="LeetCode 1–300 Hub: Explore & visualize 300 classic LeetCode DSA questions in 3D"
+          >
+            <Trophy size={13} className="text-amber-400" />
+            <span>LeetCode 1–300 🏆</span>
           </button>
         </div>
 
@@ -648,6 +717,7 @@ export default function Visualizer({ initialConcept }) {
               onChangeLanguage={handleLanguageChange}
               onOpenCustomCode={() => setIsCustomCodeOpen(true)}
               onOpenCodeDoctor={() => setIsCodeDoctorOpen(true)}
+              onOpenLeetCode={() => setIsLeetCodeOpen(true)}
               currentLineNumber={currentStep?.lineNumber || null}
               isPlaying={isPlaying}
               onPlay={handleRunCode}
@@ -680,6 +750,12 @@ export default function Visualizer({ initialConcept }) {
                 <Sparkles size={13} />
                 <span>Input Data:</span>
               </span>
+              {activeLeetCodeProblem && (
+                <span className="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                  <Trophy size={10} className="text-amber-400" />
+                  <span>#{activeLeetCodeProblem.leetcodeId || activeLeetCodeProblem.id}</span>
+                </span>
+              )}
               <input
                 type="text"
                 value={formInputValues}
@@ -834,6 +910,13 @@ export default function Visualizer({ initialConcept }) {
         isOpen={isCodeDoctorOpen}
         onClose={() => setIsCodeDoctorOpen(false)}
         onApplyCorrectedCode={handleApplyCorrectedCode}
+        currentLanguage={language}
+      />
+
+      <LeetCodeModal
+        isOpen={isLeetCodeOpen}
+        onClose={() => setIsLeetCodeOpen(false)}
+        onSelectProblem={handleSelectLeetCodeProblem}
         currentLanguage={language}
       />
     </div>
