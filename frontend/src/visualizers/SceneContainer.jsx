@@ -168,31 +168,40 @@ export default function SceneContainer({
           {/* Realistic Cyber Pedestal Stage */}
           <group position={[0, -0.04, 0]}>
             <mesh receiveShadow>
-              <cylinderGeometry args={[9.5, 10.2, 0.08, 64]} />
+              <cylinderGeometry args={[10.2, 10.8, 0.1, 64]} />
               <meshStandardMaterial
-                color={isBright ? '#e2e8f0' : '#0a101f'}
-                roughness={0.25}
-                metalness={0.75}
+                color={isBright ? '#e2e8f0' : '#080d1a'}
+                roughness={0.2}
+                metalness={0.85}
               />
             </mesh>
-            {/* Glowing Perimeter Ring */}
-            <mesh position={[0, 0.05, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-              <ringGeometry args={[9.4, 9.55, 64]} />
+            {/* Primary Glowing Perimeter Ring */}
+            <mesh position={[0, 0.06, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+              <ringGeometry args={[10.0, 10.18, 64]} />
               <meshBasicMaterial
                 color={isBright ? '#0284c7' : '#00f2fe'}
                 transparent
-                opacity={0.7}
+                opacity={0.85}
+              />
+            </mesh>
+            {/* Secondary Inner Cyan Pulsing Ring */}
+            <mesh position={[0, 0.061, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+              <ringGeometry args={[7.2, 7.28, 64]} />
+              <meshBasicMaterial
+                color={isBright ? '#6366f1' : '#38bdf8'}
+                transparent
+                opacity={0.4}
               />
             </mesh>
           </group>
 
           {/* Cinematic Ambient Particle Sparkles */}
           <Sparkles
-            count={50}
-            scale={16}
-            size={2.8}
-            speed={0.35}
-            opacity={isBright ? 0.35 : 0.65}
+            count={65}
+            scale={18}
+            size={3.2}
+            speed={0.4}
+            opacity={isBright ? 0.3 : 0.7}
             color={isBright ? '#0284c7' : '#38bdf8'}
           />
 

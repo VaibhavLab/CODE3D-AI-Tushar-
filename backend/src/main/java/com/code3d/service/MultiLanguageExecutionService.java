@@ -332,10 +332,11 @@ public class MultiLanguageExecutionService {
             } catch (NumberFormatException ignored) {}
         }
 
-        // 4. Intelligent LeetCode Function Signature Detection
+        // 4. Intelligent LeetCode & Striver Function Signature Detection
         String lower = code.toLowerCase();
         boolean isLeetCodeOrFunction =
             lower.contains("class solution") ||
+            lower.contains("striver") ||
             lower.contains("public int") ||
             lower.contains("public boolean") ||
             lower.contains("public void") ||
@@ -346,6 +347,9 @@ public class MultiLanguageExecutionService {
             lower.contains("maxprofit") ||
             lower.contains("maxsubarray") ||
             lower.contains("reverselist") ||
+            lower.contains("setzeroes") ||
+            lower.contains("nextpermutation") ||
+            lower.contains("pascal") ||
             lower.contains("isvalid");
 
         if (isLeetCodeOrFunction) {
@@ -361,6 +365,10 @@ public class MultiLanguageExecutionService {
             if (lower.contains("majority") || lower.contains("boyer")) return List.of(2, 2, 1, 1, 1, 2, 2);
             if (lower.contains("removeduplicate")) return List.of(0, 0, 1, 1, 1, 2, 2, 3, 3, 4);
             if (lower.contains("reverselist") || (lower.contains("reverse") && lower.contains("node"))) return List.of(1, 2, 3, 4, 5);
+            if (lower.contains("setzero") || lower.contains("zeroes")) return List.of(1, 1, 1, 1, 0, 1, 1, 1, 1);
+            if (lower.contains("pascal")) return List.of(1, 2, 3, 4, 5);
+            if (lower.contains("nextpermutation") || lower.contains("permutation")) return List.of(1, 2, 3, 6, 5, 4);
+            if (lower.contains("inversion")) return List.of(8, 4, 2, 1);
             if (lower.contains("rotate") && lower.contains("image")) return List.of(1, 2, 3, 4, 5, 6, 7, 8, 9);
             if (lower.contains("rotate")) return List.of(1, 2, 3, 4, 5, 6, 7);
             if (lower.contains("climbstairs")) return List.of(1, 2, 3, 5, 8);

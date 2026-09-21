@@ -180,10 +180,10 @@ function ArrayCell({
           <boxGeometry args={[1.45, baseHeight, 1.45]} />
           <meshStandardMaterial
             color={boxColor}
-            metalness={0.4}
-            roughness={0.25}
+            metalness={0.55}
+            roughness={0.18}
             emissive={emissiveColor}
-            emissiveIntensity={isTargetFound ? 1.4 : isActive ? 0.95 : isInWindow ? 0.5 : 0.2}
+            emissiveIntensity={isTargetFound ? 1.5 : isActive ? 1.1 : isInWindow ? 0.6 : 0.25}
           />
         </mesh>
 
@@ -293,28 +293,42 @@ function ArrayCell({
           </Float>
         )}
 
-        {/* Floating Multi-Pointer Tags above cell */}
+        {/* Floating Multi-Pointer Tags above cell with holographic vertical beam */}
         {pointerNames.length > 0 && !isTargetFound && (
-          <group position={[0, baseHeight / 2 + 0.7, 0]}>
-            <Float speed={4} rotationIntensity={0.1} floatIntensity={0.25}>
+          <group position={[0, baseHeight / 2 + 0.6, 0]}>
+            <mesh position={[0, -0.28, 0]}>
+              <cylinderGeometry args={[0.02, 0.02, 0.55, 8]} />
+              <meshBasicMaterial
+                color={POINTER_COLORS[pointerNames[0]] || '#38bdf8'}
+                transparent
+                opacity={0.8}
+              />
+            </mesh>
+            <Float speed={4} rotationIntensity={0.08} floatIntensity={0.2}>
               <mesh position={[0, 0, 0]} rotation={[Math.PI, 0, 0]}>
-                <coneGeometry args={[0.22, 0.45, 16]} />
+                <coneGeometry args={[0.24, 0.48, 16]} />
                 <meshStandardMaterial
                   color={POINTER_COLORS[pointerNames[0]] || '#38bdf8'}
                   emissive={POINTER_COLORS[pointerNames[0]] || '#0284c7'}
-                  emissiveIntensity={0.9}
+                  emissiveIntensity={1.2}
                 />
               </mesh>
-              <Text
-                position={[0, 0.55, 0]}
-                fontSize={0.24}
-                color={POINTER_COLORS[pointerNames[0]] || '#38bdf8'}
-                anchorX="center"
-                anchorY="bottom"
-                fontWeight="bold"
-              >
-                {pointerNames.join(', ')}
-              </Text>
+              <group position={[0, 0.55, 0]}>
+                <mesh position={[0, 0, -0.01]}>
+                  <planeGeometry args={[Math.max(0.85, pointerNames.join(', ').length * 0.16), 0.34]} />
+                  <meshBasicMaterial color="#0b0f19" transparent opacity={0.85} />
+                </mesh>
+                <Text
+                  position={[0, 0, 0]}
+                  fontSize={0.22}
+                  color={POINTER_COLORS[pointerNames[0]] || '#38bdf8'}
+                  anchorX="center"
+                  anchorY="middle"
+                  fontWeight="bold"
+                >
+                  {pointerNames.join(', ')}
+                </Text>
+              </group>
             </Float>
           </group>
         )}

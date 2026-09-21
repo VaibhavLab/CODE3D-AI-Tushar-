@@ -88,6 +88,16 @@ export default function MatrixVisualizer3D({ dataStructureState }) {
                   {String(val)}
                 </Text>
 
+                {/* Value on Front Face for 3D/Front camera angles */}
+                <Text
+                  position={[0, blockHeight / 2, 0.72]}
+                  fontSize={0.38}
+                  color="#ffffff"
+                  fontWeight="bold"
+                >
+                  {String(val)}
+                </Text>
+
                 {/* Coordinate label beneath */}
                 <Text
                   position={[0, 0.02, 0.85]}
