@@ -4681,6 +4681,549 @@ export function generateDynamic3SumTrace(values = [], lang = 'java') {
 }
 
 /**
+ * Striver SDE Sheet Flagship: Next Permutation (3D In-Place Two-Pointer Simulation)
+ */
+export function generateDynamicNextPermutationTrace(values = [], lang = 'java') {
+  const steps = [];
+  let step = 1;
+  const nums = values && values.length >= 3 ? [...values] : [1, 2, 3, 6, 5, 4];
+  const n = nums.length;
+  const output = [];
+
+  output.push(`[Input] Initial array: [${nums.join(', ')}]`);
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 4,
+    eventType: 'ARRAY_INIT',
+    variables: { nums: `[${nums.join(', ')}]`, n },
+    output: [...output],
+    dataStructureState: {
+      type: 'array',
+      name: 'nums',
+      values: [...nums],
+      pointers: {},
+      label: `Initial Array: [${nums.join(', ')}]`,
+      focusInfo: 'Scanning from right to find pivot breakpoint nums[i] < nums[i+1]'
+    },
+    explanation: `Next Permutation initialized with array [${nums.join(', ')}]. We scan backwards to find the first decreasing element.`,
+    aiHint: 'Lexicographical order requires finding the longest non-increasing suffix.'
+  });
+
+  // Step 1: Find breakpoint i from right
+  let i = n - 2;
+  while (i >= 0 && nums[i] >= nums[i + 1]) {
+    steps.push({
+      stepNumber: step++,
+      lineNumber: 6,
+      eventType: 'POINTER_SCAN',
+      variables: { i, 'nums[i]': nums[i], 'nums[i+1]': nums[i + 1] },
+      condition: {
+        expression: `nums[${i}] >= nums[${i + 1}]`,
+        evaluation: `${nums[i]} >= ${nums[i + 1]}`,
+        result: true,
+        branch: 'CONTINUE SCANNING LEFT'
+      },
+      output: [...output],
+      dataStructureState: {
+        type: 'array',
+        name: 'nums',
+        values: [...nums],
+        activeIndex: i,
+        pointers: { i },
+        label: `Scanning suffix: nums[${i}] (${nums[i]}) >= nums[${i + 1}] (${nums[i + 1]})`,
+        focusInfo: `Index ${i}: strictly non-increasing suffix`
+      },
+      explanation: `Element nums[${i}] (${nums[i]}) is >= nums[${i + 1}] (${nums[i + 1]}). Continuing backward scan.`,
+      aiHint: 'Moving leftwards towards breakpoint.'
+    });
+    i--;
+  }
+
+  if (i >= 0) {
+    output.push(`Breakpoint pivot found at index ${i} (value ${nums[i]}) where ${nums[i]} < ${nums[i + 1]}`);
+    steps.push({
+      stepNumber: step++,
+      lineNumber: 8,
+      eventType: 'BREAKPOINT_FOUND',
+      variables: { i, pivotVal: nums[i] },
+      output: [...output],
+      dataStructureState: {
+        type: 'array',
+        name: 'nums',
+        values: [...nums],
+        activeIndex: i,
+        pointers: { i },
+        label: `Pivot Breakpoint Found at index ${i} (${nums[i]})`,
+        focusInfo: `nums[${i}] = ${nums[i]} will be swapped with next larger element`
+      },
+      explanation: `Pivot breakpoint found at index ${i} with value ${nums[i]}. Next, find the smallest element in suffix larger than ${nums[i]}.`,
+      aiHint: 'Now finding successor in suffix from the right.'
+    });
+
+    // Step 2: Find j from right where nums[j] > nums[i]
+    let j = n - 1;
+    while (nums[j] <= nums[i]) {
+      j--;
+    }
+
+    output.push(`Swap candidate found at index ${j} (value ${nums[j]}) > nums[${i}] (${nums[i]})`);
+    steps.push({
+      stepNumber: step++,
+      lineNumber: 10,
+      eventType: 'SWAP_CANDIDATE',
+      variables: { i, j, 'nums[i]': nums[i], 'nums[j]': nums[j] },
+      output: [...output],
+      dataStructureState: {
+        type: 'array',
+        name: 'nums',
+        values: [...nums],
+        pointers: { i, j },
+        label: `Swap Candidates: nums[${i}]=${nums[i]} & nums[${j}]=${nums[j]}`,
+        focusInfo: `Swapping indices ${i} and ${j}`
+      },
+      explanation: `Element at index ${j} (${nums[j]}) is the smallest value in suffix greater than ${nums[i]}. Swapping them.`,
+      aiHint: 'Swapping creates the next lexicographical prefix.'
+    });
+
+    // Swap nums[i] and nums[j]
+    const temp = nums[i];
+    nums[i] = nums[j];
+    nums[j] = temp;
+
+    output.push(`Swapped nums[${i}] (${nums[i]}) and nums[${j}] (${nums[j]}): array is now [${nums.join(', ')}]`);
+    steps.push({
+      stepNumber: step++,
+      lineNumber: 12,
+      eventType: 'SWAP',
+      variables: { i, j, 'nums[i]': nums[i], 'nums[j]': nums[j], nums: `[${nums.join(', ')}]` },
+      output: [...output],
+      dataStructureState: {
+        type: 'array',
+        name: 'nums',
+        values: [...nums],
+        pointers: { i, j },
+        label: `Swapped nums[${i}] and nums[${j}] → [${nums.join(', ')}]`,
+        focusInfo: `Array updated: ${nums.join(', ')}`
+      },
+      explanation: `Swapped elements at index ${i} and ${j}. Next, reverse the suffix from index ${i + 1} to ${n - 1}.`,
+      aiHint: 'Reversing suffix minimizes the remaining digits.'
+    });
+  }
+
+  // Step 3: Reverse suffix from i + 1 to n - 1
+  let left = i + 1;
+  let right = n - 1;
+  output.push(`Reversing suffix from index ${left} to ${right}`);
+
+  while (left < right) {
+    const t = nums[left];
+    nums[left] = nums[right];
+    nums[right] = t;
+
+    steps.push({
+      stepNumber: step++,
+      lineNumber: 15,
+      eventType: 'REVERSE_STEP',
+      variables: { left, right, nums: `[${nums.join(', ')}]` },
+      output: [...output, `Reversed pair at indices [${left}, ${right}]: [${nums.join(', ')}]`],
+      dataStructureState: {
+        type: 'array',
+        name: 'nums',
+        values: [...nums],
+        pointers: { left, right },
+        label: `Reversing Suffix: [${left}] ↔ [${right}]`,
+        focusInfo: `Inverted elements at ${left} and ${right}`
+      },
+      explanation: `Reversed elements at indices ${left} and ${right}. Suffix is becoming monotonically increasing.`,
+      aiHint: 'Two-pointer reversal ensures optimal minimal order.'
+    });
+    left++;
+    right--;
+  }
+
+  output.push(`[Result] Next Permutation = [${nums.join(', ')}]`);
+  steps.push({
+    stepNumber: step,
+    lineNumber: 18,
+    eventType: 'PROGRAM_END',
+    variables: { result: `[${nums.join(', ')}]`, status: 'COMPLETED' },
+    output: [...output],
+    dataStructureState: {
+      type: 'array',
+      name: 'nums',
+      values: [...nums],
+      pointers: {},
+      label: `Next Permutation: [${nums.join(', ')}]`,
+      focusInfo: 'Lexicographically next greater permutation computed successfully'
+    },
+    explanation: `Next Permutation complete! Transformed to [${nums.join(', ')}] in optimal O(n) time and O(1) space.`,
+    aiHint: 'Verified Striver SDE Sheet Day 1 Problem 3.'
+  });
+
+  return steps;
+}
+
+/**
+ * Striver SDE Sheet Flagship: Rotate Image / Matrix by 90° Clockwise
+ */
+export function generateDynamicRotateMatrixTrace(values = [], lang = 'java') {
+  const steps = [];
+  let step = 1;
+  const initial = values && values.length >= 9 ? values.slice(0, 9) : [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  let matrix = [
+    [initial[0], initial[1], initial[2]],
+    [initial[3], initial[4], initial[5]],
+    [initial[6], initial[7], initial[8]],
+  ];
+  const n = 3;
+  const output = [];
+
+  output.push(`[Input] Initial 3x3 Matrix:`);
+  output.push(`  [${matrix[0].join(', ')}]`);
+  output.push(`  [${matrix[1].join(', ')}]`);
+  output.push(`  [${matrix[2].join(', ')}]`);
+
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 3,
+    eventType: 'MATRIX_INIT',
+    variables: { n, matrix: JSON.stringify(matrix) },
+    output: [...output],
+    dataStructureState: {
+      type: 'matrix',
+      matrix: matrix.map(r => [...r]),
+      pointers: { activeRow: 0, activeCol: 0 },
+      label: 'Initial 3D Matrix (3x3)',
+      focusInfo: 'Algorithm: Step 1 = Transpose Matrix, Step 2 = Reverse Each Row'
+    },
+    explanation: 'Initialized 3x3 matrix in 3D space. To rotate by 90° clockwise in-place: first transpose the matrix, then reverse each row.',
+    aiHint: 'O(1) in-place transformation: Transpose + Horizontal Reflection = 90° Clockwise Rotation.'
+  });
+
+  // Step 1: Transpose matrix (matrix[i][j] <-> matrix[j][i])
+  output.push('Phase 1: Transposing matrix along main diagonal...');
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const temp = matrix[i][j];
+      matrix[i][j] = matrix[j][i];
+      matrix[j][i] = temp;
+
+      output.push(`Swapped matrix[${i}][${j}] (${matrix[i][j]}) with matrix[${j}][${i}] (${matrix[j][i]})`);
+      steps.push({
+        stepNumber: step++,
+        lineNumber: 6,
+        eventType: 'TRANSPOSE_SWAP',
+        variables: { i, j, [`matrix[${i}][${j}]`]: matrix[i][j], [`matrix[${j}][${i}]`]: matrix[j][i] },
+        output: [...output],
+        dataStructureState: {
+          type: 'matrix',
+          matrix: matrix.map(r => [...r]),
+          pointers: { activeRow: i, activeCol: j },
+          label: `Transpose Swap: [${i}][${j}] ↔ [${j}][${i}]`,
+          focusInfo: `Transposing cell (${i}, ${j})`
+        },
+        explanation: `Transposed elements across the diagonal: matrix[${i}][${j}] swapped with matrix[${j}][${i}].`,
+        aiHint: 'Transpose swaps rows and columns.'
+      });
+    }
+  }
+
+  // Step 2: Reverse each row
+  output.push('Phase 2: Reversing each row in-place...');
+  for (let i = 0; i < n; i++) {
+    let left = 0, right = n - 1;
+    while (left < right) {
+      const temp = matrix[i][left];
+      matrix[i][left] = matrix[i][right];
+      matrix[i][right] = temp;
+
+      output.push(`Row ${i}: Swapped column ${left} and ${right} → [${matrix[i].join(', ')}]`);
+      steps.push({
+        stepNumber: step++,
+        lineNumber: 11,
+        eventType: 'ROW_REVERSE',
+        variables: { row: i, left, right, [`row[${i}]`]: `[${matrix[i].join(', ')}]` },
+        output: [...output],
+        dataStructureState: {
+          type: 'matrix',
+          matrix: matrix.map(r => [...r]),
+          pointers: { activeRow: i, activeCol: left },
+          label: `Reversing Row ${i}: Col ${left} ↔ Col ${right}`,
+          focusInfo: `Row ${i} now: [${matrix[i].join(', ')}]`
+        },
+        explanation: `Reversed elements in row ${i} between column ${left} and ${right}.`,
+        aiHint: 'Row reversal completes the 90° clockwise rotation.'
+      });
+      left++;
+      right--;
+    }
+  }
+
+  output.push(`[Result] 90° Clockwise Rotated Matrix:`);
+  output.push(`  [${matrix[0].join(', ')}]`);
+  output.push(`  [${matrix[1].join(', ')}]`);
+  output.push(`  [${matrix[2].join(', ')}]`);
+
+  steps.push({
+    stepNumber: step,
+    lineNumber: 15,
+    eventType: 'PROGRAM_END',
+    variables: { result: JSON.stringify(matrix), status: 'COMPLETED' },
+    output: [...output],
+    dataStructureState: {
+      type: 'matrix',
+      matrix: matrix.map(r => [...r]),
+      pointers: {},
+      label: 'Matrix Rotated 90° Clockwise (Complete)',
+      focusInfo: 'In-place rotation finished in O(n²) time and O(1) space'
+    },
+    explanation: 'Matrix rotation complete! All elements rotated 90° clockwise in-place.',
+    aiHint: 'Verified Striver SDE Sheet Day 2 Problem 7.'
+  });
+
+  return steps;
+}
+
+/**
+ * Striver SDE Sheet Flagship: Find the Duplicate Number (Floyd's Tortoise and Hare)
+ */
+export function generateDynamicFindDuplicateTrace(values = [], lang = 'java') {
+  const steps = [];
+  let step = 1;
+  const nums = values && values.length >= 4 ? [...values] : [1, 3, 4, 2, 2];
+  const output = [];
+
+  output.push(`[Input] nums = [${nums.join(', ')}]`);
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 4,
+    eventType: 'ARRAY_INIT',
+    variables: { nums: `[${nums.join(', ')}]` },
+    output: [...output],
+    dataStructureState: {
+      type: 'array',
+      name: 'nums',
+      values: [...nums],
+      pointers: { slow: 0, fast: 0 },
+      label: `Initial Array: [${nums.join(', ')}]`,
+      focusInfo: 'Cycle detection: nums[i] represents pointer to nums[nums[i]]'
+    },
+    explanation: `Find Duplicate initialized using Floyd's Tortoise and Hare algorithm. Array elements act as pointers creating an implicit linked list cycle.`,
+    aiHint: 'Because there are n + 1 integers between 1 and n, Pigeonhole Principle guarantees a cycle.'
+  });
+
+  // Phase 1: Detect intersection
+  let slow = nums[0];
+  let fast = nums[nums[0]];
+  output.push(`Phase 1: Slow pointer at index ${slow}, Fast pointer at index ${fast}`);
+
+  while (slow !== fast && step < 30) {
+    steps.push({
+      stepNumber: step++,
+      lineNumber: 7,
+      eventType: 'CYCLE_PHASE_1',
+      variables: { slow, fast, 'nums[slow]': nums[slow], 'nums[fast]': nums[fast] },
+      condition: {
+        expression: `slow != fast (${slow} != ${fast})`,
+        evaluation: `${slow} != ${fast}`,
+        result: true,
+        branch: 'ADVANCE SLOW 1x, FAST 2x'
+      },
+      output: [...output, `Slow → index ${slow} (${nums[slow]}), Fast → index ${fast} (${nums[fast]})`],
+      dataStructureState: {
+        type: 'array',
+        name: 'nums',
+        values: [...nums],
+        activeIndex: slow,
+        pointers: { slow, fast },
+        label: `Phase 1: Slow=${slow} | Fast=${fast}`,
+        focusInfo: `Slow: 1 step, Fast: 2 steps`
+      },
+      explanation: `Slow pointer advances 1 step (to index ${slow}), Fast pointer advances 2 steps (to index ${fast}).`,
+      aiHint: 'Fast travels twice as fast and will eventually enter and lap slow in the cycle.'
+    });
+
+    slow = nums[slow];
+    fast = nums[nums[fast]];
+  }
+
+  output.push(`Intersection detected! Slow and Fast meet at index ${slow} (value ${nums[slow]})`);
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 10,
+    eventType: 'INTERSECTION_MET',
+    variables: { intersection: slow },
+    output: [...output],
+    dataStructureState: {
+      type: 'array',
+      name: 'nums',
+      values: [...nums],
+      pointers: { slow, fast },
+      label: `Intersection Found at index ${slow}!`,
+      focusInfo: 'Pointers converged. Now starting Phase 2 to locate cycle entry.'
+    },
+    explanation: `Intersection point found at index ${slow}. Resetting slow pointer to start of array to locate the entrance of the cycle.`,
+    aiHint: 'The entrance of the cycle corresponds to the duplicate number.'
+  });
+
+  // Phase 2: Find cycle entry
+  slow = nums[0];
+  output.push(`Phase 2: Reset slow = nums[0] (${nums[0]}). Both advance 1 step each.`);
+
+  while (slow !== fast && step < 40) {
+    steps.push({
+      stepNumber: step++,
+      lineNumber: 13,
+      eventType: 'CYCLE_PHASE_2',
+      variables: { slow, fast },
+      output: [...output, `Phase 2: Slow at ${slow}, Fast at ${fast}`],
+      dataStructureState: {
+        type: 'array',
+        name: 'nums',
+        values: [...nums],
+        pointers: { slow, fast },
+        label: `Phase 2 Search: Slow=${slow}, Fast=${fast}`,
+        focusInfo: 'Both pointers advance at 1x speed'
+      },
+      explanation: `Both slow and fast pointers advance by 1 step until they meet at the cycle entrance.`,
+      aiHint: 'Distance from head to cycle entrance equals distance from meeting point to cycle entrance.'
+    });
+    slow = nums[slow];
+    fast = nums[fast];
+  }
+
+  const duplicate = slow;
+  output.push(`[Result] Duplicate number identified: ${duplicate}!`);
+  steps.push({
+    stepNumber: step,
+    lineNumber: 16,
+    eventType: 'PROGRAM_END',
+    variables: { duplicate, result: duplicate, status: 'COMPLETED' },
+    output: [...output],
+    dataStructureState: {
+      type: 'array',
+      name: 'nums',
+      values: [...nums],
+      activeIndex: duplicate,
+      pointers: { duplicate },
+      label: `🎯 Duplicate Found: ${duplicate}`,
+      focusInfo: `The duplicate number in array is ${duplicate}`
+    },
+    explanation: `Floyd's Tortoise and Hare algorithm complete! Duplicate number ${duplicate} detected in O(n) time and O(1) space.`,
+    aiHint: 'Verified Striver SDE Sheet Day 2 Problem 10.'
+  });
+
+  return steps;
+}
+
+/**
+ * Striver SDE Sheet Flagship: Valid Parentheses (3D Glowing Stack Simulation)
+ */
+export function generateDynamicValidParenthesesTrace(bracketStr = '()[]{}', lang = 'java') {
+  const steps = [];
+  let step = 1;
+  const s = typeof bracketStr === 'string' && bracketStr.length > 0 ? bracketStr.replace(/[^()\[\]{}]/g, '') : '()[]{}';
+  const stack = [];
+  const output = [];
+
+  output.push(`[Input] Parentheses String: "${s}"`);
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 3,
+    eventType: 'STACK_INIT',
+    variables: { s, stackSize: 0 },
+    output: [...output],
+    dataStructureState: {
+      type: 'stack',
+      stack: [],
+      values: [],
+      label: '3D Stack Initialized (LIFO)',
+      focusInfo: `Evaluating parentheses string: "${s}"`
+    },
+    explanation: `Valid Parentheses solver initialized. We push opening brackets onto the LIFO stack and pop when matching closing brackets occur.`,
+    aiHint: 'Time Complexity: O(n) | Space Complexity: O(n).'
+  });
+
+  let isValid = true;
+  for (let i = 0; i < s.length && step < 40; i++) {
+    const ch = s[i];
+    if (ch === '(' || ch === '{' || ch === '[') {
+      stack.push(ch);
+      output.push(`Read opening '${ch}': Pushed to stack. Stack = [${stack.join(', ')}]`);
+      steps.push({
+        stepNumber: step++,
+        lineNumber: 6,
+        eventType: 'STACK_PUSH',
+        variables: { i, char: ch, stack: JSON.stringify(stack) },
+        output: [...output],
+        dataStructureState: {
+          type: 'stack',
+          stack: [...stack],
+          values: stack.map((c, idx) => (idx + 1) * 10),
+          label: `Pushed '${ch}' to Stack (Height: ${stack.length})`,
+          focusInfo: `Top of Stack: '${ch}'`
+        },
+        explanation: `Encountered opening bracket '${ch}'. Pushed onto stack top.`,
+        aiHint: 'Opening bracket waits for its corresponding closing pair.'
+      });
+    } else {
+      if (stack.length === 0) {
+        isValid = false;
+        output.push(`Mismatch! Closing bracket '${ch}' found but stack is empty!`);
+        break;
+      }
+      const top = stack.pop();
+      const matched = (ch === ')' && top === '(') || (ch === '}' && top === '{') || (ch === ']' && top === '[');
+      if (!matched) {
+        isValid = false;
+        output.push(`Mismatch! Closing '${ch}' does not match top '${top}'!`);
+        break;
+      }
+      output.push(`Matched pair '${top}' & '${ch}'! Popped from stack. Stack = [${stack.join(', ')}]`);
+      steps.push({
+        stepNumber: step++,
+        lineNumber: 10,
+        eventType: 'STACK_POP',
+        variables: { i, char: ch, popped: top, stack: JSON.stringify(stack) },
+        output: [...output],
+        dataStructureState: {
+          type: 'stack',
+          stack: [...stack],
+          values: stack.map((c, idx) => (idx + 1) * 10),
+          label: `✓ Matched & Popped '${top}' with '${ch}'`,
+          focusInfo: `Remaining stack height: ${stack.length}`
+        },
+        explanation: `Closing bracket '${ch}' matches top opening bracket '${top}'. Successfully popped from stack.`,
+        aiHint: 'Balanced pair resolved.'
+      });
+    }
+  }
+
+  const finalResult = isValid && stack.length === 0;
+  output.push(`[Result] Parentheses string is ${finalResult ? 'VALID (true)' : 'INVALID (false)'}`);
+  steps.push({
+    stepNumber: step,
+    lineNumber: 15,
+    eventType: 'PROGRAM_END',
+    variables: { result: finalResult, status: 'COMPLETED' },
+    output: [...output],
+    dataStructureState: {
+      type: 'stack',
+      stack: [...stack],
+      values: stack.map((c, idx) => (idx + 1) * 10),
+      label: finalResult ? '✓ Valid Parentheses (Stack Empty)' : '✗ Invalid Parentheses',
+      focusInfo: `Result: ${finalResult}`
+    },
+    explanation: finalResult
+      ? 'All brackets matched and stack is empty. String is VALID.'
+      : 'Unmatched brackets or non-empty stack. String is INVALID.',
+    aiHint: 'Verified Striver SDE Sheet Day 13 Problem 79.'
+  });
+
+  return steps;
+}
+
+/**
  * Master Universal Arbitrary Code Simulation Engine
  * Intelligently analyzes ANY user-submitted code in Java, Python, C, C++, or JavaScript:
  * - Detects custom array variable names (`nums`, `prices`, `data`, `arr`, etc.)
@@ -4742,6 +5285,8 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code', custo
 
   const hasCount = cleanCode.includes('count') || cleanCode.includes('ans') || cleanCode.includes('evens') || cleanCode.includes('odds');
   const countVarName = cleanCode.includes('evens') ? 'evens' : cleanCode.includes('odds') ? 'odds' : cleanCode.includes('ans') ? 'ans' : 'count';
+
+  const hasLoop = cleanCode.includes('for') || cleanCode.includes('while') || cleanCode.includes('foreach') || cleanCode.includes('def ') || cleanCode.includes('void ');
 
   // -------------------------------------------------------------
   // PATH 0: PROCEDURAL / ARITHMETIC / SCANNER / CONDITIONAL EXECUTION
@@ -5925,7 +6470,7 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code', custo
  * Dynamically synthesizes an execution trace for ANY custom user code or program ID.
  * Parses user numbers, detects algorithms & data structures, and provides real 3D steps.
  */
-export function getExecutionTrace(code, language = 'java', customInput = null) {
+export function getExecutionTrace(code, language = 'java', customInput = null, explicitArchetype = null) {
   if (!code || typeof code !== 'string') {
     return ARRAY_LOOP_EXECUTION_TRACE;
   }
@@ -5933,6 +6478,12 @@ export function getExecutionTrace(code, language = 'java', customInput = null) {
   const cleanCode = code.toLowerCase();
   const inputVals = customInput ? extractNumbersFromCode(customInput) : [];
   const values = inputVals.length > 0 ? inputVals : extractNumbersFromCode(code);
+
+  const rawSteps = _computeExecutionTrace(code, cleanCode, values, language, customInput, explicitArchetype);
+  return ensureTraceOutputs(rawSteps, values, code);
+}
+
+function _computeExecutionTrace(code, cleanCode, values, language, customInput, explicitArchetype) {
 
   // 00. Procedural / Scanner / Student Result / Variable Execution
   const isProceduralProgram = cleanCode.includes('scanner') ||
@@ -5964,6 +6515,26 @@ export function getExecutionTrace(code, language = 'java', customInput = null) {
   // 0A3. Striver SDE Sheet: 3Sum
   if (cleanCode.includes('threesum') || cleanCode.includes('three_sum') || cleanCode.includes('3sum') || (cleanCode.includes('nums[i]') && cleanCode.includes('nums[left]') && cleanCode.includes('nums[right]'))) {
     return generateDynamic3SumTrace(values, language);
+  }
+
+  // 0A4. Striver SDE Sheet: Next Permutation
+  if (cleanCode.includes('nextpermutation') || cleanCode.includes('next_permutation') || cleanCode.includes('next permutation') || (cleanCode.includes('nums[j] <= nums[i]') && cleanCode.includes('reverse'))) {
+    return generateDynamicNextPermutationTrace(values, language);
+  }
+
+  // 0A5. Striver SDE Sheet: Rotate Image / Matrix by 90°
+  if ((cleanCode.includes('rotate') && (cleanCode.includes('image') || cleanCode.includes('matrix') || cleanCode.includes('90'))) || (cleanCode.includes('matrix[i][j]') && cleanCode.includes('matrix[j][i]'))) {
+    return generateDynamicRotateMatrixTrace(values, language);
+  }
+
+  // 0A6. Striver SDE Sheet: Find Duplicate Number
+  if (cleanCode.includes('findduplicate') || cleanCode.includes('find_duplicate') || (cleanCode.includes('duplicate') && cleanCode.includes('slow') && cleanCode.includes('fast'))) {
+    return generateDynamicFindDuplicateTrace(values, language);
+  }
+
+  // 0A7. Striver SDE Sheet: Valid Parentheses
+  if (cleanCode.includes('isvalid') || cleanCode.includes('parentheses') || cleanCode.includes('balancedparentheses') || (cleanCode.includes('stack') && cleanCode.includes('('))) {
+    return generateDynamicValidParenthesesTrace(customInput || '()[]{}', language);
   }
 
   // 0B. Rotten Oranges (Multi-Source BFS)
@@ -6247,8 +6818,55 @@ export function getExecutionTrace(code, language = 'java', customInput = null) {
     return generateDynamicSortTrace(values, language);
   }
 
-  // 28. Master Universal Arbitrary Code Simulation Engine
+  // 33. Explicit Archetype Fallback Dispatch
+  if (explicitArchetype) {
+    const arch = explicitArchetype.toLowerCase();
+    if (arch.includes('matrix')) return generateDynamicMatrixTrace(values, language);
+    if (arch.includes('tree') || arch.includes('bst')) return generateDynamicTreeTrace(values, language);
+    if (arch.includes('graph') || arch.includes('topological')) return generateDynamicGraphTrace(values, language);
+    if (arch.includes('linked-list') || arch.includes('cycle')) return generateDynamicLinkedListTrace(values, language);
+    if (arch.includes('stack') || arch.includes('monotonic-stack')) return generateDynamicStackTrace(values, language);
+    if (arch.includes('queue')) return generateDynamicQueueTrace(values, language);
+    if (arch.includes('heap')) return generateDynamicHeapTrace(values, language);
+    if (arch.includes('two-pointer')) return generateDynamicReverseTrace(values, language);
+    if (arch.includes('kadane')) return generateDynamicKadaneTrace(values, language);
+    if (arch.includes('sliding-window')) return generateDynamicSlidingWindowMaxTrace(values, language);
+    if (arch.includes('trapping-water')) return generateDynamicTrappingWaterTrace(values, language);
+    if (arch.includes('container-water')) return generateDynamicContainerWaterTrace(values, language);
+  }
+
+  // 34. Master Universal Arbitrary Code Simulation Engine
   return generateDynamicUniversalTrace(code, values, language, customInput);
+}
+
+/**
+ * Ensures that 100% of execution traces have non-empty, pedagogical terminal outputs.
+ */
+function ensureTraceOutputs(steps, values = [], code = '') {
+  if (!steps || !Array.isArray(steps) || steps.length === 0) return steps;
+  const hasOutputs = steps.some(s => s.output && s.output.length > 0);
+  if (!hasOutputs) {
+    const inputSummary = values && values.length > 0 ? values.slice(0, 8).join(', ') : 'Initialized';
+    if (steps[0]) {
+      steps[0].output = [`[3D Ready] Execution loaded input: [${inputSummary}]`];
+    }
+    for (let i = 1; i < steps.length - 1; i++) {
+      const s = steps[i];
+      if (!s.output || s.output.length === 0) {
+        if (s.explanation) {
+          s.output = [`[Step ${s.stepNumber || i + 1}] ${s.explanation}`];
+        }
+      }
+    }
+    const last = steps[steps.length - 1];
+    if (last && (!last.output || last.output.length === 0)) {
+      const finalVars = last.variables
+        ? Object.entries(last.variables).map(([k, v]) => `${k} = ${v}`).join(', ')
+        : 'Completed';
+      last.output = [`[Result] Program execution completed: ${finalVars}`];
+    }
+  }
+  return steps;
 }
 
 

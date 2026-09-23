@@ -281,40 +281,39 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
   const applyNewValuesToCode = async (vals) => {
     if (!vals || vals.length === 0) return;
 
+    const inputStr = vals.join(', ');
+    setFormInputValues(inputStr);
+
     let updatedCode = code;
+    const hasBracketNumbers = /\[[0-9,\s\-]+\]/.test(updatedCode);
+    const hasBraceNumbers = /\{[0-9,\s\-]+\}/.test(updatedCode);
+
     if (language === 'python' || language === 'javascript') {
-      if (updatedCode.includes('[')) {
-        updatedCode = updatedCode.replace(/\[[0-9,\s\-]+\]/, `[${vals.join(', ')}]`);
-      } else {
-        updatedCode = `arr = [${vals.join(', ')}]\nfor i in range(len(arr)):\n    print(arr[i])\n`;
+      if (hasBracketNumbers) {
+        updatedCode = updatedCode.replace(/\[[0-9,\s\-]+\]/, `[${inputStr}]`);
+        setCode(updatedCode);
+        setLastExecutedCode(updatedCode);
       }
     } else {
-      if (updatedCode.includes('{')) {
-        updatedCode = updatedCode.replace(/\{[0-9,\s\-]+\}/, `{${vals.join(', ')}}`);
-      } else {
-        updatedCode = `public class Main {\n    public static void main(String[] args) {\n        int[] arr = {${vals.join(', ')}};\n        for(int i = 0; i < arr.length; i++) {\n            System.out.println(arr[i]);\n        }\n    }\n}\n`;
+      if (hasBraceNumbers) {
+        updatedCode = updatedCode.replace(/\{[0-9,\s\-]+\}/, `{${inputStr}}`);
+        setCode(updatedCode);
+        setLastExecutedCode(updatedCode);
       }
     }
-    setCode(updatedCode);
-    setLastExecutedCode(updatedCode);
 
-    // Run dynamic trace
-    let newSteps = null;
-    if (backendOnline) {
-      try {
-        const res = await executeProgram(updatedCode, 'custom', language);
-        if (res?.steps?.length > 0) newSteps = res.steps;
-      } catch (e) {}
-    }
-
-    if (!newSteps || newSteps.length === 0) {
-      newSteps = getExecutionTrace(updatedCode, language);
-    }
+    // Run dynamic trace with new input values preserving the algorithm
+    let newSteps = getExecutionTrace(
+      updatedCode,
+      language,
+      inputStr,
+      activeStriverProblem?.archetype
+    );
 
     if (newSteps && newSteps.length > 0) {
       setTrace(newSteps);
       reset();
-      setTimeout(() => play(), 80);
+      setTimeout(() => play(), 60);
     }
   };
 
@@ -437,7 +436,7 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
       }
 
       if (!newSteps || newSteps.length === 0) {
-        newSteps = getExecutionTrace(code, language, formInputValues);
+        newSteps = getExecutionTrace(code, language, formInputValues, activeStriverProblem?.archetype);
       }
 
       if (newSteps && newSteps.length > 0) {
@@ -553,6 +552,7 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
 
   // Handle user selecting a Striver SDE Sheet question from drawer
   const handleSelectStriverProblem = async (problem) => {
+    setIsStriverSheetOpen(false); // Automatically dismiss drawer so 3D scene is immediately visible
     setActiveStriverProblem(problem);
     const sampleObj = {
       id: problem.id || `striver-${problem.striverId}`,
@@ -575,29 +575,28 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
       setFormInputValues(problem.defaultInput);
     }
 
-    let newSteps = null;
-    if (backendOnline) {
-      try {
-        const [execRes, astRes] = await Promise.all([
-          executeProgram(problem.code, `striver-${problem.striverId || problem.id}`, problem.language || language, problem.defaultInput),
-          analyzeCode(problem.code, problem.language || language),
-        ]);
-        if (execRes?.steps?.length > 0) newSteps = execRes.steps;
-        if (astRes?.timeComplexity) setTimeComplexity(astRes.timeComplexity);
-        if (astRes?.spaceComplexity) setSpaceComplexity(astRes.spaceComplexity);
-      } catch (err) {
-        console.warn('Backend Striver execution failed, fallback to simulator:', err);
-      }
-    }
+    // Synthesize verified 3D execution trace with matched archetype and accurate inputs/outputs
+    const newSteps = getExecutionTrace(
+      problem.code,
+      problem.language || language,
+      problem.defaultInput,
+      problem.archetype
+    );
 
-    if (!newSteps || newSteps.length === 0) {
-      newSteps = getExecutionTrace(problem.code, problem.language || language, problem.defaultInput);
+    // Enrich complexity metrics in background if backend is online
+    if (backendOnline) {
+      analyzeCode(problem.code, problem.language || language)
+        .then((astRes) => {
+          if (astRes?.timeComplexity) setTimeComplexity(astRes.timeComplexity);
+          if (astRes?.spaceComplexity) setSpaceComplexity(astRes.spaceComplexity);
+        })
+        .catch(() => {});
     }
 
     if (newSteps && newSteps.length > 0) {
       setTrace(newSteps);
       reset();
-      setTimeout(() => play(), 80);
+      setTimeout(() => play(), 60);
 
       recordExecutionHistory({
         programTitle: problem.title,

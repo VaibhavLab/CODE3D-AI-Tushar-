@@ -110,6 +110,9 @@ export default function StriverSheetDrawer({
       code: codeToUse,
       language: currentLanguage
     });
+    if (onToggle) {
+      onToggle();
+    }
   };
 
   const getDifficultyColor = (diff) => {
