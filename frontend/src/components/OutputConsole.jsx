@@ -7,7 +7,7 @@ export default function OutputConsole({ output = [], correctOutput = null, isAtE
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
-    const textToCopy = [...output, correctOutput ? `Correct Output: ${correctOutput}` : ''].filter(Boolean).join('\n');
+    const textToCopy = [...output, correctOutput ? `Simulation result: ${correctOutput}` : ''].filter(Boolean).join('\n');
     navigator.clipboard.writeText(textToCopy);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -28,11 +28,11 @@ export default function OutputConsole({ output = [], correctOutput = null, isAtE
         <div className="flex items-center gap-2">
           <Terminal size={13} className={isBright ? 'text-cyan-600' : 'text-cyan-400'} />
           <span className={`text-[11px] font-semibold tracking-wide uppercase ${isBright ? 'text-slate-800' : 'text-slate-300'}`}>
-            Standard Output Stream
+            Simulation output
           </span>
           {isAtEnd && (
             <span className="hidden sm:inline-flex items-center gap-1 text-[10px] px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-bold">
-              ✓ Process Finished (0)
+              ✓ Simulation finished
             </span>
           )}
         </div>
@@ -76,8 +76,8 @@ export default function OutputConsole({ output = [], correctOutput = null, isAtE
           ))
         )}
 
-        {/* Highlighted Verified Correct Output Banner */}
-        {correctOutput && (
+        {/* Highlighted Simulation result Banner */}
+        {isAtEnd && correctOutput && (
           <div className={`mt-2 p-2.5 rounded-lg border flex items-center justify-between gap-2 transition-all animate-fadeIn ${
             isAtEnd
               ? isBright
@@ -91,7 +91,7 @@ export default function OutputConsole({ output = [], correctOutput = null, isAtE
               <Trophy size={14} className={isAtEnd ? 'text-emerald-500' : 'text-cyan-400 animate-pulse'} />
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider block leading-none">
-                  {isAtEnd ? '🏆 Verified Correct Output' : '⚡ Current Result'}
+                  {isAtEnd ? '🏆 Simulation result' : '⚡ Current Result'}
                 </span>
                 <span className="text-xs font-bold font-mono mt-0.5 block">
                   {correctOutput}
@@ -103,7 +103,7 @@ export default function OutputConsole({ output = [], correctOutput = null, isAtE
                 ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border-emerald-500/30'
                 : 'bg-cyan-500/20 text-cyan-600 dark:text-cyan-300 border-cyan-500/30'
             }`}>
-              {isAtEnd ? 'VERIFIED ✓' : 'COMPUTING'}
+              {isAtEnd ? 'SIMULATED ✓' : 'COMPUTING'}
             </span>
           </div>
         )}

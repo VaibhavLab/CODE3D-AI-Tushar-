@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
+import AuthGate from './components/AuthGate';
+import { BACKEND_BASE_URL } from './services/apiService';
 import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
-import Visualizer from './pages/Visualizer';
-import DsaHub from './pages/DsaHub';
-import QuizArena from './pages/QuizArena';
-import HistoryPage from './pages/HistoryPage';
-import SettingsPage from './pages/SettingsPage';
+const Visualizer = lazy(() => import('./pages/Visualizer'));
+const DsaHub = lazy(() => import('./pages/DsaHub'));
+const QuizArena = lazy(() => import('./pages/QuizArena'));
+const HistoryPage = lazy(() => import('./pages/HistoryPage'));
+const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 import LoginModal from './components/LoginModal';
-import CodeDoctorModal from './components/CodeDoctorModal';
-import AuthGate from './components/AuthGate';
+const CodeDoctorModal = lazy(() => import('./components/CodeDoctorModal'));
+
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 
@@ -19,10 +21,7 @@ function MainApp() {
   const [selectedConcept, setSelectedConcept] = useState(null);
   const [isDoctorOpen, setIsDoctorOpen] = useState(false);
 
-  // If user is not logged in, enforce AuthGate so the site is NOT accessible
-  if (!user) {
-    return <AuthGate />;
-  }
+  if (BACKEND_BASE_URL && !user) return <AuthGate />;
 
   const handleLaunchConcept = (concept) => {
     setSelectedConcept(concept);
@@ -71,7 +70,8 @@ function MainApp() {
       />
 
       {/* Main View Container */}
-      <main className="flex-1 flex flex-col overflow-hidden pb-14 md:pb-0">
+      <main className="flex-1 min-h-0 flex flex-col overflow-auto">
+        <Suspense fallback={<div role="status" className="m-auto text-sm text-cyan-500">Loading workspace...</div>}>
         {activeTab === 'dashboard' && (
           <Dashboard onNavigate={(tab) => setActiveTab(tab)} />
         )}
@@ -93,80 +93,16 @@ function MainApp() {
         {activeTab === 'settings' && (
           <SettingsPage />
         )}
+        </Suspense>
       </main>
-
-      {/* Mobile Bottom Navigation Bar (Visible only on mobile devices) */}
-      <nav className={`md:hidden fixed bottom-0 left-0 right-0 h-14 backdrop-blur-xl border-t px-2 flex items-center justify-around z-40 select-none transition-colors ${
-        isBright
-          ? 'bg-white/95 border-slate-200 shadow-lg text-slate-700'
-          : 'bg-slate-950/95 border-slate-800/80 text-slate-400'
-      }`}>
-        <button
-          onClick={() => setActiveTab('dashboard')}
-          className={`flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-lg transition ${
-            activeTab === 'dashboard'
-              ? 'text-cyan-600 font-bold dark:text-cyan-400'
-              : isBright ? 'text-slate-500 hover:text-slate-900' : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          <span className="text-lg">🏠</span>
-          <span className="text-[9px] font-medium">Home</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('visualizer')}
-          className={`flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-lg transition ${
-            activeTab === 'visualizer'
-              ? 'text-cyan-600 font-bold dark:text-cyan-400'
-              : isBright ? 'text-slate-500 hover:text-slate-900' : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          <span className="text-lg">🧊</span>
-          <span className="text-[9px] font-medium">3D Code</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('dsa')}
-          className={`flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-lg transition ${
-            activeTab === 'dsa'
-              ? 'text-cyan-600 font-bold dark:text-cyan-400'
-              : isBright ? 'text-slate-500 hover:text-slate-900' : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          <span className="text-lg">📚</span>
-          <span className="text-[9px] font-medium">DSA Hub</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('quiz')}
-          className={`flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-lg transition ${
-            activeTab === 'quiz'
-              ? 'text-cyan-600 font-bold dark:text-cyan-400'
-              : isBright ? 'text-slate-500 hover:text-slate-900' : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          <span className="text-lg">🏆</span>
-          <span className="text-[9px] font-medium">Quiz</span>
-        </button>
-
-        <button
-          onClick={() => setIsDoctorOpen(true)}
-          className={`flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-lg transition ${
-            isBright ? 'text-amber-600 hover:text-amber-700' : 'text-amber-400 hover:text-amber-300'
-          }`}
-        >
-          <span className="text-lg">💡</span>
-          <span className="text-[9px] font-medium">Personal Problem</span>
-        </button>
-      </nav>
 
       {/* Global Modals */}
       <LoginModal />
-      <CodeDoctorModal
+      {isDoctorOpen && <Suspense fallback={null}><CodeDoctorModal
         isOpen={isDoctorOpen}
         onClose={() => setIsDoctorOpen(false)}
         onApplyCorrectedCode={handleApplyDoctorCode}
-      />
+      /></Suspense>}
     </div>
   );
 }

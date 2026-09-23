@@ -16,29 +16,13 @@ import { DEFAULT_JAVA_CODE, SAMPLE_PROGRAMS, LANGUAGE_DEFAULTS, CURRICULUM_CATEG
 import { STRIVER_PROBLEMS } from '../utils/striverCatalog';
 import { executeProgram, analyzeCode, checkBackendHealth, recordExecutionHistory } from '../services/apiService';
 import { useTheme } from '../context/ThemeContext';
-import {
-  Code2,
-  Sparkles,
-  HelpCircle,
-  Layers,
-  Cpu,
-  Server,
-  Check,
-  Lightbulb,
-  Stethoscope,
-  Maximize2,
-  Minimize2,
-  SlidersHorizontal,
-  Eye,
-  EyeOff,
-  Play,
-  Trophy,
-  BookOpen
-} from 'lucide-react';
+import { Code2, SlidersHorizontal } from 'lucide-react';
+
+const DEFAULT_SAMPLE = SAMPLE_PROGRAMS.find((sample) => sample.id === 'array-loop');
 
 export default function Visualizer({ initialConcept, initialOpenStriver = false }) {
   const { isBright } = useTheme();
-  const [selectedSample, setSelectedSample] = useState(initialConcept || SAMPLE_PROGRAMS[0]);
+  const [selectedSample, setSelectedSample] = useState(initialConcept || DEFAULT_SAMPLE);
   const [code, setCode] = useState(initialConcept?.code || DEFAULT_JAVA_CODE);
   const [lastExecutedCode, setLastExecutedCode] = useState(initialConcept?.code || DEFAULT_JAVA_CODE);
   const isCodeDirty = code !== lastExecutedCode;
@@ -51,8 +35,8 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
     return getExecutionTrace(initialConcept?.code || DEFAULT_JAVA_CODE, initialConcept?.language || 'java');
   });
   const [backendOnline, setBackendOnline] = useState(false);
-  const [timeComplexity, setTimeComplexity] = useState(initialConcept?.timeComplexity || SAMPLE_PROGRAMS[0].timeComplexity);
-  const [spaceComplexity, setSpaceComplexity] = useState(initialConcept?.spaceComplexity || SAMPLE_PROGRAMS[0].spaceComplexity);
+  const [timeComplexity, setTimeComplexity] = useState(initialConcept?.timeComplexity || DEFAULT_SAMPLE.timeComplexity);
+  const [spaceComplexity, setSpaceComplexity] = useState(initialConcept?.spaceComplexity || DEFAULT_SAMPLE.spaceComplexity);
 
   // View Layout Toggles requested by user:
   // 1. Program State panel visibility toggle
@@ -92,51 +76,6 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
     cumulativeOutput,
     finalCorrectOutput,
   } = useExecutionTimeline(trace);
-
-  // Dynamic Box Resizing State (Editor width % and Console height px)
-  const [editorWidthPercent, setEditorWidthPercent] = useState(35);
-  const [consoleHeightPx, setConsoleHeightPx] = useState(165);
-  const [isResizingEditor, setIsResizingEditor] = useState(false);
-  const [isResizingConsole, setIsResizingConsole] = useState(false);
-
-  // Handle dragging horizontal splitter between Code Editor and 3D Viewport
-  const startEditorResize = (e) => {
-    e.preventDefault();
-    setIsResizingEditor(true);
-    const onMouseMove = (moveEvent) => {
-      const containerWidth = window.innerWidth;
-      const newPercent = Math.min(65, Math.max(20, (moveEvent.clientX / containerWidth) * 100));
-      setEditorWidthPercent(Math.round(newPercent));
-    };
-    const onMouseUp = () => {
-      setIsResizingEditor(false);
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
-    };
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
-  };
-
-  // Handle dragging vertical splitter between 3D Canvas and Output Console
-  const startConsoleResize = (e) => {
-    e.preventDefault();
-    setIsResizingConsole(true);
-    const startY = moveEvent => moveEvent.clientY;
-    const initialHeight = consoleHeightPx;
-    const initialY = e.clientY;
-    const onMouseMove = (moveEvent) => {
-      const deltaY = initialY - moveEvent.clientY;
-      const newHeight = Math.min(380, Math.max(70, initialHeight + deltaY));
-      setConsoleHeightPx(Math.round(newHeight));
-    };
-    const onMouseUp = () => {
-      setIsResizingConsole(false);
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
-    };
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
-  };
 
   // Check backend health on mount
   useEffect(() => {
@@ -624,32 +563,20 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
   // Window-level Ctrl+Enter / Cmd+Enter listener to trigger instant 3D execution
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      if (!e.defaultPrevented && !isExecuting && (e.ctrlKey || e.metaKey) && e.key === 'Enter') {
         e.preventDefault();
         handleRunCode();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [code, language, backendOnline, isCodeDirty]);
+  }, [code, language, backendOnline, isCodeDirty, isExecuting]);
 
   return (
-    <div className={`flex-1 flex flex-col h-[calc(100vh-3.5rem)] overflow-hidden select-none transition-colors duration-200 ${
-      isBright ? 'bg-slate-100 text-slate-900' : 'bg-[#070b14] text-slate-100'
-    }`}>
-      {/* Visualizer Header Controls */}
-      <div className={`min-h-10 border-b px-3 py-1.5 flex items-center justify-between text-xs overflow-x-auto no-scrollbar gap-2 transition-colors ${
-        isBright
-          ? 'bg-white border-slate-200 text-slate-700 shadow-sm'
-          : 'bg-[#0b0f19] border-slate-800/80 text-slate-300'
-      }`}>
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-          <span className={`font-semibold flex items-center gap-1.5 ${isBright ? 'text-slate-800' : 'text-slate-200'}`}>
-            <Layers size={14} className={isBright ? 'text-cyan-600' : 'text-cyan-400'} />
-            <span className="hidden sm:inline">Concept:</span>
-          </span>
-
-          {/* Categorized Concept Dropdown grouped by Curriculum & Striver Sheet */}
+    <div className={`studio ${isBright ? 'studio-light' : ''}`}>
+      <header className="studio-toolbar">
+        <div className="studio-heading"><span className="studio-eyebrow">WORKSPACE</span><h1>Algorithm studio</h1></div>
+        <div className="studio-algorithm">
           <select
             value={selectedSample.id}
             onChange={(e) => {
@@ -681,11 +608,8 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
                 if (found) handleSelectProgram(found);
               }
             }}
-            className={`h-8 border rounded-lg px-2.5 text-xs font-medium focus:outline-none focus:border-cyan-500 cursor-pointer max-w-[160px] sm:max-w-none transition-colors ${
-              isBright
-                ? 'bg-white border-slate-300 text-slate-900 font-semibold'
-                : 'bg-slate-950 border-slate-700/80 text-cyan-300'
-            }`}
+            aria-label="Algorithm"
+            className="studio-select"
           >
             {(selectedSample.id === 'custom' || selectedSample.id === 'personal-problem') && (
               <option value={selectedSample.id}>
@@ -713,498 +637,52 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
               );
             })}
           </select>
-
-          {/* Prominent Personal Problem Button */}
-          <button
-            onClick={() => setIsCodeDoctorOpen(true)}
-            className={`h-8 flex items-center gap-1.5 px-3 rounded-lg text-xs font-semibold transition shadow-xs shrink-0 border cursor-pointer ${
-              isBright
-                ? 'bg-amber-100 text-amber-900 border-amber-300 hover:bg-amber-200'
-                : 'bg-gradient-to-r from-amber-500/15 to-orange-500/15 hover:from-amber-500/25 hover:to-orange-500/25 text-amber-300 border-amber-500/40'
-            }`}
-            title="Personal Problem: Solve custom DSA problems & auto-visualize in 3D"
-          >
-            <Lightbulb size={13} className={isBright ? 'text-amber-700' : 'text-amber-400'} />
-            <span>Personal Problem 💡</span>
-          </button>
-
-          {/* Prominent "Input Any Code" Button */}
-          <button
-            onClick={() => setIsCustomCodeOpen(true)}
-            className={`h-8 flex items-center gap-1.5 px-3 rounded-lg text-xs font-semibold transition shadow-xs shrink-0 border cursor-pointer ${
-              isBright
-                ? 'bg-cyan-100 text-cyan-900 border-cyan-300 hover:bg-cyan-200'
-                : 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 hover:from-cyan-500/30 hover:to-blue-500/30 text-cyan-300 border-cyan-500/40'
-            }`}
-            title="Input any code in JS, C, C++, Python, or Java to visualize in 3D"
-          >
-            <Code2 size={13} className={isBright ? 'text-cyan-700' : 'text-cyan-400'} />
-            <span>Input Code ⚡</span>
-          </button>
-
-          {/* Striver SDE Sheet Toggle Button */}
-          <button
-            onClick={() => setIsStriverSheetOpen((prev) => !prev)}
-            className={`h-8 flex items-center gap-1.5 px-3 rounded-lg text-xs font-semibold transition shadow-xs shrink-0 border cursor-pointer ${
-              isStriverSheetOpen
-                ? 'bg-amber-500 text-slate-950 border-amber-400 font-bold shadow-amber-500/20'
-                : isBright
-                  ? 'bg-amber-50 text-amber-900 border-amber-300 hover:bg-amber-100'
-                  : 'bg-gradient-to-r from-amber-500/20 to-orange-500/20 hover:from-amber-500/30 hover:to-orange-500/30 text-amber-300 border-amber-500/40 shadow-amber-500/10'
-            }`}
-            title="Toggle Striver SDE Sheet: 182 Core DSA Problems with 3D Visualization"
-          >
-            <BookOpen size={13} className={isStriverSheetOpen ? 'text-slate-950' : 'text-amber-400'} />
-            <span>Striver Sheet 📜</span>
-            <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/30 text-amber-200 font-mono">182</span>
-          </button>
         </div>
-
-        {/* Center: Complexity Badges & Backend status */}
-        <div className="hidden lg:flex items-center gap-2 text-[11px] font-mono shrink-0">
-          <div className={`h-8 flex items-center border rounded-lg px-2.5 ${
-            isBright ? 'bg-slate-50 border-slate-300 text-slate-700' : 'bg-slate-950/70 border-slate-800'
-          }`}>
-            Time: <strong className={`ml-1 ${isBright ? 'text-cyan-700 font-bold' : 'text-cyan-400 font-bold'}`}>{timeComplexity}</strong>
-          </div>
-          <div className={`h-8 flex items-center border rounded-lg px-2.5 ${
-            isBright ? 'bg-slate-50 border-slate-300 text-slate-700' : 'bg-slate-950/70 border-slate-800'
-          }`}>
-            Space: <strong className={`ml-1 ${isBright ? 'text-emerald-700 font-bold' : 'text-emerald-400 font-bold'}`}>{spaceComplexity}</strong>
-          </div>
-        </div>
-
-        {/* Right Controls: State Panel Toggle, Full 3D Theater Mode, AI Tutor & Quiz */}
-        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-          {/* Toggle Program State Panel Button */}
-          <button
-            onClick={() => setShowStatePanel((prev) => !prev)}
-            className={`h-8 flex items-center gap-1.5 px-3 rounded-lg text-xs font-semibold transition border shadow-xs cursor-pointer ${
-              showStatePanel
-                ? isBright
-                  ? 'bg-cyan-50 border-cyan-300 text-cyan-800'
-                  : 'bg-cyan-950/70 border-cyan-700/50 text-cyan-300'
-                : isBright
-                  ? 'bg-slate-100 border-slate-300 text-slate-500 hover:text-slate-800'
-                  : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
-            }`}
-            title={showStatePanel ? 'Hide Program State panel to expand 3D viewport' : 'Show Program State panel'}
-          >
-            {showStatePanel ? <Eye size={12} /> : <EyeOff size={12} />}
-            <span className="hidden sm:inline">State:</span>
-            <span>{showStatePanel ? 'ON' : 'OFF'}</span>
-          </button>
-
-          {/* Fullscreen 3D Theater Mode Toggle Button */}
-          <button
-            onClick={() => setIsFull3DView((prev) => !prev)}
-            className={`h-8 flex items-center gap-1.5 px-3 rounded-lg text-xs font-semibold transition border shadow-xs cursor-pointer ${
-              isFull3DView
-                ? 'bg-purple-600 border-purple-400 text-white shadow-md shadow-purple-600/30'
-                : isBright
-                  ? 'bg-purple-50 hover:bg-purple-100 border-purple-300 text-purple-800'
-                  : 'bg-purple-950/70 hover:bg-purple-900 border-purple-700/50 text-purple-300'
-            }`}
-            title={isFull3DView ? 'Exit Full 3D Theater mode and show Studio' : 'Full 3D Mode: Expand 3D canvas to 100% full screen'}
-          >
-            {isFull3DView ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
-            <span className="hidden sm:inline">{isFull3DView ? 'Exit 3D' : 'Full 3D'}</span>
-          </button>
-
-          <button
-            onClick={() => setIsAiOpen(true)}
-            className={`h-8 flex items-center gap-1.5 px-3 rounded-lg text-xs font-semibold transition border shadow-xs cursor-pointer ${
-              isBright
-                ? 'bg-cyan-50 hover:bg-cyan-100 border-cyan-300 text-cyan-800'
-                : 'bg-cyan-950/70 hover:bg-cyan-900 border-cyan-700/50 text-cyan-300'
-            }`}
-          >
-            <Sparkles size={13} className={isBright ? 'text-cyan-600' : 'text-cyan-400'} />
-            <span className="hidden sm:inline">AI Tutor</span>
-          </button>
-
-          <button
-            onClick={() => setIsQuizOpen(true)}
-            className={`h-8 flex items-center gap-1.5 px-3 rounded-lg text-xs font-semibold transition border shadow-xs cursor-pointer ${
-              isBright
-                ? 'bg-emerald-50 hover:bg-emerald-100 border-emerald-300 text-emerald-800'
-                : 'bg-emerald-950/70 hover:bg-emerald-900 border-emerald-700/50 text-emerald-300'
-            }`}
-          >
-            <HelpCircle size={13} className={isBright ? 'text-emerald-600' : 'text-emerald-400'} />
-            <span className="hidden sm:inline">Quiz</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile View Switcher (Visible only on mobile devices) */}
-      <div className={`md:hidden flex items-center border-b p-1 shrink-0 ${
-        isBright ? 'bg-white border-slate-200' : 'bg-slate-950 border-slate-800/80'
-      }`}>
-        <button
-          onClick={() => setMobileTab('3d')}
-          className={`flex-1 py-1.5 text-xs font-semibold rounded-md flex items-center justify-center gap-1.5 transition ${
-            mobileTab === '3d'
-              ? isBright
-                ? 'bg-cyan-100 text-cyan-800 border border-cyan-300 shadow-sm'
-                : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm'
-              : isBright ? 'text-slate-600 hover:text-slate-900' : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          <span>🧊 3D Scene</span>
-        </button>
-        <button
-          onClick={() => setMobileTab('code')}
-          className={`flex-1 py-1.5 text-xs font-semibold rounded-md flex items-center justify-center gap-1.5 transition ${
-            mobileTab === 'code'
-              ? isBright
-                ? 'bg-cyan-100 text-cyan-800 border border-cyan-300 shadow-sm'
-                : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm'
-              : isBright ? 'text-slate-600 hover:text-slate-900' : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          <span>💻 Code Editor</span>
-        </button>
-        <button
-          onClick={() => setMobileTab('state')}
-          className={`flex-1 py-1.5 text-xs font-semibold rounded-md flex items-center justify-center gap-1.5 transition ${
-            mobileTab === 'state'
-              ? isBright
-                ? 'bg-cyan-100 text-cyan-800 border border-cyan-300 shadow-sm'
-                : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm'
-              : isBright ? 'text-slate-600 hover:text-slate-900' : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          <span>📊 Variables</span>
-        </button>
-      </div>
-
-      {/* Execution Pipeline Warning / Error Alert */}
-      {executionError && (
-        <div className={`px-4 py-2 text-xs flex items-center justify-between border-b animate-fadeIn z-20 shrink-0 ${
-          isBright
-            ? 'bg-rose-50 text-rose-900 border-rose-200'
-            : 'bg-rose-950/40 text-rose-200 border-rose-800/60'
-        }`}>
-          <div className="flex items-center gap-2">
-            <span className="font-bold">⚠️ Notice:</span>
-            <span>{executionError}</span>
-          </div>
-          <button
-            onClick={() => setExecutionError(null)}
-            className={`px-2 py-0.5 rounded text-[11px] font-semibold border transition cursor-pointer ${
-              isBright
-                ? 'bg-white hover:bg-rose-100 border-rose-300 text-rose-800'
-                : 'bg-rose-900/60 hover:bg-rose-900 border-rose-700 text-rose-200'
-            }`}
-          >
-            Dismiss
-          </button>
-        </div>
-      )}
-
-      {/* Main Studio Workspace with Draggable Box Resizers */}
-      <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative select-none">
-        {/* Left Box: Monaco Code Editor */}
-        {!isFull3DView && (
-          <div
-            className={`${mobileTab === 'code' ? 'block w-full' : 'hidden'} md:block h-full overflow-hidden shrink-0 transition-all duration-75`}
-            style={{ width: isFull3DView ? 0 : `${editorWidthPercent}%` }}
-          >
-            <CodeEditor
-              code={code}
-              onChangeCode={setCode}
-              language={language}
-              onChangeLanguage={handleLanguageChange}
-              onOpenCustomCode={() => setIsCustomCodeOpen(true)}
-              onOpenCodeDoctor={() => setIsCodeDoctorOpen(true)}
-              onOpenPersonalProblem={() => setIsCodeDoctorOpen(true)}
-              onOpenStriverSheet={() => setIsStriverSheetOpen(true)}
-              onOpenLeetCode={() => setIsStriverSheetOpen(true)}
-              currentLineNumber={currentStep?.lineNumber || null}
-              isPlaying={isPlaying}
-              onPlay={handleRunCode}
-              onRunCode={handleRunCode}
-              onResetCode={handleResetCode}
-              isExecuting={isExecuting}
-              isCodeDirty={isCodeDirty}
-              onPause={pause}
-              onNext={nextStep}
-              onPrev={prevStep}
-              onReset={reset}
-              isAtStart={isAtStart}
-              isAtEnd={isAtEnd}
-            />
-          </div>
-        )}
-
-        {/* Draggable & Hover Resizing Divider Bar between Code Editor and 3D Visualizer */}
-        {!isFull3DView && (
-          <div
-            onMouseDown={startEditorResize}
-            className={`hidden md:flex flex-col items-center justify-center w-2 relative group cursor-col-resize z-20 transition-colors ${
-              isResizingEditor
-                ? 'bg-cyan-500 shadow-lg shadow-cyan-500/50'
-                : isBright
-                ? 'bg-slate-200 hover:bg-cyan-400'
-                : 'bg-slate-800/80 hover:bg-cyan-500/80'
-            }`}
-            title={`Drag to resize Code vs 3D Box (Current: ${editorWidthPercent}%)`}
-          >
-            {/* Hover Grab Handle Dots */}
-            <div className="w-1 h-8 rounded-full bg-slate-400/50 group-hover:bg-slate-900 group-hover:scale-y-125 transition-all"></div>
-
-            {/* Quick Preset Buttons on Hover */}
-            <div className="absolute top-2 left-3 hidden group-hover:flex items-center gap-1 backdrop-blur-md bg-slate-950/90 border border-slate-700 rounded-lg p-1 text-[10px] shadow-xl z-30 pointer-events-auto">
-              <span className="text-slate-400 font-mono px-1">Editor:</span>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setEditorWidthPercent(25);
-                }}
-                className="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-cyan-600 text-cyan-300 font-mono"
-              >
-                25%
-              </button>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setEditorWidthPercent(35);
-                }}
-                className="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-cyan-600 text-cyan-300 font-mono"
-              >
-                35%
-              </button>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setEditorWidthPercent(50);
-                }}
-                className="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-cyan-600 text-cyan-300 font-mono"
-              >
-                50%
-              </button>
+        <div className="studio-actions">
+          <button className="studio-button" onClick={() => setIsCustomCodeOpen(true)}><Code2 size={15} /> Import code</button>
+          <details className="studio-tools">
+            <summary className="studio-button">Tools <SlidersHorizontal size={14} /></summary>
+            <div className="studio-menu" onClick={(event) => { if (event.target.closest('button')) event.currentTarget.parentElement.open = false; }}>
+              <button onClick={() => setIsStriverSheetOpen(true)}>Problem library</button>
+              <button onClick={() => setIsCodeDoctorOpen(true)}>Code assistant</button>
+              <button onClick={() => setIsAiOpen(true)}>Explain this step</button>
+              <button onClick={() => setIsQuizOpen(true)}>Practice quiz</button>
+              <button onClick={handleResetCode}>Restore example code</button>
+              <button onClick={() => setShowStatePanel(value => !value)}>{showStatePanel ? 'Hide' : 'Show'} state panel</button>
             </div>
-          </div>
-        )}
-
-        {/* Center Box: 3D Visualization + Console + User Input Bar */}
-        <div className={`
-          ${mobileTab === '3d' ? 'flex' : 'hidden'} 
-          md:flex flex-1 h-full flex-col overflow-hidden transition-all duration-75 border-r border-slate-800/80
-        `}>
-          {/* Direct Interactive Form User Input Bar */}
-          <div className={`px-3 py-1.5 border-b flex flex-wrap items-center justify-between gap-2 text-xs transition-colors shrink-0 ${
-            isBright ? 'bg-slate-50 border-slate-200 text-slate-800' : 'bg-[#0b0f19] border-slate-800 text-slate-200'
-          }`}>
-            <div className="flex items-center gap-2 flex-1 min-w-0">
-              <span className={`font-semibold text-[11px] shrink-0 flex items-center gap-1 ${
-                isBright ? 'text-cyan-700' : 'text-cyan-400'
-              }`}>
-                <Sparkles size={13} />
-                <span className="hidden sm:inline">Input Data:</span>
-              </span>
-              {activeStriverProblem && (
-                <span className="hidden md:inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/40 shrink-0">
-                  <BookOpen size={10} className="text-amber-400" />
-                  <span>#{activeStriverProblem.striverId || activeStriverProblem.id}</span>
-                </span>
-              )}
-              <input
-                type="text"
-                value={formInputValues}
-                onChange={(e) => setFormInputValues(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleApplyFormInput()}
-                placeholder="e.g. 15, 42, 8, 99, 23, 67"
-                className={`flex-1 min-w-0 px-2.5 py-0.5 rounded text-xs font-mono border focus:outline-none focus:ring-1 focus:ring-cyan-500 transition ${
-                  isBright
-                    ? 'bg-white border-slate-300 text-slate-900'
-                    : 'bg-slate-950 border-slate-700 text-cyan-300 placeholder:text-slate-600'
-                }`}
-              />
-              <button
-                onClick={handleApplyFormInput}
-                className={`px-2.5 py-0.5 rounded font-semibold text-xs transition shadow-sm shrink-0 cursor-pointer ${
-                  isBright
-                    ? 'bg-cyan-600 hover:bg-cyan-700 text-white shadow-cyan-600/20'
-                    : 'bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold shadow-cyan-500/20'
-                }`}
-                title="Apply these values directly into code and visualize in 3D"
-              >
-                Apply & Run ⚡
-              </button>
-            </div>
-
-            {/* Quick Data Presets */}
-            <div className="flex items-center gap-1 shrink-0 text-[11px]">
-              <span className="text-slate-500 hidden xl:inline">Presets:</span>
-              <button
-                onClick={() => handleApplyPresetValues([14, 52, 8, 91, 33, 47])}
-                className={`px-1.5 py-0.5 rounded transition ${
-                  isBright
-                    ? 'bg-slate-200 hover:bg-slate-300 text-slate-700'
-                    : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
-                }`}
-                title="Random custom numbers"
-              >
-                🎲 Random
-              </button>
-              <button
-                onClick={() => handleApplyPresetValues([5, 12, 19, 28, 35, 42])}
-                className={`px-1.5 py-0.5 rounded transition ${
-                  isBright
-                    ? 'bg-slate-200 hover:bg-slate-300 text-slate-700'
-                    : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
-                }`}
-                title="Sorted ascending numbers"
-              >
-                📈 Sorted
-              </button>
-              <button
-                onClick={() => handleApplyPresetValues([50, 40, 30, 20, 10])}
-                className={`px-1.5 py-0.5 rounded transition ${
-                  isBright
-                    ? 'bg-slate-200 hover:bg-slate-300 text-slate-700'
-                    : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
-                }`}
-                title="Reverse descending numbers"
-              >
-                📉 Reverse
-              </button>
-              <button
-                onClick={() => handleApplyPresetValues([1, 8, 6, 2, 5, 4, 8, 3, 7])}
-                className={`px-1.5 py-0.5 rounded transition ${
-                  isBright
-                    ? 'bg-slate-200 hover:bg-slate-300 text-slate-700'
-                    : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
-                }`}
-                title="Peaks and water walls"
-              >
-                🌊 Waves
-              </button>
-            </div>
-          </div>
-
-          {/* 3D Canvas Viewport Box */}
-          <div className="flex-1 relative min-h-[220px]">
-            <SceneContainer
-              currentStep={currentStep}
-              code={code}
-              statusLabel={currentStep?.dataStructureState?.label || null}
-              activeDetails={currentStep?.dataStructureState?.focusInfo || null}
-              correctOutput={finalCorrectOutput}
-              isAtEnd={isAtEnd}
-              cumulativeOutput={cumulativeOutput}
-              isFull3DView={isFull3DView}
-              onToggleFull3D={() => setIsFull3DView((prev) => !prev)}
-            >
-              <DsaSceneDispatcher
-                dataStructureState={currentStep?.dataStructureState}
-              />
+          </details>
+        </div>
+      </header>
+      <div className="studio-meta"><span>Learning simulation <span className="studio-meta-note">/ Pattern-based, not compiled execution</span></span><span>Time <b>{timeComplexity}</b> <span className="studio-meta-space">Space <b>{spaceComplexity}</b></span></span></div>
+      {!isFull3DView && <nav className="studio-tabs" aria-label="Workspace panels">
+        {[['code', 'Code'], ['3d', 'Scene'], ['state', 'State']].map(([id, label]) => <button key={id} aria-pressed={mobileTab === id} onClick={() => setMobileTab(id)}>{label}</button>)}
+      </nav>}
+      {executionError && <div className="studio-error" role="alert"><span>{executionError}</span><button onClick={() => setExecutionError(null)}>Dismiss</button></div>}
+      <div className={`studio-grid ${isFull3DView ? 'studio-focus' : ''} ${!showStatePanel ? 'studio-no-state' : ''}`} data-panel={mobileTab}>
+        {!isFull3DView && <section className="studio-editor" aria-label="Source code">
+          <CodeEditor code={code} onChangeCode={setCode} language={language} onChangeLanguage={handleLanguageChange}
+            currentLineNumber={currentStep?.lineNumber || null} isCodeDirty={isCodeDirty} onRunCode={handleRunCode} />
+        </section>}
+        <section className="studio-scene" aria-label="Visualization">
+          <form className="studio-input" onSubmit={(event) => { event.preventDefault(); handleApplyFormInput(); }}>
+            <label htmlFor="simulation-input">Input</label>
+            <input id="simulation-input" value={formInputValues} onChange={(event) => setFormInputValues(event.target.value)} placeholder="10, 20, 30, 40" />
+            <button className="studio-button" disabled={isExecuting} type="submit">Apply</button>
+          </form>
+          <div className="studio-viewport">
+            <SceneContainer currentStep={currentStep} code={code} statusLabel={currentStep?.dataStructureState?.label}
+              isFull3DView={isFull3DView} onToggleFull3D={() => setIsFull3DView(value => !value)}>
+              <DsaSceneDispatcher dataStructureState={currentStep?.dataStructureState} />
             </SceneContainer>
           </div>
-
-          {/* Draggable & Hover Resizing Divider Bar between 3D Canvas and Console */}
-          {!isFull3DView && (
-            <div
-              onMouseDown={startConsoleResize}
-              className={`h-2 w-full relative group cursor-row-resize z-20 flex items-center justify-center transition-colors ${
-                isResizingConsole
-                  ? 'bg-cyan-500 shadow-lg shadow-cyan-500/50'
-                  : isBright
-                  ? 'bg-slate-200 hover:bg-cyan-400'
-                  : 'bg-slate-800/80 hover:bg-cyan-500/80'
-              }`}
-              title={`Drag to resize Console Height (Current: ${consoleHeightPx}px)`}
-            >
-              {/* Horizontal Grip Line */}
-              <div className="w-12 h-1 rounded-full bg-slate-400/50 group-hover:bg-slate-900 group-hover:scale-x-125 transition-all"></div>
-
-              {/* Quick Height Preset Buttons on Hover */}
-              <div className="absolute right-3 -top-7 hidden group-hover:flex items-center gap-1 backdrop-blur-md bg-slate-950/90 border border-slate-700 rounded-lg p-1 text-[10px] shadow-xl z-30 pointer-events-auto">
-                <span className="text-slate-400 font-mono px-1">Console:</span>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setConsoleHeightPx(90);
-                  }}
-                  className="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-cyan-600 text-cyan-300 font-mono"
-                >
-                  90px
-                </button>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setConsoleHeightPx(165);
-                  }}
-                  className="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-cyan-600 text-cyan-300 font-mono"
-                >
-                  165px
-                </button>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setConsoleHeightPx(260);
-                  }}
-                  className="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-cyan-600 text-cyan-300 font-mono"
-                >
-                  260px
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Integrated Output Console Box */}
-          {!isFull3DView && (
-            <div style={{ height: `${consoleHeightPx}px` }} className="shrink-0 overflow-hidden transition-all duration-75">
-              <OutputConsole
-                output={cumulativeOutput}
-                correctOutput={finalCorrectOutput}
-                isAtEnd={isAtEnd}
-              />
-            </div>
-          )}
-        </div>
-
-        {/* Right Column: Program State Inspector */}
-        {!isFull3DView && showStatePanel && (
-          <div className={`${mobileTab === 'state' ? 'block w-full' : 'hidden'} md:block w-72 lg:w-80 h-full overflow-hidden shrink-0 transition-all duration-300`}>
-            <StatePanel
-              currentStep={currentStep}
-              totalSteps={totalSteps}
-              correctOutput={finalCorrectOutput}
-              isAtEnd={isAtEnd}
-            />
-          </div>
-        )}
+          {!isFull3DView && <div className="studio-output"><OutputConsole output={cumulativeOutput} correctOutput={finalCorrectOutput} isAtEnd={isAtEnd} /></div>}
+        </section>
+        {!isFull3DView && <aside className="studio-state" aria-label="Program state"><StatePanel currentStep={currentStep} totalSteps={totalSteps} correctOutput={finalCorrectOutput} isAtEnd={isAtEnd} /></aside>}
       </div>
-
-      {/* Bottom Full-Width Time Machine Timeline */}
-      <div className="w-full">
-        <Timeline
-          currentStepIndex={currentStepIndex}
-          totalSteps={totalSteps}
-          isPlaying={isPlaying}
-          playbackSpeed={playbackSpeed}
-          setPlaybackSpeed={setPlaybackSpeed}
-          onPlay={handleTimelinePlay}
-          isCodeDirty={isCodeDirty}
-          onPause={pause}
-          onPrev={prevStep}
-          onNext={nextStep}
-          onReset={reset}
-          onGoToStep={goToStep}
-          isAtStart={isAtStart}
-          isAtEnd={isAtEnd}
-        />
-      </div>
-
+      <Timeline currentStepIndex={currentStepIndex} totalSteps={totalSteps} isPlaying={isPlaying}
+        playbackSpeed={playbackSpeed} setPlaybackSpeed={setPlaybackSpeed} onPlay={handleTimelinePlay}
+        isExecuting={isExecuting} isCodeDirty={isCodeDirty} onPause={pause} onPrev={() => { pause(); prevStep(); }} onNext={() => { pause(); nextStep(); }}
+        onReset={reset} onGoToStep={index => { pause(); goToStep(index); }} isAtStart={isAtStart} isAtEnd={isAtEnd} />
       {/* Modals */}
       <AiAssistantModal
         isOpen={isAiOpen}

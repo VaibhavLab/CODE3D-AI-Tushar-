@@ -24,7 +24,7 @@ export default function Dashboard({ onNavigate }) {
   const cards = [
     {
       title: 'Start Visualizer',
-      desc: 'Step inside Java execution. Inspect arrays, variables, and loops in interactive 3D.',
+      desc: 'Explore algorithms in interactive 3D. Runs locally without installing Java.',
       icon: Play,
       action: () => onNavigate('visualizer'),
       primary: true,
@@ -69,10 +69,10 @@ export default function Dashboard({ onNavigate }) {
   ];
 
   const stats = [
-    { label: 'Programs Executed', value: '1,420+', icon: Activity, change: '+12% this week' },
+    { label: 'Runtime', value: 'Browser', icon: Activity, change: 'No Java installation' },
     { label: '3D Visualizations', value: `${SAMPLE_PROGRAMS.length} Curated`, icon: Box, change: 'All active' },
-    { label: 'DSA Concepts', value: '8 Modules', icon: Cpu, change: 'Java 21 ready' },
-    { label: 'Learning Progress', value: '88% Mastery', icon: TrendingUp, change: 'Interactive mode' },
+    { label: 'DSA Concepts', value: '8 Modules', icon: Cpu, change: 'Learning simulations' },
+    { label: 'Playback', value: 'Step by step', icon: TrendingUp, change: 'Pause and rewind' },
   ];
 
   return (
@@ -97,7 +97,7 @@ export default function Dashboard({ onNavigate }) {
                 : 'bg-cyan-950/60 border-cyan-800/50 text-cyan-400'
             }`}>
               <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse"></span>
-              Exhibition Ready • Version 1.0 • {SAMPLE_PROGRAMS.length} DSA Topics
+              Learning Studio • Version 1.0 • {SAMPLE_PROGRAMS.length} DSA Topics
             </div>
 
             <h1 className={`text-4xl md:text-5xl font-extrabold tracking-tight font-sans ${isBright ? 'text-slate-900' : 'text-white'}`}>

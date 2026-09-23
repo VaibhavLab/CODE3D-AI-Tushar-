@@ -130,41 +130,16 @@ export default function StriverSheetDrawer({
 
   return (
     <>
-      {/* Docked Side Toggle Button (Always visible on the side) */}
-      <button
-        onClick={onToggle}
-        className={`fixed left-0 top-1/2 -translate-y-1/2 z-40 flex items-center gap-1.5 px-2.5 py-3 rounded-r-xl font-mono text-xs font-semibold shadow-2xl transition-all duration-300 border-r border-y ${
-          isOpen
-            ? isBright
-              ? 'bg-amber-500 text-white border-amber-600 translate-x-[480px] sm:translate-x-[540px]'
-              : 'bg-gradient-to-b from-amber-500 to-orange-600 text-white border-amber-400 translate-x-[480px] sm:translate-x-[540px]'
-            : isBright
-              ? 'bg-white hover:bg-amber-50 text-slate-800 border-slate-300 hover:border-amber-400'
-              : 'bg-slate-900 hover:bg-slate-850 text-amber-300 border-amber-500/40 hover:border-amber-400 shadow-amber-500/10'
-        }`}
-        title={isOpen ? 'Collapse Striver SDE Sheet' : 'Open Striver SDE Sheet (182 Questions)'}
-      >
-        <div className="flex flex-col items-center gap-1">
-          {isOpen ? <ChevronLeft size={16} /> : <BookOpen size={16} className="text-amber-400 animate-bounce" />}
-          <span className="[writing-mode:vertical-lr] tracking-wider uppercase font-bold text-[11px] py-1">
-            {isOpen ? 'Close' : 'Striver SDE Sheet'}
-          </span>
-          <span className="text-[10px] px-1 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono">
-            {solvedCount}/{totalCount}
-          </span>
-        </div>
-      </button>
-
       {/* Backdrop overlay for mobile screens */}
       {isOpen && (
         <div
           onClick={onToggle}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30 lg:hidden transition-opacity"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30  transition-opacity"
         />
       )}
 
-      {/* Slide-out Striver Sheet Side Drawer */}
-      <div
+      {/* Mount the problem catalog only while the drawer is open. */}
+      {isOpen && <div
         className={`fixed top-14 left-0 bottom-0 z-40 w-[480px] sm:w-[540px] max-w-[92vw] flex flex-col shadow-2xl transition-transform duration-300 ease-in-out border-r ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         } ${
@@ -385,7 +360,7 @@ export default function StriverSheetDrawer({
             })
           )}
         </div>
-      </div>
+      </div>}
     </>
   );
 }

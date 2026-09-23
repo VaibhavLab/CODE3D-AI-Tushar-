@@ -29,7 +29,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenCodeDoctor, onOp
   ];
 
   return (
-    <header className={`h-14 backdrop-blur-md border-b px-4 flex items-center justify-between z-30 sticky top-0 select-none transition-colors duration-200 ${
+    <header className={`app-navbar h-14 shrink-0 gap-3 backdrop-blur-md border-b px-4 flex items-center justify-between z-30 sticky top-0 select-none transition-colors duration-200 ${
       isBright
         ? 'bg-white/90 border-slate-200 shadow-sm'
         : 'bg-slate-900/90 border-slate-800/80 shadow-md shadow-black/20'
@@ -45,14 +45,14 @@ export default function Navbar({ activeTab, setActiveTab, onOpenCodeDoctor, onOp
               CODE<span className="text-cyan-500 dark:text-cyan-400">3D</span> <span className="text-xs bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30 rounded px-1.5 py-0.2 font-mono">AI</span>
             </span>
           </div>
-          <span className={`text-[10px] hidden sm:inline tracking-tight -mt-0.5 ${isBright ? 'text-slate-500' : 'text-slate-400'}`}>
+          <span className={`text-[10px] hidden 2xl:inline tracking-tight -mt-0.5 ${isBright ? 'text-slate-500' : 'text-slate-400'}`}>
             Don't just read the code. See the code execute.
           </span>
         </div>
       </div>
 
       {/* Center Navigation Links */}
-      <nav className="hidden md:flex items-center gap-1 sm:gap-1.5">
+      <nav className="app-navlinks items-center gap-1">
         {navLinks.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
@@ -88,6 +88,10 @@ export default function Navbar({ activeTab, setActiveTab, onOpenCodeDoctor, onOp
           );
         })}
       </nav>
+
+      <select className="app-navselect studio-select" aria-label="Navigate" value={activeTab} onChange={event => setActiveTab(event.target.value)}>
+        {navLinks.map(item => <option key={item.id} value={item.id}>{item.label}</option>)}
+      </select>
 
       {/* Right Side: Theme Toggle & User Auth */}
       <div className="flex items-center gap-2">

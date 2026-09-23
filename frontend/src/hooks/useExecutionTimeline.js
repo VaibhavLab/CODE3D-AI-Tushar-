@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { collectOutput } from '../services/traceOutput.js';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
 /**
  * Custom hook for Time Machine execution controls
@@ -17,6 +18,7 @@ export function useExecutionTimeline(trace = []) {
   // Auto-reset index whenever a new execution trace is loaded
   useEffect(() => {
     setCurrentStepIndex(0);
+    setIsPlaying(false);
   }, [trace]);
 
   const pause = useCallback(() => {
@@ -52,6 +54,7 @@ export function useExecutionTimeline(trace = []) {
   }, [totalSteps]);
 
   const play = useCallback(() => {
+    if (totalSteps <= 1) return;
     setCurrentStepIndex((prev) => (prev >= totalSteps - 1 ? 0 : prev));
     setIsPlaying(true);
   }, [totalSteps]);
@@ -97,43 +100,10 @@ export function useExecutionTimeline(trace = []) {
   }, [isPlaying, playbackSpeed, totalSteps]);
 
   // Accumulate stdout output from step 0 up to currentStepIndex
-  const cumulativeOutput = (() => {
-    if (!trace || trace.length === 0) return [];
-    const seen = new Set();
-    const result = [];
-
-    // First check if currentStep already has an accumulated array
-    const currOut = currentStep?.output;
-    if (Array.isArray(currOut) && currOut.length > 0) {
-      // Check if previous steps also had outputs
-      for (let i = 0; i <= currentStepIndex && i < trace.length; i++) {
-        const stepOut = trace[i]?.output;
-        if (Array.isArray(stepOut)) {
-          for (const line of stepOut) {
-            if (line && !seen.has(line)) {
-              seen.add(line);
-              result.push(line);
-            }
-          }
-        }
-      }
-      return result.length > 0 ? result : currOut;
-    }
-
-    // Otherwise gather from all steps up to now
-    for (let i = 0; i <= currentStepIndex && i < trace.length; i++) {
-      const stepOut = trace[i]?.output;
-      if (Array.isArray(stepOut)) {
-        for (const line of stepOut) {
-          if (line && !seen.has(line)) {
-            seen.add(line);
-            result.push(line);
-          }
-        }
-      }
-    }
-    return result;
-  })();
+  const cumulativeOutput = useMemo(
+    () => collectOutput(trace, currentStepIndex),
+    [trace, currentStepIndex]
+  );
 
   // Extract the verified correct final output / return value
   const finalCorrectOutput = (() => {

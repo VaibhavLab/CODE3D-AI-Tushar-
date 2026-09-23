@@ -1,4 +1,23 @@
 # CODE3D AI
+
+## Local demo (no Java required)
+
+```sh
+cd frontend
+npm install
+npm run dev
+```
+
+Open http://localhost:5173. The default mode runs educational simulations in your browser without an account or backend. Three.js is already the 3D renderer. Source examples may use Java syntax; no JVM is needed to visualize them.
+
+These are pattern-based learning simulations, **not verified executions of arbitrary source code**. Some advanced examples use canned data. See [project review](docs/PROJECT_REVIEW.md) for findings and next priorities.
+
+Backend access is opt-in: copy `frontend/.env.example` to `frontend/.env.local` and configure `VITE_BACKEND_URL` only if needed. Restart Vite after changing it. No automatic cloud fallback is used. The legacy Java backend requires security work before public use.
+
+Validation: `cd frontend`, then `npm test` and `npm run build`.
+
+The original project overview follows; roadmap and feature claims below may describe intended rather than implemented behavior.
+
 > *"Don't just read the code. See the code execute."*
 
 An interactive 3D code execution visualizer and pedagogical learning platform built for computer science students and technology exhibitions.

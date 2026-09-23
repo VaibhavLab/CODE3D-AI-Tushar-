@@ -23,6 +23,7 @@ export const ARRAY_LOOP_EXECUTION_TRACE = [
     previousValue: null,
     currentValue: "[10, 20, 30, 40]",
     condition: null,
+    outputMode: 'snapshot',
     output: [],
     dataStructureState: {
       type: "array",
@@ -48,6 +49,7 @@ export const ARRAY_LOOP_EXECUTION_TRACE = [
     previousValue: null,
     currentValue: 0,
     condition: null,
+    outputMode: 'snapshot',
     output: [],
     dataStructureState: {
       type: "array",
@@ -78,6 +80,7 @@ export const ARRAY_LOOP_EXECUTION_TRACE = [
       result: true,
       branch: "ENTER LOOP BODY"
     },
+    outputMode: 'snapshot',
     output: [],
     dataStructureState: {
       type: "array",
@@ -104,6 +107,7 @@ export const ARRAY_LOOP_EXECUTION_TRACE = [
     previousValue: null,
     currentValue: "10",
     condition: null,
+    outputMode: 'snapshot',
     output: ["10"],
     dataStructureState: {
       type: "array",
@@ -129,6 +133,7 @@ export const ARRAY_LOOP_EXECUTION_TRACE = [
     previousValue: 0,
     currentValue: 1,
     condition: null,
+    outputMode: 'snapshot',
     output: ["10"],
     dataStructureState: {
       type: "array",
@@ -159,6 +164,7 @@ export const ARRAY_LOOP_EXECUTION_TRACE = [
       result: true,
       branch: "CONTINUE LOOP"
     },
+    outputMode: 'snapshot',
     output: ["10"],
     dataStructureState: {
       type: "array",
@@ -185,6 +191,7 @@ export const ARRAY_LOOP_EXECUTION_TRACE = [
     previousValue: null,
     currentValue: "20",
     condition: null,
+    outputMode: 'snapshot',
     output: ["10", "20"],
     dataStructureState: {
       type: "array",
@@ -210,6 +217,7 @@ export const ARRAY_LOOP_EXECUTION_TRACE = [
     previousValue: 1,
     currentValue: 2,
     condition: null,
+    outputMode: 'snapshot',
     output: ["10", "20"],
     dataStructureState: {
       type: "array",
@@ -240,6 +248,7 @@ export const ARRAY_LOOP_EXECUTION_TRACE = [
       result: true,
       branch: "CONTINUE LOOP"
     },
+    outputMode: 'snapshot',
     output: ["10", "20"],
     dataStructureState: {
       type: "array",
@@ -266,6 +275,7 @@ export const ARRAY_LOOP_EXECUTION_TRACE = [
     previousValue: null,
     currentValue: "30",
     condition: null,
+    outputMode: 'snapshot',
     output: ["10", "20", "30"],
     dataStructureState: {
       type: "array",
@@ -291,6 +301,7 @@ export const ARRAY_LOOP_EXECUTION_TRACE = [
     previousValue: 2,
     currentValue: 3,
     condition: null,
+    outputMode: 'snapshot',
     output: ["10", "20", "30"],
     dataStructureState: {
       type: "array",
@@ -321,6 +332,7 @@ export const ARRAY_LOOP_EXECUTION_TRACE = [
       result: true,
       branch: "CONTINUE LOOP"
     },
+    outputMode: 'snapshot',
     output: ["10", "20", "30"],
     dataStructureState: {
       type: "array",
@@ -347,6 +359,7 @@ export const ARRAY_LOOP_EXECUTION_TRACE = [
     previousValue: null,
     currentValue: "40",
     condition: null,
+    outputMode: 'snapshot',
     output: ["10", "20", "30", "40"],
     dataStructureState: {
       type: "array",
@@ -372,6 +385,7 @@ export const ARRAY_LOOP_EXECUTION_TRACE = [
     previousValue: 3,
     currentValue: 4,
     condition: null,
+    outputMode: 'snapshot',
     output: ["10", "20", "30", "40"],
     dataStructureState: {
       type: "array",
@@ -402,6 +416,7 @@ export const ARRAY_LOOP_EXECUTION_TRACE = [
       result: false,
       branch: "EXIT LOOP"
     },
+    outputMode: 'snapshot',
     output: ["10", "20", "30", "40"],
     dataStructureState: {
       type: "array",
@@ -427,6 +442,7 @@ export const ARRAY_LOOP_EXECUTION_TRACE = [
     previousValue: null,
     currentValue: null,
     condition: null,
+    outputMode: 'snapshot',
     output: ["10", "20", "30", "40"],
     dataStructureState: {
       type: "array",
@@ -723,6 +739,7 @@ function generateDynamicArrayTrace(values, lang = 'code') {
         result: true,
         branch: 'ENTER LOOP'
       },
+      outputMode: 'snapshot',
       output: [...output],
       dataStructureState: {
         type: 'array',
@@ -748,6 +765,7 @@ function generateDynamicArrayTrace(values, lang = 'code') {
       variables: { arr: `[${values.join(', ')}]`, i, 'arr[i]': val },
       changedVariable: 'output',
       currentValue: String(val),
+      outputMode: 'snapshot',
       output: [...output],
       dataStructureState: {
         type: 'array',
@@ -772,6 +790,7 @@ function generateDynamicArrayTrace(values, lang = 'code') {
       changedVariable: 'i',
       previousValue: i,
       currentValue: nextI,
+      outputMode: 'snapshot',
       output: [...output],
       dataStructureState: {
         type: 'array',
@@ -799,6 +818,7 @@ function generateDynamicArrayTrace(values, lang = 'code') {
       result: false,
       branch: 'EXIT LOOP'
     },
+    outputMode: 'snapshot',
     output: [...output],
     dataStructureState: {
       type: 'array',
@@ -819,6 +839,7 @@ function generateDynamicArrayTrace(values, lang = 'code') {
     lineNumber: 5,
     eventType: 'PROGRAM_END',
     variables: { arr: `[${values.join(', ')}]`, itemsProcessed: n },
+    outputMode: 'snapshot',
     output: [...output],
     dataStructureState: {
       type: 'array',
@@ -2815,6 +2836,7 @@ export function generateDynamicTrappingWaterTrace(values, lang = 'java') {
           lineNumber: 6,
           eventType: 'UPDATE_LEFT_MAX',
           variables: { left, right, leftMax, rightMax, totalWater },
+          outputMode: 'snapshot',
           output: [...output],
           dataStructureState: {
             type: 'trapping-rain-water',
@@ -2840,6 +2862,7 @@ export function generateDynamicTrappingWaterTrace(values, lang = 'java') {
           lineNumber: 8,
           eventType: 'WATER_TRAPPED',
           variables: { left, right, leftMax, rightMax, totalWater, [`trapped[${left}]`]: trapped },
+          outputMode: 'snapshot',
           output: [...output],
           dataStructureState: {
             type: 'trapping-rain-water',
@@ -2865,6 +2888,7 @@ export function generateDynamicTrappingWaterTrace(values, lang = 'java') {
           lineNumber: 11,
           eventType: 'UPDATE_RIGHT_MAX',
           variables: { left, right, leftMax, rightMax, totalWater },
+          outputMode: 'snapshot',
           output: [...output],
           dataStructureState: {
             type: 'trapping-rain-water',
@@ -2890,6 +2914,7 @@ export function generateDynamicTrappingWaterTrace(values, lang = 'java') {
           lineNumber: 13,
           eventType: 'WATER_TRAPPED',
           variables: { left, right, leftMax, rightMax, totalWater, [`trapped[${right}]`]: trapped },
+          outputMode: 'snapshot',
           output: [...output],
           dataStructureState: {
             type: 'trapping-rain-water',
@@ -2915,6 +2940,7 @@ export function generateDynamicTrappingWaterTrace(values, lang = 'java') {
     lineNumber: 16,
     eventType: 'PROGRAM_END',
     variables: { totalWater, leftMax, rightMax },
+    outputMode: 'snapshot',
     output: [...output, `Total Trapped Water = ${totalWater} units`],
     dataStructureState: {
       type: 'trapping-rain-water',
@@ -3009,6 +3035,7 @@ export function generateDynamicLruCacheTrace(values, lang = 'java') {
           MRU: op.key,
           LRU: cacheOrder[cacheOrder.length - 1],
         },
+        outputMode: 'snapshot',
         output: [...output],
         dataStructureState: {
           type: 'hash-table',
@@ -3047,6 +3074,7 @@ export function generateDynamicLruCacheTrace(values, lang = 'java') {
           cacheState: cacheOrder.map(k => `${k}:${cacheMap[k]}`).join(' → '),
           MRU: hit ? op.key : (cacheOrder[0] || 'none'),
         },
+        outputMode: 'snapshot',
         output: [...output],
         dataStructureState: {
           type: 'hash-table',
@@ -3110,6 +3138,7 @@ export function generateDynamicTrieTrace(wordsInput, lang = 'java') {
     lineNumber: 5,
     eventType: 'TRIE_INSERT',
     variables: { word: 'cat', path: 'ROOT → c → a → t', isEndOfWord: true },
+    outputMode: 'snapshot',
     output: [...output],
     dataStructureState: {
       type: 'tree',
@@ -3129,6 +3158,7 @@ export function generateDynamicTrieTrace(wordsInput, lang = 'java') {
     lineNumber: 6,
     eventType: 'TRIE_INSERT',
     variables: { word: 'car', sharedPrefix: 'ca', path: 'ROOT → c → a → r', isEndOfWord: true },
+    outputMode: 'snapshot',
     output: [...output],
     dataStructureState: {
       type: 'tree',
@@ -3148,6 +3178,7 @@ export function generateDynamicTrieTrace(wordsInput, lang = 'java') {
     lineNumber: 7,
     eventType: 'TRIE_INSERT',
     variables: { word: 'cart', path: 'ROOT → c → a → r → t', isEndOfWord: true },
+    outputMode: 'snapshot',
     output: [...output],
     dataStructureState: {
       type: 'tree',
@@ -3167,6 +3198,7 @@ export function generateDynamicTrieTrace(wordsInput, lang = 'java') {
     lineNumber: 8,
     eventType: 'TRIE_INSERT',
     variables: { word: 'dog', path: 'ROOT → d → o → g', isEndOfWord: true },
+    outputMode: 'snapshot',
     output: [...output],
     dataStructureState: {
       type: 'tree',
@@ -3186,6 +3218,7 @@ export function generateDynamicTrieTrace(wordsInput, lang = 'java') {
     lineNumber: 11,
     eventType: 'TRIE_SEARCH_FOUND',
     variables: { query: 'car', result: true, finalNode: 'r', isEnd: true },
+    outputMode: 'snapshot',
     output: [...output],
     dataStructureState: {
       type: 'tree',
@@ -3205,6 +3238,7 @@ export function generateDynamicTrieTrace(wordsInput, lang = 'java') {
     lineNumber: 12,
     eventType: 'TRIE_SEARCH_MISSING',
     variables: { query: 'can', result: false, stoppedAt: 'a', missingChar: 'n' },
+    outputMode: 'snapshot',
     output: [...output],
     dataStructureState: {
       type: 'tree',
@@ -3285,6 +3319,7 @@ export function generateDynamicDsuTrace(values, lang = 'java') {
     lineNumber: 5,
     eventType: 'DSU_UNION',
     variables: { parent: `[${parent.join(', ')}]`, edge: '0 - 1', components: '{0, 1}, {2}, {3}, {4}' },
+    outputMode: 'snapshot',
     output: [...output],
     dataStructureState: {
       type: 'graph',
@@ -3312,6 +3347,7 @@ export function generateDynamicDsuTrace(values, lang = 'java') {
     lineNumber: 6,
     eventType: 'DSU_UNION',
     variables: { parent: `[${parent.join(', ')}]`, edge: '1 - 2', components: '{0, 1, 2}, {3}, {4}' },
+    outputMode: 'snapshot',
     output: [...output],
     dataStructureState: {
       type: 'graph',
@@ -3339,6 +3375,7 @@ export function generateDynamicDsuTrace(values, lang = 'java') {
     lineNumber: 7,
     eventType: 'DSU_UNION',
     variables: { parent: `[${parent.join(', ')}]`, edge: '3 - 4', components: '{0, 1, 2}, {3, 4}' },
+    outputMode: 'snapshot',
     output: [...output],
     dataStructureState: {
       type: 'graph',
@@ -3365,6 +3402,7 @@ export function generateDynamicDsuTrace(values, lang = 'java') {
     lineNumber: 9,
     eventType: 'DSU_FIND_CONNECTED',
     variables: { query: 'connected(0, 2)', find0: 0, find2: 0, result: true },
+    outputMode: 'snapshot',
     output: [...output],
     dataStructureState: {
       type: 'graph',
@@ -3384,6 +3422,7 @@ export function generateDynamicDsuTrace(values, lang = 'java') {
     lineNumber: 10,
     eventType: 'DSU_FIND_DISCONNECTED',
     variables: { query: 'connected(0, 3)', find0: 0, find3: 3, result: false },
+    outputMode: 'snapshot',
     output: [...output],
     dataStructureState: {
       type: 'graph',
@@ -3404,6 +3443,7 @@ export function generateDynamicDsuTrace(values, lang = 'java') {
     lineNumber: 12,
     eventType: 'DSU_UNION',
     variables: { parent: `[${parent.join(', ')}]`, finalComponents: '{0, 1, 2, 3, 4}', count: 1 },
+    outputMode: 'snapshot',
     output: [...output],
     dataStructureState: {
       type: 'graph',
@@ -3482,6 +3522,7 @@ export function generateDynamicLisTrace(values, lang = 'java') {
             lineNumber: 6,
             eventType: 'LIS_EXTEND',
             variables: { i, j, [`nums[${j}]`]: arr[j], [`nums[${i}]`]: arr[i], [`dp[${i}]`]: dp[i], maxLIS: maxLisLength },
+            outputMode: 'snapshot',
             output: [...output, `dp[${i}] updated to ${dp[i]} extending nums[${j}] (${arr[j]} < ${arr[i]})`],
             dataStructureState: {
               type: 'lis',
@@ -3517,6 +3558,7 @@ export function generateDynamicLisTrace(values, lang = 'java') {
     lineNumber: 10,
     eventType: 'PROGRAM_END',
     variables: { maxLIS: maxLisLength, optimalSubsequence: `[${optimalLisValues.join(', ')}]` },
+    outputMode: 'snapshot',
     output: [...output],
     dataStructureState: {
       type: 'lis',
@@ -3583,6 +3625,7 @@ export function generateDynamicStockTrace(values, lang = 'java') {
         lineNumber: 5,
         eventType: 'NEW_MIN_PRICE',
         variables: { day: i, price: currentPrice, minPrice, maxProfit },
+        outputMode: 'snapshot',
         output: [...output],
         dataStructureState: {
           type: 'array',
@@ -3610,6 +3653,7 @@ export function generateDynamicStockTrace(values, lang = 'java') {
         lineNumber: 7,
         eventType: isNewPeak ? 'NEW_MAX_PROFIT' : 'CHECK_PROFIT',
         variables: { day: i, price: currentPrice, buyPrice: minPrice, currentProfit, maxProfit },
+        outputMode: 'snapshot',
         output: [...output],
         dataStructureState: {
           type: 'array',
@@ -3636,6 +3680,7 @@ export function generateDynamicStockTrace(values, lang = 'java') {
     lineNumber: 9,
     eventType: 'PROGRAM_END',
     variables: { maxProfit, buyDay: bestBuy, sellDay: bestSell, buyPrice: prices[bestBuy], sellPrice: prices[bestSell] },
+    outputMode: 'snapshot',
     output: [...output],
     dataStructureState: {
       type: 'array',
@@ -4696,6 +4741,7 @@ export function generateDynamicNextPermutationTrace(values = [], lang = 'java') 
     lineNumber: 4,
     eventType: 'ARRAY_INIT',
     variables: { nums: `[${nums.join(', ')}]`, n },
+    outputMode: 'snapshot',
     output: [...output],
     dataStructureState: {
       type: 'array',
@@ -4723,6 +4769,7 @@ export function generateDynamicNextPermutationTrace(values = [], lang = 'java') 
         result: true,
         branch: 'CONTINUE SCANNING LEFT'
       },
+      outputMode: 'snapshot',
       output: [...output],
       dataStructureState: {
         type: 'array',
@@ -4746,6 +4793,7 @@ export function generateDynamicNextPermutationTrace(values = [], lang = 'java') 
       lineNumber: 8,
       eventType: 'BREAKPOINT_FOUND',
       variables: { i, pivotVal: nums[i] },
+      outputMode: 'snapshot',
       output: [...output],
       dataStructureState: {
         type: 'array',
@@ -4772,6 +4820,7 @@ export function generateDynamicNextPermutationTrace(values = [], lang = 'java') 
       lineNumber: 10,
       eventType: 'SWAP_CANDIDATE',
       variables: { i, j, 'nums[i]': nums[i], 'nums[j]': nums[j] },
+      outputMode: 'snapshot',
       output: [...output],
       dataStructureState: {
         type: 'array',
@@ -4796,6 +4845,7 @@ export function generateDynamicNextPermutationTrace(values = [], lang = 'java') 
       lineNumber: 12,
       eventType: 'SWAP',
       variables: { i, j, 'nums[i]': nums[i], 'nums[j]': nums[j], nums: `[${nums.join(', ')}]` },
+      outputMode: 'snapshot',
       output: [...output],
       dataStructureState: {
         type: 'array',
@@ -4825,6 +4875,7 @@ export function generateDynamicNextPermutationTrace(values = [], lang = 'java') 
       lineNumber: 15,
       eventType: 'REVERSE_STEP',
       variables: { left, right, nums: `[${nums.join(', ')}]` },
+      outputMode: 'snapshot',
       output: [...output, `Reversed pair at indices [${left}, ${right}]: [${nums.join(', ')}]`],
       dataStructureState: {
         type: 'array',
@@ -4847,6 +4898,7 @@ export function generateDynamicNextPermutationTrace(values = [], lang = 'java') 
     lineNumber: 18,
     eventType: 'PROGRAM_END',
     variables: { result: `[${nums.join(', ')}]`, status: 'COMPLETED' },
+    outputMode: 'snapshot',
     output: [...output],
     dataStructureState: {
       type: 'array',
@@ -4888,6 +4940,7 @@ export function generateDynamicRotateMatrixTrace(values = [], lang = 'java') {
     lineNumber: 3,
     eventType: 'MATRIX_INIT',
     variables: { n, matrix: JSON.stringify(matrix) },
+    outputMode: 'snapshot',
     output: [...output],
     dataStructureState: {
       type: 'matrix',
@@ -4914,6 +4967,7 @@ export function generateDynamicRotateMatrixTrace(values = [], lang = 'java') {
         lineNumber: 6,
         eventType: 'TRANSPOSE_SWAP',
         variables: { i, j, [`matrix[${i}][${j}]`]: matrix[i][j], [`matrix[${j}][${i}]`]: matrix[j][i] },
+        outputMode: 'snapshot',
         output: [...output],
         dataStructureState: {
           type: 'matrix',
@@ -4943,6 +4997,7 @@ export function generateDynamicRotateMatrixTrace(values = [], lang = 'java') {
         lineNumber: 11,
         eventType: 'ROW_REVERSE',
         variables: { row: i, left, right, [`row[${i}]`]: `[${matrix[i].join(', ')}]` },
+        outputMode: 'snapshot',
         output: [...output],
         dataStructureState: {
           type: 'matrix',
@@ -4969,6 +5024,7 @@ export function generateDynamicRotateMatrixTrace(values = [], lang = 'java') {
     lineNumber: 15,
     eventType: 'PROGRAM_END',
     variables: { result: JSON.stringify(matrix), status: 'COMPLETED' },
+    outputMode: 'snapshot',
     output: [...output],
     dataStructureState: {
       type: 'matrix',
@@ -4999,6 +5055,7 @@ export function generateDynamicFindDuplicateTrace(values = [], lang = 'java') {
     lineNumber: 4,
     eventType: 'ARRAY_INIT',
     variables: { nums: `[${nums.join(', ')}]` },
+    outputMode: 'snapshot',
     output: [...output],
     dataStructureState: {
       type: 'array',
@@ -5029,6 +5086,7 @@ export function generateDynamicFindDuplicateTrace(values = [], lang = 'java') {
         result: true,
         branch: 'ADVANCE SLOW 1x, FAST 2x'
       },
+      outputMode: 'snapshot',
       output: [...output, `Slow → index ${slow} (${nums[slow]}), Fast → index ${fast} (${nums[fast]})`],
       dataStructureState: {
         type: 'array',
@@ -5053,6 +5111,7 @@ export function generateDynamicFindDuplicateTrace(values = [], lang = 'java') {
     lineNumber: 10,
     eventType: 'INTERSECTION_MET',
     variables: { intersection: slow },
+    outputMode: 'snapshot',
     output: [...output],
     dataStructureState: {
       type: 'array',
@@ -5076,6 +5135,7 @@ export function generateDynamicFindDuplicateTrace(values = [], lang = 'java') {
       lineNumber: 13,
       eventType: 'CYCLE_PHASE_2',
       variables: { slow, fast },
+      outputMode: 'snapshot',
       output: [...output, `Phase 2: Slow at ${slow}, Fast at ${fast}`],
       dataStructureState: {
         type: 'array',
@@ -5099,6 +5159,7 @@ export function generateDynamicFindDuplicateTrace(values = [], lang = 'java') {
     lineNumber: 16,
     eventType: 'PROGRAM_END',
     variables: { duplicate, result: duplicate, status: 'COMPLETED' },
+    outputMode: 'snapshot',
     output: [...output],
     dataStructureState: {
       type: 'array',
@@ -5132,6 +5193,7 @@ export function generateDynamicValidParenthesesTrace(bracketStr = '()[]{}', lang
     lineNumber: 3,
     eventType: 'STACK_INIT',
     variables: { s, stackSize: 0 },
+    outputMode: 'snapshot',
     output: [...output],
     dataStructureState: {
       type: 'stack',
@@ -5155,6 +5217,7 @@ export function generateDynamicValidParenthesesTrace(bracketStr = '()[]{}', lang
         lineNumber: 6,
         eventType: 'STACK_PUSH',
         variables: { i, char: ch, stack: JSON.stringify(stack) },
+        outputMode: 'snapshot',
         output: [...output],
         dataStructureState: {
           type: 'stack',
@@ -5185,6 +5248,7 @@ export function generateDynamicValidParenthesesTrace(bracketStr = '()[]{}', lang
         lineNumber: 10,
         eventType: 'STACK_POP',
         variables: { i, char: ch, popped: top, stack: JSON.stringify(stack) },
+        outputMode: 'snapshot',
         output: [...output],
         dataStructureState: {
           type: 'stack',
@@ -5206,6 +5270,7 @@ export function generateDynamicValidParenthesesTrace(bracketStr = '()[]{}', lang
     lineNumber: 15,
     eventType: 'PROGRAM_END',
     variables: { result: finalResult, status: 'COMPLETED' },
+    outputMode: 'snapshot',
     output: [...output],
     dataStructureState: {
       type: 'stack',
@@ -5446,6 +5511,7 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code', custo
             result: condResult,
             branch: condResult ? 'BRANCH TAKEN' : 'BRANCH SKIPPED'
           },
+          outputMode: 'snapshot',
           output: [...output],
           dataStructureState: {
             type: 'universal-execution',
@@ -5485,6 +5551,7 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code', custo
               result: false,
               branch: 'BRANCH SKIPPED'
             },
+            outputMode: 'snapshot',
             output: [...output],
             dataStructureState: {
               type: 'universal-execution',
@@ -5524,6 +5591,7 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code', custo
               result: condResult,
               branch: condResult ? 'BRANCH TAKEN' : 'BRANCH SKIPPED'
             },
+            outputMode: 'snapshot',
             output: [...output],
             dataStructureState: {
               type: 'universal-execution',
@@ -5561,6 +5629,7 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code', custo
               result: false,
               branch: 'BRANCH SKIPPED'
             },
+            outputMode: 'snapshot',
             output: [...output],
             dataStructureState: {
               type: 'universal-execution',
@@ -5594,6 +5663,7 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code', custo
               result: true,
               branch: 'BRANCH TAKEN'
             },
+            outputMode: 'snapshot',
             output: [...output],
             dataStructureState: {
               type: 'universal-execution',
@@ -5632,6 +5702,7 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code', custo
           eventType: 'SCANNER_INIT',
           variables: { ...vars },
           changedVariable: scName,
+          outputMode: 'snapshot',
           output: [...output],
           dataStructureState: {
             type: 'universal-execution',
@@ -5675,6 +5746,7 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code', custo
           variables: { ...vars },
           changedVariable: varName,
           currentValue: val,
+          outputMode: 'snapshot',
           output: [...output],
           dataStructureState: {
             type: 'universal-execution',
@@ -5716,6 +5788,7 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code', custo
           lineNumber: origLineNum,
           eventType: 'PRINT_OUTPUT',
           variables: { ...vars },
+          outputMode: 'snapshot',
           output: [...output],
           dataStructureState: {
             type: 'universal-execution',
@@ -5756,6 +5829,7 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code', custo
           variables: { ...vars },
           changedVariable: varName,
           currentValue: evalVal,
+          outputMode: 'snapshot',
           output: [...output],
           dataStructureState: {
             type: 'universal-execution',
@@ -5781,6 +5855,7 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code', custo
           lineNumber: origLineNum,
           eventType: 'IO_CLOSE',
           variables: { ...vars },
+          outputMode: 'snapshot',
           output: [...output],
           dataStructureState: {
             type: 'universal-execution',
@@ -5804,6 +5879,7 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code', custo
         lineNumber: rawLines.length,
         eventType: 'PROGRAM_END',
         variables: { ...vars, grade: summaryGrade },
+        outputMode: 'snapshot',
         output: [...output, `Program Completed: Status 0 (Result: Grade ${summaryGrade})`],
         dataStructureState: {
           type: 'universal-execution',
@@ -5895,6 +5971,7 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code', custo
       lineNumber: 8,
       eventType: 'PROGRAM_END',
       variables: { target: targetVal, found: targetFound, index: foundIndex },
+      outputMode: 'snapshot',
       output: [...output, targetFound ? `Search Success: Found at index ${foundIndex}` : `Search Finished: Target ${targetVal} not found`],
       dataStructureState: {
         type: 'array',
@@ -5957,6 +6034,7 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code', custo
           result: true,
           branch: 'POINTERS ACTIVE'
         },
+        outputMode: 'snapshot',
         output: [...output],
         dataStructureState: {
           type: 'array',
@@ -5983,6 +6061,7 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code', custo
           lineNumber: 6,
           eventType: 'SWAP_ELEMENTS',
           variables: { left, right, [arrayName]: `[${workingArr.join(', ')}]` },
+          outputMode: 'snapshot',
           output: [...output],
           dataStructureState: {
             type: 'array',
@@ -6008,6 +6087,7 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code', custo
       lineNumber: 9,
       eventType: 'PROGRAM_END',
       variables: { [arrayName]: `[${workingArr.join(', ')}]`, finalLeft: left, finalRight: right },
+      outputMode: 'snapshot',
       output: [...output, `Two-pointer execution complete: [${workingArr.join(', ')}]`],
       dataStructureState: {
         type: 'array',
@@ -6073,6 +6153,7 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code', custo
             result: valI > valJ,
             branch: (valI > valJ) ? (isSortOrSwap ? 'SWAP NEEDED' : 'CONDITION TRUE') : 'ORDER OK'
           },
+          outputMode: 'snapshot',
           output: [...output],
           dataStructureState: {
             type: 'array',
@@ -6097,6 +6178,7 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code', custo
             lineNumber: 6,
             eventType: 'SWAP_ELEMENTS',
             variables: { i, j, [arrayName]: `[${workingArr.join(', ')}]` },
+            outputMode: 'snapshot',
             output: [...output],
             dataStructureState: {
               type: 'array',
@@ -6120,6 +6202,7 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code', custo
       lineNumber: 8,
       eventType: 'PROGRAM_END',
       variables: { [arrayName]: `[${workingArr.join(', ')}]` },
+      outputMode: 'snapshot',
       output: [...output, `Nested loop finished: [${workingArr.join(', ')}]`],
       dataStructureState: {
         type: 'array',
@@ -6209,6 +6292,7 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code', custo
         result: true,
         branch: 'ENTER LOOP'
       },
+      outputMode: 'snapshot',
       output: [...output],
       dataStructureState: {
         type: 'array',
@@ -6262,6 +6346,7 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code', custo
           result: conditionPassed,
           branch: conditionPassed ? 'EXECUTE IF BLOCK' : 'SKIP IF BLOCK'
         },
+        outputMode: 'snapshot',
         output: [...output],
         dataStructureState: {
           type: 'array',
@@ -6287,6 +6372,7 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code', custo
           changedVariable: countVarName,
           previousValue: prevCount,
           currentValue: liveVars[countVarName],
+          outputMode: 'snapshot',
           output: [...output],
           dataStructureState: {
             type: 'array',
@@ -6316,6 +6402,7 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code', custo
         changedVariable: sumVarName,
         previousValue: prevSum,
         currentValue: newSum,
+        outputMode: 'snapshot',
         output: [...output],
         dataStructureState: {
           type: 'array',
@@ -6343,6 +6430,7 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code', custo
         changedVariable: prodVarName,
         previousValue: prevProd,
         currentValue: newProd,
+        outputMode: 'snapshot',
         output: [...output],
         dataStructureState: {
           type: 'array',
@@ -6369,6 +6457,7 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code', custo
         changedVariable: maxVarName,
         previousValue: prevMax,
         currentValue: val,
+        outputMode: 'snapshot',
         output: [...output],
         dataStructureState: {
           type: 'array',
@@ -6395,6 +6484,7 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code', custo
         changedVariable: minVarName,
         previousValue: prevMin,
         currentValue: val,
+        outputMode: 'snapshot',
         output: [...output],
         dataStructureState: {
           type: 'array',
@@ -6426,6 +6516,7 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code', custo
       changedVariable: 'i',
       previousValue: i,
       currentValue: nextI,
+      outputMode: 'snapshot',
       output: [...output],
       dataStructureState: {
         type: 'array',
@@ -6451,6 +6542,7 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code', custo
     lineNumber: 8,
     eventType: 'PROGRAM_END',
     variables: { ...liveVars },
+    outputMode: 'snapshot',
     output: [...output, `Execution Finished: ${finalSummaryVars}`],
     dataStructureState: {
       type: 'array',

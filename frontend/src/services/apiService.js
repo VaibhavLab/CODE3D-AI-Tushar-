@@ -4,31 +4,17 @@
 
 import { solvePersonalProblem, correctPersonalCode } from './personalProblemSolver';
 
-const LIVE_RENDER_URL = 'https://code3d-ai.onrender.com/api';
-const LOCAL_URL = 'http://localhost:8080/api';
-
-// When accessed from phone, GitHub Pages, or Vercel, always use the live Render backend!
-const isLocalhost = typeof window !== 'undefined' && 
-  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-
-const BACKEND_BASE_URL = import.meta.env.VITE_BACKEND_URL || 
-  (isLocalhost ? LOCAL_URL : LIVE_RENDER_URL);
+// Local simulation is the default. Remote services require an explicit URL.
+export const BACKEND_BASE_URL = (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '');
 
 async function smartFetch(endpoint, options = {}) {
+  if (!BACKEND_BASE_URL) throw new Error('Local demo mode: backend not configured');
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
   try {
-    const res = await fetch(`${BACKEND_BASE_URL}${endpoint}`, options);
-    return res;
-  } catch (err) {
-    // If local fetch failed, fallback to live Render cloud backend
-    if (BACKEND_BASE_URL !== LIVE_RENDER_URL) {
-      try {
-        console.warn(`Local backend unreachable at ${BACKEND_BASE_URL}. Falling back to live cloud backend...`);
-        return await fetch(`${LIVE_RENDER_URL}${endpoint}`, options);
-      } catch (fallbackErr) {
-        console.warn('Live backend also unreachable:', fallbackErr);
-      }
-    }
-    throw err;
+    return await fetch(`${BACKEND_BASE_URL}${endpoint}`, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
   }
 }
 
@@ -298,20 +284,6 @@ export async function getExecutionHistory() {
     if (!combinedQuizzes.some((q) => q.conceptId === b.conceptId && q.completedAt === b.completedAt)) {
       combinedQuizzes.push(b);
     }
-  }
-
-  // Fallback defaults if empty
-  if (combinedExecutions.length === 0) {
-    combinedExecutions.push(
-      { id: 1, programTitle: '1D Array Traversal & Print', conceptId: 'array-loop', language: 'java', totalSteps: 16, status: 'COMPLETED', executedAt: 'Earlier today' },
-      { id: 2, programTitle: 'Bubble Sort Algorithm', conceptId: 'bubble-sort', language: 'java', totalSteps: 14, status: 'COMPLETED', executedAt: 'Earlier today' }
-    );
-  }
-
-  if (combinedQuizzes.length === 0) {
-    combinedQuizzes.push(
-      { id: 1, conceptId: 'array-loop', score: 2, totalQuestions: 2, accuracy: 100, completedAt: 'Today' }
-    );
   }
 
   return {
