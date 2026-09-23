@@ -216,21 +216,7 @@ export default function CodeEditor({
             </button>
           )}
 
-          {/* Personal Problem Button */}
-          {(onOpenPersonalProblem || onOpenCodeDoctor) && (
-            <button
-              onClick={onOpenPersonalProblem || onOpenCodeDoctor}
-              className={`h-7 flex items-center gap-1 text-xs px-2 rounded-md border transition font-semibold shadow-xs cursor-pointer shrink-0 ${
-                isBright
-                  ? 'bg-amber-100 text-amber-900 border-amber-300 hover:bg-amber-200'
-                  : 'bg-gradient-to-r from-amber-500/15 to-orange-500/15 hover:from-amber-500/25 hover:to-orange-500/25 text-amber-300 border-amber-500/35'
-              }`}
-              title="Personal Problem: Solve custom DSA problems & visualize in 3D"
-            >
-              <Lightbulb size={12} className={`shrink-0 ${isBright ? 'text-amber-700' : 'text-amber-400'}`} />
-              <span className="hidden 2xl:inline">Personal 💡</span>
-            </button>
-          )}
+
 
           {/* Direct "Input Any Code" Button */}
           {onOpenCustomCode && (

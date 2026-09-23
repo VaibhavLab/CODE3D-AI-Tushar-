@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Layers, HelpCircle, History, Settings, Play, Home, Code2, Lightbulb, User, LogOut, Sparkles, ChevronDown, Sun, Moon, BookOpen, Github } from 'lucide-react';
+import { Box, Layers, HelpCircle, History, Settings, Play, Home, Code2, User, LogOut, Sparkles, ChevronDown, Sun, Moon, BookOpen } from 'lucide-react';
 import { checkBackendHealth } from '../services/apiService';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -89,7 +89,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenCodeDoctor, onOp
         })}
       </nav>
 
-      {/* Right Side: Theme Toggle, Personal Problem, GitHub, Status, User Auth */}
+      {/* Right Side: Theme Toggle & User Auth */}
       <div className="flex items-center gap-2">
         {/* Dynamic Dark / Bright Mode Toggle Button */}
         <button
@@ -114,48 +114,6 @@ export default function Navbar({ activeTab, setActiveTab, onOpenCodeDoctor, onOp
             </>
           )}
         </button>
-
-        {/* Dedicated Personal Problem Button */}
-        {(onOpenPersonalProblem || onOpenCodeDoctor) && (
-          <button
-            onClick={onOpenPersonalProblem || onOpenCodeDoctor}
-            className={`h-8 flex items-center gap-1.5 px-2.5 rounded-lg text-xs font-semibold transition border shadow-xs cursor-pointer ${
-              isBright
-                ? 'bg-amber-100/90 hover:bg-amber-200 text-amber-900 border-amber-300'
-                : 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border-amber-500/35'
-            }`}
-            title="Personal Problem: Solve custom DSA problems & 3D visualize complete code"
-          >
-            <Lightbulb size={13} className={isBright ? 'text-amber-700' : 'text-amber-400'} />
-            <span className="hidden sm:inline">Personal Problem</span>
-          </button>
-        )}
-
-        {/* GitHub Repository Link */}
-        <a
-          href="https://github.com/himanshu70784231/CODE3D-AI"
-          target="_blank"
-          rel="noopener noreferrer"
-          className={`h-8 flex items-center gap-1.5 px-2.5 rounded-lg text-xs font-semibold transition border shadow-xs ${
-            isBright
-              ? 'bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300'
-              : 'bg-slate-800/80 hover:bg-slate-700 text-slate-200 border-slate-700 shadow-sm'
-          }`}
-          title="Open CODE3D-AI repository on GitHub"
-        >
-          <Github size={14} className={isBright ? 'text-slate-800' : 'text-slate-200'} />
-          <span className="hidden sm:inline">GitHub</span>
-        </a>
-
-        {/* Backend Online status badge */}
-        <div className={`h-8 hidden xl:flex items-center gap-1.5 border rounded-lg px-2.5 text-xs font-mono ${
-          isBright ? 'bg-slate-100 border-slate-200 text-slate-700' : 'bg-slate-950/70 border-slate-800 text-slate-300'
-        }`}>
-          <span className={`w-2 h-2 rounded-full ${backendOnline ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`}></span>
-          <span className="text-[10px]">
-            {backendOnline ? 'Spring Boot Active' : 'Standalone'}
-          </span>
-        </div>
 
         {/* User Profile / Login System */}
         {isAuthenticated && user ? (

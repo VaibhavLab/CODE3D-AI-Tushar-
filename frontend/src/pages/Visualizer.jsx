@@ -768,14 +768,6 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
           }`}>
             Space: <strong className={`ml-1 ${isBright ? 'text-emerald-700 font-bold' : 'text-emerald-400 font-bold'}`}>{spaceComplexity}</strong>
           </div>
-          <div className={`h-8 flex items-center gap-1.5 border rounded-lg px-2.5 ${
-            isBright ? 'bg-slate-50 border-slate-300' : 'bg-slate-950/70 border-slate-800'
-          }`}>
-            <span className={`w-2 h-2 rounded-full ${backendOnline ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`}></span>
-            <span className={`text-[10px] ${isBright ? 'text-slate-600' : 'text-slate-400'}`}>
-              {backendOnline ? 'Spring Boot Active' : 'Standalone'}
-            </span>
-          </div>
         </div>
 
         {/* Right Controls: State Panel Toggle, Full 3D Theater Mode, AI Tutor & Quiz */}
