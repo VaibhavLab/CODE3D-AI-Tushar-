@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import Editor from '@monaco-editor/react';
-import { Play, Pause, SkipBack, SkipForward, RotateCcw, FileCode, CheckCircle2, Code2, Sparkles, Trophy, BookOpen } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, RotateCcw, FileCode, CheckCircle2, Code2, Sparkles, Trophy, BookOpen, Lightbulb } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 
 const LANGUAGE_CONFIG = {
@@ -44,6 +44,7 @@ export default function CodeEditor({
   onChangeLanguage,
   onOpenCustomCode,
   onOpenCodeDoctor,
+  onOpenPersonalProblem,
   onOpenLeetCode,
   onOpenStriverSheet,
   isPlaying,
@@ -201,30 +202,31 @@ export default function CodeEditor({
           {(onOpenStriverSheet || onOpenLeetCode) && (
             <button
               onClick={onOpenStriverSheet || onOpenLeetCode}
-              className={`flex items-center gap-1 text-[11px] px-2 py-0.5 rounded border transition font-mono font-medium shadow-sm ${
+              className={`h-7 flex items-center gap-1.5 text-xs px-2.5 rounded-md border transition font-semibold shadow-xs cursor-pointer ${
                 isBright
                   ? 'bg-amber-100 text-amber-800 border-amber-300 hover:bg-amber-200'
-                  : 'bg-gradient-to-r from-amber-500/20 to-orange-500/20 hover:from-amber-500/30 hover:to-orange-500/30 text-amber-300 border-amber-500/40'
+                  : 'bg-gradient-to-r from-amber-500/15 to-orange-500/15 hover:from-amber-500/25 hover:to-orange-500/25 text-amber-300 border-amber-500/40'
               }`}
               title="Open Striver SDE Sheet (182 Core Problems) in 3D"
             >
-              <BookOpen size={11} className="text-amber-400" />
+              <BookOpen size={12} className="text-amber-400" />
               <span>Striver Sheet 📜</span>
             </button>
           )}
 
-          {/* AI Code Doctor Button */}
-          {onOpenCodeDoctor && (
+          {/* Personal Problem Button */}
+          {(onOpenPersonalProblem || onOpenCodeDoctor) && (
             <button
-              onClick={onOpenCodeDoctor}
-              className={`flex items-center gap-1 text-[11px] px-2 py-0.5 rounded border transition font-mono font-medium shadow-sm ${
+              onClick={onOpenPersonalProblem || onOpenCodeDoctor}
+              className={`h-7 flex items-center gap-1.5 text-xs px-2.5 rounded-md border transition font-semibold shadow-xs cursor-pointer ${
                 isBright
-                  ? 'bg-amber-100 text-amber-800 border-amber-300 hover:bg-amber-200'
-                  : 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border-amber-500/30'
+                  ? 'bg-amber-100 text-amber-900 border-amber-300 hover:bg-amber-200'
+                  : 'bg-gradient-to-r from-amber-500/15 to-orange-500/15 hover:from-amber-500/25 hover:to-orange-500/25 text-amber-300 border-amber-500/35'
               }`}
-              title="AI Code Doctor: Fix broken syntax and visualize in 3D"
+              title="Personal Problem: Solve custom DSA problems & visualize in 3D"
             >
-              <span>🩺 AI Doctor</span>
+              <Lightbulb size={12} className={isBright ? 'text-amber-700' : 'text-amber-400'} />
+              <span>Personal Problem 💡</span>
             </button>
           )}
 
@@ -232,20 +234,20 @@ export default function CodeEditor({
           {onOpenCustomCode && (
             <button
               onClick={onOpenCustomCode}
-              className={`flex items-center gap-1 text-[11px] px-2 py-0.5 rounded border transition font-mono font-medium shadow-sm ${
+              className={`h-7 flex items-center gap-1.5 text-xs px-2.5 rounded-md border transition font-semibold shadow-xs cursor-pointer ${
                 isBright
                   ? 'bg-cyan-100 text-cyan-800 border-cyan-300 hover:bg-cyan-200'
                   : 'bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border-cyan-500/30 shadow-cyan-950'
               }`}
               title="Input Any Code in JS, C, C++, Python, or Java to visualize in 3D"
             >
-              <Code2 size={11} className={isBright ? 'text-cyan-700' : 'text-cyan-400'} />
+              <Code2 size={12} className={isBright ? 'text-cyan-700' : 'text-cyan-400'} />
               <span>Input Code ⚡</span>
             </button>
           )}
 
           {currentLineNumber && (
-            <div className={`flex items-center gap-1.5 text-[11px] font-mono px-2 py-0.5 rounded border ${
+            <div className={`h-7 flex items-center gap-1.5 text-xs font-mono px-2 rounded-md border ${
               isBright
                 ? 'text-cyan-700 bg-cyan-50 border-cyan-300'
                 : 'text-cyan-400 bg-cyan-950/60 border-cyan-800/50'

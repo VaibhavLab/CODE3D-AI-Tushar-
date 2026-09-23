@@ -24,6 +24,7 @@ import {
   Cpu,
   Server,
   Check,
+  Lightbulb,
   Stethoscope,
   Maximize2,
   Minimize2,
@@ -364,19 +365,28 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
     }
   };
 
-  // Handle AI Code Doctor applied correction
-  const handleApplyCorrectedCode = async ({ code: correctedCode, language: correctedLang, trace: correctedTrace }) => {
+  // Handle Personal Problem applied solution & 3D visualization
+  const handleApplyCorrectedCode = async ({
+    code: correctedCode,
+    language: correctedLang,
+    trace: correctedTrace,
+    problemTitle,
+    timeComplexity: tc,
+    spaceComplexity: sc,
+  }) => {
     setLanguage(correctedLang);
     setCode(correctedCode);
     setLastExecutedCode(correctedCode);
+    if (tc) setTimeComplexity(tc);
+    if (sc) setSpaceComplexity(sc);
     setSelectedSample({
-      id: 'custom',
-      title: `🩺 Repaired ${correctedLang.toUpperCase()} Code`,
-      category: 'AI Auto-Corrected',
-      description: 'Automatically diagnosed, repaired, and simulated in 3D WebGL.',
-      difficulty: 'Repaired',
-      timeComplexity: 'O(n)',
-      spaceComplexity: 'O(1)',
+      id: 'personal-problem',
+      title: problemTitle ? `💡 ${problemTitle}` : `💡 Personal Problem (${correctedLang.toUpperCase()})`,
+      category: 'Personal Problem',
+      description: 'Custom personal problem solved and fully simulated in 3D WebGL.',
+      difficulty: 'Custom',
+      timeComplexity: tc || 'O(n)',
+      spaceComplexity: sc || 'O(1)',
       code: correctedCode,
     });
 
@@ -583,14 +593,14 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
                 if (found) handleSelectProgram(found);
               }
             }}
-            className={`border rounded-md px-2 py-1 text-xs font-mono focus:outline-none focus:border-cyan-500 cursor-pointer max-w-[160px] sm:max-w-none transition-colors ${
+            className={`h-8 border rounded-lg px-2.5 text-xs font-medium focus:outline-none focus:border-cyan-500 cursor-pointer max-w-[160px] sm:max-w-none transition-colors ${
               isBright
                 ? 'bg-white border-slate-300 text-slate-900 font-semibold'
                 : 'bg-slate-950 border-slate-700/80 text-cyan-300'
             }`}
           >
-            {selectedSample.id === 'custom' && (
-              <option value="custom">
+            {(selectedSample.id === 'custom' || selectedSample.id === 'personal-problem') && (
+              <option value={selectedSample.id}>
                 {selectedSample.title || '⚡ Custom Execution'}
               </option>
             )}
@@ -616,24 +626,24 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
             })}
           </select>
 
-          {/* Prominent AI Code Doctor Button */}
+          {/* Prominent Personal Problem Button */}
           <button
             onClick={() => setIsCodeDoctorOpen(true)}
-            className={`flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-semibold transition shadow-sm shrink-0 border ${
+            className={`h-8 flex items-center gap-1.5 px-3 rounded-lg text-xs font-semibold transition shadow-xs shrink-0 border cursor-pointer ${
               isBright
                 ? 'bg-amber-100 text-amber-900 border-amber-300 hover:bg-amber-200'
-                : 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border-amber-500/40'
+                : 'bg-gradient-to-r from-amber-500/15 to-orange-500/15 hover:from-amber-500/25 hover:to-orange-500/25 text-amber-300 border-amber-500/40'
             }`}
-            title="AI Code Doctor: Fix broken syntax/loops and auto-visualize in 3D"
+            title="Personal Problem: Solve custom DSA problems & auto-visualize in 3D"
           >
-            <Stethoscope size={13} className={isBright ? 'text-amber-600' : 'text-amber-400'} />
-            <span>AI Doctor</span>
+            <Lightbulb size={13} className={isBright ? 'text-amber-700' : 'text-amber-400'} />
+            <span>Personal Problem 💡</span>
           </button>
 
           {/* Prominent "Input Any Code" Button */}
           <button
             onClick={() => setIsCustomCodeOpen(true)}
-            className={`flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-semibold transition shadow-sm shrink-0 border ${
+            className={`h-8 flex items-center gap-1.5 px-3 rounded-lg text-xs font-semibold transition shadow-xs shrink-0 border cursor-pointer ${
               isBright
                 ? 'bg-cyan-100 text-cyan-900 border-cyan-300 hover:bg-cyan-200'
                 : 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 hover:from-cyan-500/30 hover:to-blue-500/30 text-cyan-300 border-cyan-500/40'
@@ -647,34 +657,34 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
           {/* Striver SDE Sheet Toggle Button */}
           <button
             onClick={() => setIsStriverSheetOpen((prev) => !prev)}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold transition shadow-sm shrink-0 border ${
+            className={`h-8 flex items-center gap-1.5 px-3 rounded-lg text-xs font-semibold transition shadow-xs shrink-0 border cursor-pointer ${
               isStriverSheetOpen
                 ? 'bg-amber-500 text-slate-950 border-amber-400 font-bold shadow-amber-500/20'
                 : isBright
-                  ? 'bg-amber-100 text-amber-900 border-amber-300 hover:bg-amber-200'
+                  ? 'bg-amber-50 text-amber-900 border-amber-300 hover:bg-amber-100'
                   : 'bg-gradient-to-r from-amber-500/20 to-orange-500/20 hover:from-amber-500/30 hover:to-orange-500/30 text-amber-300 border-amber-500/40 shadow-amber-500/10'
             }`}
             title="Toggle Striver SDE Sheet: 182 Core DSA Problems with 3D Visualization"
           >
             <BookOpen size={13} className={isStriverSheetOpen ? 'text-slate-950' : 'text-amber-400'} />
-            <span>Striver SDE Sheet 📜</span>
+            <span>Striver Sheet 📜</span>
             <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/30 text-amber-200 font-mono">182</span>
           </button>
         </div>
 
         {/* Center: Complexity Badges & Backend status */}
-        <div className="hidden lg:flex items-center gap-2.5 text-[11px] font-mono shrink-0">
-          <div className={`border rounded px-2 py-0.5 ${
+        <div className="hidden lg:flex items-center gap-2 text-[11px] font-mono shrink-0">
+          <div className={`h-8 flex items-center border rounded-lg px-2.5 ${
             isBright ? 'bg-slate-50 border-slate-300 text-slate-700' : 'bg-slate-950/70 border-slate-800'
           }`}>
-            Time: <strong className={isBright ? 'text-cyan-700 font-bold' : 'text-cyan-400 font-bold'}>{timeComplexity}</strong>
+            Time: <strong className={`ml-1 ${isBright ? 'text-cyan-700 font-bold' : 'text-cyan-400 font-bold'}`}>{timeComplexity}</strong>
           </div>
-          <div className={`border rounded px-2 py-0.5 ${
+          <div className={`h-8 flex items-center border rounded-lg px-2.5 ${
             isBright ? 'bg-slate-50 border-slate-300 text-slate-700' : 'bg-slate-950/70 border-slate-800'
           }`}>
-            Space: <strong className={isBright ? 'text-emerald-700 font-bold' : 'text-emerald-400 font-bold'}>{spaceComplexity}</strong>
+            Space: <strong className={`ml-1 ${isBright ? 'text-emerald-700 font-bold' : 'text-emerald-400 font-bold'}`}>{spaceComplexity}</strong>
           </div>
-          <div className={`flex items-center gap-1.5 border rounded px-2 py-0.5 ${
+          <div className={`h-8 flex items-center gap-1.5 border rounded-lg px-2.5 ${
             isBright ? 'bg-slate-50 border-slate-300' : 'bg-slate-950/70 border-slate-800'
           }`}>
             <span className={`w-2 h-2 rounded-full ${backendOnline ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`}></span>
@@ -689,7 +699,7 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
           {/* Toggle Program State Panel Button */}
           <button
             onClick={() => setShowStatePanel((prev) => !prev)}
-            className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold transition border ${
+            className={`h-8 flex items-center gap-1.5 px-3 rounded-lg text-xs font-semibold transition border shadow-xs cursor-pointer ${
               showStatePanel
                 ? isBright
                   ? 'bg-cyan-50 border-cyan-300 text-cyan-800'
@@ -708,7 +718,7 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
           {/* Fullscreen 3D Theater Mode Toggle Button */}
           <button
             onClick={() => setIsFull3DView((prev) => !prev)}
-            className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold transition border ${
+            className={`h-8 flex items-center gap-1.5 px-3 rounded-lg text-xs font-semibold transition border shadow-xs cursor-pointer ${
               isFull3DView
                 ? 'bg-purple-600 border-purple-400 text-white shadow-md shadow-purple-600/30'
                 : isBright
@@ -723,7 +733,7 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
 
           <button
             onClick={() => setIsAiOpen(true)}
-            className={`flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-semibold transition border ${
+            className={`h-8 flex items-center gap-1.5 px-3 rounded-lg text-xs font-semibold transition border shadow-xs cursor-pointer ${
               isBright
                 ? 'bg-cyan-50 hover:bg-cyan-100 border-cyan-300 text-cyan-800'
                 : 'bg-cyan-950/70 hover:bg-cyan-900 border-cyan-700/50 text-cyan-300'
@@ -735,7 +745,7 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
 
           <button
             onClick={() => setIsQuizOpen(true)}
-            className={`flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-semibold transition border ${
+            className={`h-8 flex items-center gap-1.5 px-3 rounded-lg text-xs font-semibold transition border shadow-xs cursor-pointer ${
               isBright
                 ? 'bg-emerald-50 hover:bg-emerald-100 border-emerald-300 text-emerald-800'
                 : 'bg-emerald-950/70 hover:bg-emerald-900 border-emerald-700/50 text-emerald-300'

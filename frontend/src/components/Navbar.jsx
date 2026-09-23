@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Layers, HelpCircle, History, Settings, Play, Home, Code2, Stethoscope, User, LogOut, Sparkles, ChevronDown, Sun, Moon, BookOpen, Github } from 'lucide-react';
+import { Box, Layers, HelpCircle, History, Settings, Play, Home, Code2, Lightbulb, User, LogOut, Sparkles, ChevronDown, Sun, Moon, BookOpen, Github } from 'lucide-react';
 import { checkBackendHealth } from '../services/apiService';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 
-export default function Navbar({ activeTab, setActiveTab, onOpenCodeDoctor }) {
+export default function Navbar({ activeTab, setActiveTab, onOpenCodeDoctor, onOpenPersonalProblem }) {
   const [backendOnline, setBackendOnline] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const { user, isAuthenticated, logout, openLoginModal } = useAuth();
@@ -61,7 +61,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenCodeDoctor }) {
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
+              className={`h-8 flex items-center gap-1.5 px-3 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                 isActive
                   ? isBright
                     ? 'bg-cyan-50 text-cyan-700 border border-cyan-300 shadow-sm font-semibold'
@@ -89,14 +89,14 @@ export default function Navbar({ activeTab, setActiveTab, onOpenCodeDoctor }) {
         })}
       </nav>
 
-      {/* Right Side: Theme Toggle, AI Code Doctor, Status, User Auth */}
+      {/* Right Side: Theme Toggle, Personal Problem, GitHub, Status, User Auth */}
       <div className="flex items-center gap-2">
         {/* Dynamic Dark / Bright Mode Toggle Button */}
         <button
           onClick={toggleTheme}
           aria-label={isBright ? 'Switch to Dark Mode' : 'Switch to Bright Mode'}
           title={isBright ? 'Switch to Dark Mode (🌙)' : 'Switch to Bright Mode (☀️)'}
-          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-medium transition-all duration-200 shadow-sm ${
+          className={`h-8 flex items-center gap-1.5 px-2.5 rounded-lg border text-xs font-semibold transition-all duration-200 shadow-xs cursor-pointer ${
             isBright
               ? 'bg-amber-50 hover:bg-amber-100 text-amber-800 border-amber-300 shadow-amber-200/50'
               : 'bg-slate-800/80 hover:bg-slate-700 text-slate-200 border-slate-700 shadow-slate-900/60'
@@ -105,7 +105,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenCodeDoctor }) {
           {isBright ? (
             <>
               <Sun size={14} className="text-amber-500 fill-amber-400 animate-spin-slow" />
-              <span className="hidden sm:inline font-semibold">Bright</span>
+              <span className="hidden sm:inline">Bright</span>
             </>
           ) : (
             <>
@@ -115,19 +115,19 @@ export default function Navbar({ activeTab, setActiveTab, onOpenCodeDoctor }) {
           )}
         </button>
 
-        {/* Dedicated AI Code Doctor Button */}
-        {onOpenCodeDoctor && (
+        {/* Dedicated Personal Problem Button */}
+        {(onOpenPersonalProblem || onOpenCodeDoctor) && (
           <button
-            onClick={onOpenCodeDoctor}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition shadow-sm ${
+            onClick={onOpenPersonalProblem || onOpenCodeDoctor}
+            className={`h-8 flex items-center gap-1.5 px-2.5 rounded-lg text-xs font-semibold transition border shadow-xs cursor-pointer ${
               isBright
-                ? 'bg-amber-100/80 hover:bg-amber-200 text-amber-900 border border-amber-300'
-                : 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                ? 'bg-amber-100/90 hover:bg-amber-200 text-amber-900 border-amber-300'
+                : 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border-amber-500/35'
             }`}
-            title="AI Code Doctor: Auto-fix broken code and visualize in 3D"
+            title="Personal Problem: Solve custom DSA problems & 3D visualize complete code"
           >
-            <Stethoscope size={13} className={isBright ? 'text-amber-600' : 'text-amber-400'} />
-            <span className="hidden sm:inline">AI Code Doctor</span>
+            <Lightbulb size={13} className={isBright ? 'text-amber-700' : 'text-amber-400'} />
+            <span className="hidden sm:inline">Personal Problem</span>
           </button>
         )}
 
@@ -136,7 +136,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenCodeDoctor }) {
           href="https://github.com/himanshu70784231/CODE3D-AI"
           target="_blank"
           rel="noopener noreferrer"
-          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition border ${
+          className={`h-8 flex items-center gap-1.5 px-2.5 rounded-lg text-xs font-semibold transition border shadow-xs ${
             isBright
               ? 'bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300'
               : 'bg-slate-800/80 hover:bg-slate-700 text-slate-200 border-slate-700 shadow-sm'
@@ -148,11 +148,11 @@ export default function Navbar({ activeTab, setActiveTab, onOpenCodeDoctor }) {
         </a>
 
         {/* Backend Online status badge */}
-        <div className={`hidden xl:flex items-center gap-1.5 border rounded-full px-2.5 py-1 text-xs ${
-          isBright ? 'bg-slate-100 border-slate-200' : 'bg-slate-950/70 border-slate-800'
+        <div className={`h-8 hidden xl:flex items-center gap-1.5 border rounded-lg px-2.5 text-xs font-mono ${
+          isBright ? 'bg-slate-100 border-slate-200 text-slate-700' : 'bg-slate-950/70 border-slate-800 text-slate-300'
         }`}>
           <span className={`w-2 h-2 rounded-full ${backendOnline ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`}></span>
-          <span className={`text-[10px] font-mono ${isBright ? 'text-slate-600' : 'text-slate-400'}`}>
+          <span className="text-[10px]">
             {backendOnline ? 'Spring Boot Active' : 'Standalone'}
           </span>
         </div>
@@ -162,7 +162,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenCodeDoctor }) {
           <div className="relative">
             <button
               onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-              className={`flex items-center gap-2 p-1 pl-1.5 rounded-xl border transition ${
+              className={`h-8 flex items-center gap-2 px-2 rounded-lg border transition cursor-pointer ${
                 isBright ? 'bg-slate-100 border-slate-200 hover:bg-slate-200/80' : 'bg-slate-950 border-slate-800 hover:border-slate-700'
               }`}
             >
@@ -226,7 +226,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenCodeDoctor }) {
         ) : (
           <button
             onClick={openLoginModal}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold text-xs transition shadow-sm shadow-cyan-500/20"
+            className="h-8 flex items-center gap-1.5 px-3 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold text-xs transition shadow-xs shadow-cyan-500/20 cursor-pointer"
           >
             <User size={13} />
             <span>Sign In</span>

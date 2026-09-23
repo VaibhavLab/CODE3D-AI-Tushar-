@@ -169,8 +169,8 @@ export default function AuthGate() {
             }`}>
               <Cpu size={16} className="text-indigo-500 shrink-0 mt-0.5" />
               <div className="text-left">
-                <p className={`text-xs font-semibold ${isBright ? 'text-slate-900' : 'text-slate-200'}`}>AI Code Doctor</p>
-                <p className={`text-[11px] ${isBright ? 'text-slate-500' : 'text-slate-400'}`}>Auto-repairs syntax bugs &amp; loop boundaries</p>
+                <p className={`text-xs font-semibold ${isBright ? 'text-slate-900' : 'text-slate-200'}`}>Personal Problem Solver</p>
+                <p className={`text-[11px] ${isBright ? 'text-slate-500' : 'text-slate-400'}`}>Solves any custom problem &amp; 3D visualizes complete code</p>
               </div>
             </div>
 

@@ -2,6 +2,8 @@
  * API Client connecting the CODE3D AI frontend to the Spring Boot REST backend.
  */
 
+import { solvePersonalProblem } from './personalProblemSolver';
+
 const LIVE_RENDER_URL = 'https://code3d-ai.onrender.com/api';
 const LOCAL_URL = 'http://localhost:8080/api';
 
@@ -160,7 +162,7 @@ export async function demoUserLogin() {
   }
 }
 
-// AI Code Doctor & Auto-Correction API
+// Personal Problem Solver & Auto-Correction API
 export async function correctAndVisualizeCode(code, language = 'java') {
   try {
     const res = await smartFetch('/code/correct-and-visualize', {
@@ -168,9 +170,17 @@ export async function correctAndVisualizeCode(code, language = 'java') {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ code, language }),
     });
-    return await res.json();
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.correctedCode) {
+        return data;
+      }
+    }
   } catch (err) {
-    console.warn('AI Code Doctor unavailable:', err);
-    return null;
+    console.warn('Backend Personal Problem Solver API unavailable, activating client solver:', err);
   }
+  // Guaranteed client-side personal problem solver and 3D trace generator fallback
+  return solvePersonalProblem(code, language);
 }
+
+export const solveAndVisualizePersonalProblem = correctAndVisualizeCode;

@@ -160,7 +160,7 @@ public class CodeCorrectionService {
         if (errorsFound.isEmpty()) {
             response.setExplanation("Your code is syntactically clean and algorithmically valid! Generating 3D execution trace.");
         } else {
-            response.setExplanation("AI Code Doctor diagnosed " + errorsFound.size() + " issue(s) and automatically repaired your program into working code.");
+            response.setExplanation("Personal Problem Solver diagnosed " + errorsFound.size() + " issue(s) and automatically generated working 3D code.");
         }
 
         // 3. Generate 3D Execution Trace from the repaired/corrected code!

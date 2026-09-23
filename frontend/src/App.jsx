@@ -29,15 +29,15 @@ function MainApp() {
     setActiveTab('visualizer');
   };
 
-  const handleApplyDoctorCode = ({ code, language, trace }) => {
+  const handleApplyDoctorCode = ({ code, language, trace, problemTitle, timeComplexity, spaceComplexity }) => {
     setSelectedConcept({
-      id: 'custom',
-      title: `🩺 Repaired ${language.toUpperCase()} Code`,
-      category: 'AI Auto-Corrected',
-      description: 'Automatically diagnosed, repaired, and simulated in 3D WebGL.',
-      difficulty: 'Repaired',
-      timeComplexity: 'O(n)',
-      spaceComplexity: 'O(1)',
+      id: 'personal-problem',
+      title: problemTitle ? `💡 ${problemTitle}` : `💡 Personal Problem (${(language || 'java').toUpperCase()})`,
+      category: 'Personal Problem',
+      description: 'Custom personal problem solved and fully simulated in 3D WebGL.',
+      difficulty: 'Custom',
+      timeComplexity: timeComplexity || 'O(n)',
+      spaceComplexity: spaceComplexity || 'O(1)',
       code,
       language: language || 'java',
       trace: trace || null,
@@ -55,6 +55,7 @@ function MainApp() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onOpenCodeDoctor={() => setIsDoctorOpen(true)}
+        onOpenPersonalProblem={() => setIsDoctorOpen(true)}
       />
 
       {/* Main View Container */}
@@ -142,8 +143,8 @@ function MainApp() {
             isBright ? 'text-amber-600 hover:text-amber-700' : 'text-amber-400 hover:text-amber-300'
           }`}
         >
-          <span className="text-lg">🩺</span>
-          <span className="text-[9px] font-medium">AI Doctor</span>
+          <span className="text-lg">💡</span>
+          <span className="text-[9px] font-medium">Personal Problem</span>
         </button>
       </nav>
 
