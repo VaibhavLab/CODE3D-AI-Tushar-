@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { loginUser, registerUser, demoUserLogin } from '../services/apiService';
+import { loginUser, registerUser } from '../services/apiService';
 
 const AuthContext = createContext(null);
 
@@ -41,23 +41,6 @@ export function AuthProvider({ children }) {
     return { success: false, message: res?.message || 'Registration failed' };
   };
 
-  const loginAsDemo = async () => {
-    const res = await demoUserLogin();
-    if (res && res.success) {
-      setUser(res);
-    } else {
-      setUser({
-        id: 1,
-        username: 'himanshu',
-        email: 'himanshu@code3d.edu',
-        fullName: 'Himanshu (Lead Architect)',
-        role: 'Lead Architect',
-        avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-        token: 'code3d_demo_token'
-      });
-    }
-  };
-
   const logout = () => {
     setUser(null);
   };
@@ -69,7 +52,6 @@ export function AuthProvider({ children }) {
         isAuthenticated: !!user,
         login,
         register,
-        loginAsDemo,
         logout,
         isLoginModalOpen,
         openLoginModal: () => setIsLoginModalOpen(true),

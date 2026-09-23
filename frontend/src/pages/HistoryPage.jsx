@@ -1,39 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { History, CheckCircle, Award, Code2, Database, Clock, RefreshCw } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { getExecutionHistory } from '../services/apiService';
 
 export default function HistoryPage() {
   const { isBright } = useTheme();
   const [historyData, setHistoryData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const loadHistory = () => {
+  const loadHistory = async () => {
     setLoading(true);
-    fetch('http://localhost:8080/api/history')
-      .then((res) => res.json())
-      .then((data) => {
-        setHistoryData(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        // Fallback local representation if offline
-        setHistoryData({
-          totalExecutionsCount: 1420,
-          totalQuizzesTaken: 89,
-          recentExecutions: [
-            { id: 1, programTitle: '1D Array Traversal & Print', conceptId: 'array-loop', totalSteps: 16, status: 'COMPLETED', executedAt: 'Just now' },
-            { id: 2, programTitle: 'Bubble Sort Algorithm', conceptId: 'bubble-sort', totalSteps: 14, status: 'COMPLETED', executedAt: '10 mins ago' },
-            { id: 3, programTitle: 'Stack LIFO Operations', conceptId: 'stack', totalSteps: 5, status: 'COMPLETED', executedAt: '25 mins ago' },
-            { id: 4, programTitle: 'Binary Search O(log n)', conceptId: 'binary-search', totalSteps: 4, status: 'COMPLETED', executedAt: '1 hour ago' },
-          ],
-          recentQuizzes: [
-            { id: 1, conceptId: 'array-loop', score: 3, totalQuestions: 3, accuracy: 100, completedAt: 'Today' },
-            { id: 2, conceptId: 'stack', score: 2, totalQuestions: 2, accuracy: 100, completedAt: 'Today' },
-            { id: 3, conceptId: 'bst', score: 1, totalQuestions: 2, accuracy: 50, completedAt: 'Yesterday' },
-          ]
-        });
-        setLoading(false);
-      });
+    try {
+      const data = await getExecutionHistory();
+      setHistoryData(data);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {

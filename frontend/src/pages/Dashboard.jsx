@@ -79,7 +79,7 @@ export default function Dashboard({ onNavigate }) {
     <div className={`flex-1 overflow-y-auto p-6 md:p-10 select-none transition-colors duration-200 ${
       isBright ? 'bg-slate-50 text-slate-900' : 'bg-[#070b14] text-slate-100'
     }`}>
-      <div className="max-w-6xl mx-auto space-y-10">
+      <div className="max-w-7xl mx-auto space-y-10">
         {/* Hero Section */}
         <div className={`relative rounded-2xl p-8 md:p-12 overflow-hidden shadow-xl border transition-colors ${
           isBright
@@ -172,7 +172,7 @@ export default function Dashboard({ onNavigate }) {
             <span className={`text-xs font-mono ${isBright ? 'text-slate-500' : 'text-slate-400'}`}>Select a card to navigate</span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {cards.map((card, i) => {
               const Icon = card.icon;
               return (

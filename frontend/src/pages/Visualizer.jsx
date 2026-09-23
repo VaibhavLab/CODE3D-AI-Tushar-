@@ -62,6 +62,8 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
 
   // Direct Form User Input
   const [formInputValues, setFormInputValues] = useState('10, 20, 30, 40');
+  const [isExecuting, setIsExecuting] = useState(false);
+  const [executionError, setExecutionError] = useState(null);
 
   // Modals & responsive view state
   const [isAiOpen, setIsAiOpen] = useState(false);
@@ -365,6 +367,83 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
     }
   };
 
+  // Execute User Code Pipeline: Code Editor -> Verification -> 3D Trace -> Animation
+  const handleRunCode = async () => {
+    // If currently playing, clicking pause halts animation
+    if (isPlaying) {
+      pause();
+      return;
+    }
+    // If paused mid-way and code has not changed, clicking resumes
+    if (!isCodeDirty && !isAtEnd && !isAtStart) {
+      play();
+      return;
+    }
+    if (!isCodeDirty && isAtStart) {
+      play();
+      return;
+    }
+
+    if (!code || !code.trim()) {
+      setExecutionError('Cannot execute empty code! Please write code or select a sample problem.');
+      return;
+    }
+
+    const nums = extractNumbersFromCode(code);
+    if (nums && nums.length > 0) {
+      setFormInputValues(nums.join(', '));
+    }
+
+    setIsExecuting(true);
+    setExecutionError(null);
+
+    try {
+      let newSteps = null;
+      if (backendOnline) {
+        try {
+          const conceptId = activeStriverProblem ? `striver-${activeStriverProblem.striverId || activeStriverProblem.id}` : 'custom';
+          const [execRes, astRes] = await Promise.all([
+            executeProgram(code, conceptId, language, formInputValues),
+            analyzeCode(code, language),
+          ]);
+          if (execRes?.steps?.length > 0) newSteps = execRes.steps;
+          if (astRes?.timeComplexity) setTimeComplexity(astRes.timeComplexity);
+          if (astRes?.spaceComplexity) setSpaceComplexity(astRes.spaceComplexity);
+        } catch (backendErr) {
+          console.warn('Backend execution failed, falling back to simulator:', backendErr);
+        }
+      }
+
+      if (!newSteps || newSteps.length === 0) {
+        newSteps = getExecutionTrace(code, language, formInputValues);
+      }
+
+      if (newSteps && newSteps.length > 0) {
+        setTrace(newSteps);
+        setLastExecutedCode(code);
+        reset();
+        setTimeout(() => play(), 60);
+      } else {
+        setExecutionError('Could not parse execution steps for this code. Please check for syntax errors or missing brackets.');
+      }
+    } catch (err) {
+      console.error('Execution pipeline error:', err);
+      setExecutionError(`Execution Error: ${err.message || 'Unknown error occurred while parsing code.'}`);
+    } finally {
+      setIsExecuting(false);
+    }
+  };
+
+  const handleResetCode = () => {
+    const templateCode = selectedSample?.code || DEFAULT_JAVA_CODE;
+    setCode(templateCode);
+    setLastExecutedCode(templateCode);
+    setExecutionError(null);
+    const traceSteps = getExecutionTrace(templateCode, language);
+    setTrace(traceSteps);
+    reset();
+  };
+
   // Handle Personal Problem applied solution & 3D visualization
   const handleApplyCorrectedCode = async ({
     code: correctedCode,
@@ -474,50 +553,6 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
       setTrace(newSteps);
       reset();
       setTimeout(() => play(), 80);
-    }
-  };
-
-  // Run user code dynamically against backend or simulator
-  const handleRunCode = async () => {
-    setLastExecutedCode(code);
-
-    const nums = extractNumbersFromCode(code);
-    if (nums && nums.length > 0) {
-      setFormInputValues(nums.join(', '));
-    }
-
-    let newSteps = null;
-
-    if (backendOnline) {
-      try {
-        const conceptId = activeStriverProblem ? `striver-${activeStriverProblem.striverId || activeStriverProblem.id}` : 'custom';
-        const [execRes, astRes] = await Promise.all([
-          executeProgram(code, conceptId, language, formInputValues),
-          analyzeCode(code, language),
-        ]);
-
-        if (execRes && execRes.steps && execRes.steps.length > 0) {
-          newSteps = execRes.steps;
-        }
-        if (astRes) {
-          if (astRes.timeComplexity) setTimeComplexity(astRes.timeComplexity);
-          if (astRes.spaceComplexity) setSpaceComplexity(astRes.spaceComplexity);
-        }
-      } catch (err) {
-        console.warn('Backend execution error, using client simulator:', err);
-      }
-    }
-
-    if (!newSteps || newSteps.length === 0) {
-      newSteps = getExecutionTrace(code, language, formInputValues);
-    }
-
-    if (newSteps && newSteps.length > 0) {
-      setTrace(newSteps);
-      reset();
-      setTimeout(() => play(), 50);
-    } else {
-      play();
     }
   };
 
@@ -799,6 +834,30 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
         </button>
       </div>
 
+      {/* Execution Pipeline Warning / Error Alert */}
+      {executionError && (
+        <div className={`px-4 py-2 text-xs flex items-center justify-between border-b animate-fadeIn z-20 shrink-0 ${
+          isBright
+            ? 'bg-rose-50 text-rose-900 border-rose-200'
+            : 'bg-rose-950/40 text-rose-200 border-rose-800/60'
+        }`}>
+          <div className="flex items-center gap-2">
+            <span className="font-bold">⚠️ Notice:</span>
+            <span>{executionError}</span>
+          </div>
+          <button
+            onClick={() => setExecutionError(null)}
+            className={`px-2 py-0.5 rounded text-[11px] font-semibold border transition cursor-pointer ${
+              isBright
+                ? 'bg-white hover:bg-rose-100 border-rose-300 text-rose-800'
+                : 'bg-rose-900/60 hover:bg-rose-900 border-rose-700 text-rose-200'
+            }`}
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
       {/* Main Studio Workspace with Draggable Box Resizers */}
       <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative select-none">
         {/* Left Box: Monaco Code Editor */}
@@ -814,12 +873,15 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
               onChangeLanguage={handleLanguageChange}
               onOpenCustomCode={() => setIsCustomCodeOpen(true)}
               onOpenCodeDoctor={() => setIsCodeDoctorOpen(true)}
+              onOpenPersonalProblem={() => setIsCodeDoctorOpen(true)}
               onOpenStriverSheet={() => setIsStriverSheetOpen(true)}
               onOpenLeetCode={() => setIsStriverSheetOpen(true)}
               currentLineNumber={currentStep?.lineNumber || null}
               isPlaying={isPlaying}
               onPlay={handleRunCode}
               onRunCode={handleRunCode}
+              onResetCode={handleResetCode}
+              isExecuting={isExecuting}
               isCodeDirty={isCodeDirty}
               onPause={pause}
               onNext={nextStep}

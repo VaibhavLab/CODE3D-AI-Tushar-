@@ -201,7 +201,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenCodeDoctor, onOp
                       toggleTheme();
                       setIsProfileMenuOpen(false);
                     }}
-                    className={`w-full text-left px-2 py-1.5 rounded-lg flex items-center gap-2 ${
+                    className={`w-full text-left px-2 py-1.5 rounded-lg flex items-center gap-2 cursor-pointer ${
                       isBright ? 'hover:bg-slate-100 text-slate-700' : 'hover:bg-slate-800 text-slate-300'
                     }`}
                   >
@@ -214,7 +214,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenCodeDoctor, onOp
                       logout();
                       setIsProfileMenuOpen(false);
                     }}
-                    className="w-full text-left px-2 py-1.5 rounded-lg hover:bg-red-500/10 text-red-500 flex items-center gap-2"
+                    className="w-full text-left px-2 py-1.5 rounded-lg hover:bg-red-500/10 text-red-500 flex items-center gap-2 cursor-pointer"
                   >
                     <LogOut size={12} />
                     <span>Sign Out</span>

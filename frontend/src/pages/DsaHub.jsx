@@ -155,7 +155,7 @@ export default function DsaHub({ onSelectConcept, initialTab = 'curriculum' }) {
     <div className={`flex-1 overflow-y-auto p-4 md:p-8 select-none transition-colors duration-200 ${
       isBright ? 'bg-slate-50 text-slate-900' : 'bg-[#070b14] text-slate-100'
     }`}>
-      <div className="max-w-6xl mx-auto space-y-6">
+      <div className="max-w-7xl mx-auto space-y-6">
         {/* Top Header & View Mode Switcher */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1.5">
@@ -193,7 +193,7 @@ export default function DsaHub({ onSelectConcept, initialTab = 'curriculum' }) {
           }`}>
             <button
               onClick={() => setActiveMainTab('curriculum')}
-              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold transition ${
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold transition cursor-pointer ${
                 activeMainTab === 'curriculum'
                   ? isBright
                     ? 'bg-white text-cyan-800 shadow-md font-bold'
@@ -210,7 +210,7 @@ export default function DsaHub({ onSelectConcept, initialTab = 'curriculum' }) {
 
             <button
               onClick={() => setActiveMainTab('striver')}
-              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold transition ${
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold transition cursor-pointer ${
                 activeMainTab === 'striver'
                   ? isBright
                     ? 'bg-amber-500 text-white shadow-md font-bold'
@@ -296,7 +296,7 @@ export default function DsaHub({ onSelectConcept, initialTab = 'curriculum' }) {
                   <button
                     key={diff}
                     onClick={() => setSelectedDifficulty(diff)}
-                    className={`px-2.5 py-1 rounded-md text-xs font-semibold transition border ${
+                    className={`px-2.5 py-1 rounded-md text-xs font-semibold transition border cursor-pointer ${
                       selectedDifficulty === diff
                         ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-sm font-bold'
                         : isBright
@@ -335,7 +335,7 @@ export default function DsaHub({ onSelectConcept, initialTab = 'curriculum' }) {
                     setSelectedDifficulty('All');
                     setStriverSearch('');
                   }}
-                  className="text-xs text-amber-500 underline"
+                  className="text-xs text-amber-500 underline cursor-pointer"
                 >
                   Reset filters
                 </button>
@@ -367,7 +367,7 @@ export default function DsaHub({ onSelectConcept, initialTab = 'curriculum' }) {
 
                           <button
                             onClick={(e) => toggleSolved(p.id, e)}
-                            className="p-1 text-slate-400 hover:text-emerald-400 transition"
+                            className="p-1 text-slate-400 hover:text-emerald-400 transition cursor-pointer"
                             title={isSolved ? 'Mark as unsolved' : 'Mark as solved'}
                           >
                             {isSolved ? (
@@ -403,7 +403,7 @@ export default function DsaHub({ onSelectConcept, initialTab = 'curriculum' }) {
 
                         <button
                           onClick={() => handleLaunchStriverProblem(p)}
-                          className="flex items-center gap-1 px-3 py-1 rounded-md text-xs font-semibold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 shadow-sm transition active:scale-95"
+                          className="flex items-center gap-1 px-3 py-1 rounded-md text-xs font-semibold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 shadow-sm transition active:scale-95 cursor-pointer"
                         >
                           <Zap size={12} className="fill-slate-950" />
                           <span>Visualize 3D</span>
@@ -434,7 +434,7 @@ export default function DsaHub({ onSelectConcept, initialTab = 'curriculum' }) {
                     <button
                       key={cat}
                       onClick={() => setActiveCategory(cat)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition shrink-0 flex items-center gap-1.5 ${
+                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition shrink-0 flex items-center gap-1.5 cursor-pointer ${
                         isActive
                           ? isBright
                             ? 'bg-cyan-600 text-white font-bold shadow-md'
@@ -528,7 +528,7 @@ export default function DsaHub({ onSelectConcept, initialTab = 'curriculum' }) {
 
                     <button
                       onClick={() => onSelectConcept(item)}
-                      className={`w-full py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition duration-150 ${
+                      className={`w-full py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition duration-150 cursor-pointer ${
                         isBright
                           ? 'bg-cyan-600 hover:bg-cyan-700 text-white shadow-sm'
                           : 'bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'

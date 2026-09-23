@@ -48,7 +48,7 @@ export default function SettingsPage() {
             {/* Dark Mode Card */}
             <button
               onClick={() => setTheme('dark')}
-              className={`p-4 rounded-xl border text-left flex items-start gap-3.5 transition-all ${
+              className={`p-4 rounded-xl border text-left flex items-start gap-3.5 transition-all cursor-pointer ${
                 !isBright
                   ? 'bg-slate-950 border-cyan-500/80 ring-2 ring-cyan-500/30 shadow-lg shadow-cyan-950/40'
                   : 'bg-slate-100/80 border-slate-300 hover:border-slate-400 opacity-70 hover:opacity-100'
@@ -75,7 +75,7 @@ export default function SettingsPage() {
             {/* Bright Mode Card */}
             <button
               onClick={() => setTheme('bright')}
-              className={`p-4 rounded-xl border text-left flex items-start gap-3.5 transition-all ${
+              className={`p-4 rounded-xl border text-left flex items-start gap-3.5 transition-all cursor-pointer ${
                 isBright
                   ? 'bg-white border-amber-400 ring-2 ring-amber-400/30 shadow-lg shadow-amber-100'
                   : 'bg-slate-950/60 border-slate-800 hover:border-slate-700 opacity-70 hover:opacity-100'

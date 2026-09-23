@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import Editor from '@monaco-editor/react';
-import { Play, Pause, SkipBack, SkipForward, RotateCcw, FileCode, CheckCircle2, Code2, Sparkles, Trophy, BookOpen, Lightbulb } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, RotateCcw, FileCode, CheckCircle2, Code2, Sparkles, Trophy, BookOpen, Lightbulb, RefreshCw } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 
 const LANGUAGE_CONFIG = {
@@ -57,6 +57,8 @@ export default function CodeEditor({
   isAtEnd,
   isCodeDirty = false,
   onRunCode,
+  onResetCode,
+  isExecuting = false,
 }) {
   const editorRef = useRef(null);
   const monacoRef = useRef(null);
@@ -291,11 +293,11 @@ export default function CodeEditor({
         isBright ? 'bg-slate-50 border-slate-200' : 'bg-slate-900/90 border-slate-800/80'
       }`}>
         <div className="flex items-center gap-1.5">
-          {/* Play / Pause */}
+          {/* Play / Pause / Run */}
           {isPlaying ? (
             <button
               onClick={onPause}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded border text-xs font-medium transition ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded border text-xs font-medium transition cursor-pointer ${
                 isBright
                   ? 'bg-amber-100 text-amber-800 border-amber-300 hover:bg-amber-200'
                   : 'bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30'
@@ -307,33 +309,65 @@ export default function CodeEditor({
             </button>
           ) : (
             <button
-              onClick={isCodeDirty ? onRunCode || onPlay : onPlay}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold transition shadow-sm ${
-                isCodeDirty
-                  ? 'bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-950 font-bold ring-2 ring-cyan-400 shadow-lg shadow-cyan-500/40 animate-pulse'
-                  : isBright
-                    ? 'bg-cyan-600 text-white hover:bg-cyan-500 shadow-cyan-600/20'
-                    : 'bg-cyan-500 text-slate-950 hover:bg-cyan-400 shadow-cyan-500/20'
+              onClick={() => {
+                if (isExecuting) return;
+                if (onRunCode) onRunCode();
+                else if (onPlay) onPlay();
+              }}
+              disabled={isExecuting}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold transition shadow-sm cursor-pointer ${
+                isExecuting
+                  ? 'opacity-70 cursor-not-allowed bg-cyan-700 text-cyan-200'
+                  : isCodeDirty
+                    ? 'bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-950 font-bold ring-2 ring-cyan-400 shadow-lg shadow-cyan-500/40 animate-pulse'
+                    : isBright
+                      ? 'bg-cyan-600 text-white hover:bg-cyan-500 shadow-cyan-600/20'
+                      : 'bg-cyan-500 text-slate-950 hover:bg-cyan-400 shadow-cyan-500/20'
               }`}
-              title="Run / Play Simulation (Ctrl+Enter)"
+              title={isExecuting ? "Executing code..." : "Run / Play Simulation (Ctrl+Enter)"}
             >
-              <Play size={13} className="fill-current" />
-              <span>{isCodeDirty ? 'Run ⚡' : isAtEnd ? 'Replay' : isAtStart ? 'Run' : 'Resume'}</span>
+              {isExecuting ? (
+                <>
+                  <RefreshCw size={13} className="animate-spin" />
+                  <span>Compiling...</span>
+                </>
+              ) : (
+                <>
+                  <Play size={13} className="fill-current" />
+                  <span>{isCodeDirty ? 'Run ⚡' : isAtEnd ? 'Replay' : isAtStart ? 'Run' : 'Resume'}</span>
+                </>
+              )}
             </button>
           )}
 
-          {/* Reset */}
+          {/* Reset Simulation Step */}
           <button
             onClick={onReset}
-            className={`p-1.5 rounded transition ${
+            className={`p-1.5 rounded transition cursor-pointer ${
               isBright
                 ? 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/80'
             }`}
-            title="Reset to Step 1"
+            title="Reset Simulation to Step 1"
           >
             <RotateCcw size={14} />
           </button>
+
+          {/* Reset Code to Template */}
+          {onResetCode && (
+            <button
+              onClick={onResetCode}
+              className={`px-2 py-1 rounded transition cursor-pointer text-xs flex items-center gap-1 border ${
+                isBright
+                  ? 'border-slate-300 text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  : 'border-slate-700/80 text-slate-400 hover:text-slate-200 hover:bg-slate-800/70'
+              }`}
+              title="Reset Editor to Default Algorithm Code"
+            >
+              <RotateCcw size={11} className="opacity-70" />
+              <span className="text-[11px] font-mono">Reset Code</span>
+            </button>
+          )}
         </div>
 
         {/* Step-by-Step Step Back / Next */}

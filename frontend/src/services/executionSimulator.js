@@ -1347,26 +1347,185 @@ export function generateDynamicQueueTrace(values = [10, 20, 30], language = 'jav
 /**
  * Dynamic 3D Tree / BST Generator
  */
-export function generateDynamicTreeTrace(values = [50, 30, 70, 20, 40], language = 'java') {
-  const nums = values.length > 0 ? values : [50, 30, 70, 20, 40];
+export function generateDynamicTreeTrace(values = [50, 30, 70, 20, 40, 60, 80], language = 'java') {
+  const nums = values.length > 0 ? values : [50, 30, 70, 20, 40, 60, 80];
   const steps = [];
+  let stepCounter = 1;
 
-  nums.forEach((v, idx) => {
+  const currentNodes = [];
+  let nextNodeId = 0;
+
+  // 1. Step-by-step BST Insertions
+  for (let k = 0; k < nums.length; k++) {
+    const val = nums[k];
+
+    if (k === 0) {
+      // Root Node Creation
+      const rootNode = { id: 0, val, left: null, right: null, parent: null, depth: 0 };
+      currentNodes.push(rootNode);
+      nextNodeId = 1;
+
+      steps.push({
+        stepNumber: stepCounter++,
+        lineNumber: 5,
+        eventType: 'TREE_INSERT_ROOT',
+        variables: { root: val, inserted: val },
+        output: [`BST Root created with value ${val}`],
+        dataStructureState: {
+          type: 'tree',
+          nodes: currentNodes.map((n) => ({ ...n })),
+          activeIndex: 0,
+          label: `Created BST Root [${val}]`,
+          focusInfo: `Level 0 (Root) | Value: ${val}`
+        },
+        explanation: `Allocated BST Root node with value ${val} at Level 0.`,
+        aiHint: 'The root forms the foundation for all subsequent left/right comparisons.',
+      });
+      continue;
+    }
+
+    // Traverse from root to find insertion point
+    let curr = 0;
+    while (curr !== null) {
+      const parentNode = currentNodes.find((n) => n.id === curr);
+      if (!parentNode) break;
+
+      if (val < parentNode.val) {
+        steps.push({
+          stepNumber: stepCounter++,
+          lineNumber: 8,
+          eventType: 'TREE_COMPARE_LEFT',
+          variables: { current: parentNode.val, incoming: val, branch: 'LEFT' },
+          output: [`${val} < ${parentNode.val} -> Moving Left`],
+          dataStructureState: {
+            type: 'tree',
+            nodes: currentNodes.map((n) => ({ ...n })),
+            activeIndex: parentNode.id,
+            label: `Checking: ${val} < ${parentNode.val} (Left Branch)`,
+            focusInfo: `Comparing ${val} with ${parentNode.val}: Left`
+          },
+          explanation: `Value ${val} is smaller than ${parentNode.val}. Branching to Left subtree.`,
+          aiHint: 'BST invariant: Left child is strictly smaller than parent.'
+        });
+
+        if (parentNode.left === null) {
+          const newId = nextNodeId++;
+          parentNode.left = newId;
+          const newNode = {
+            id: newId,
+            val,
+            left: null,
+            right: null,
+            parent: parentNode.id,
+            depth: parentNode.depth + 1
+          };
+          currentNodes.push(newNode);
+
+          steps.push({
+            stepNumber: stepCounter++,
+            lineNumber: 11,
+            eventType: 'TREE_INSERT_NODE',
+            variables: { parent: parentNode.val, inserted: val, position: 'LEFT' },
+            output: [`Inserted ${val} as Left Child of ${parentNode.val}`],
+            dataStructureState: {
+              type: 'tree',
+              nodes: currentNodes.map((n) => ({ ...n })),
+              activeIndex: newId,
+              label: `Inserted Node [${val}] (Left)`,
+              focusInfo: `Level ${newNode.depth} | Parent: ${parentNode.val}`
+            },
+            explanation: `Placed new node ${val} as Left child of ${parentNode.val} at Level ${newNode.depth}.`,
+            aiHint: 'Leaf insertion complete in O(log n) time.'
+          });
+          break;
+        } else {
+          curr = parentNode.left;
+        }
+      } else {
+        steps.push({
+          stepNumber: stepCounter++,
+          lineNumber: 14,
+          eventType: 'TREE_COMPARE_RIGHT',
+          variables: { current: parentNode.val, incoming: val, branch: 'RIGHT' },
+          output: [`${val} >= ${parentNode.val} -> Moving Right`],
+          dataStructureState: {
+            type: 'tree',
+            nodes: currentNodes.map((n) => ({ ...n })),
+            activeIndex: parentNode.id,
+            label: `Checking: ${val} >= ${parentNode.val} (Right Branch)`,
+            focusInfo: `Comparing ${val} with ${parentNode.val}: Right`
+          },
+          explanation: `Value ${val} is greater than or equal to ${parentNode.val}. Branching to Right subtree.`,
+          aiHint: 'BST invariant: Right child is strictly greater than or equal to parent.'
+        });
+
+        if (parentNode.right === null) {
+          const newId = nextNodeId++;
+          parentNode.right = newId;
+          const newNode = {
+            id: newId,
+            val,
+            left: null,
+            right: null,
+            parent: parentNode.id,
+            depth: parentNode.depth + 1
+          };
+          currentNodes.push(newNode);
+
+          steps.push({
+            stepNumber: stepCounter++,
+            lineNumber: 17,
+            eventType: 'TREE_INSERT_NODE',
+            variables: { parent: parentNode.val, inserted: val, position: 'RIGHT' },
+            output: [`Inserted ${val} as Right Child of ${parentNode.val}`],
+            dataStructureState: {
+              type: 'tree',
+              nodes: currentNodes.map((n) => ({ ...n })),
+              activeIndex: newId,
+              label: `Inserted Node [${val}] (Right)`,
+              focusInfo: `Level ${newNode.depth} | Parent: ${parentNode.val}`
+            },
+            explanation: `Placed new node ${val} as Right child of ${parentNode.val} at Level ${newNode.depth}.`,
+            aiHint: 'Leaf insertion complete in O(log n) time.'
+          });
+          break;
+        } else {
+          curr = parentNode.right;
+        }
+      }
+    }
+  }
+
+  // 2. Final In-Order Traversal sequence (Left, Root, Right)
+  const nodeMap = new Map();
+  currentNodes.forEach((n) => nodeMap.set(n.id, n));
+  const inOrderVals = [];
+  function collectInOrder(id) {
+    if (id === null || id === undefined) return;
+    const n = nodeMap.get(id);
+    if (!n) return;
+    collectInOrder(n.left);
+    inOrderVals.push(n);
+    collectInOrder(n.right);
+  }
+  collectInOrder(0);
+
+  inOrderVals.forEach((n, idx) => {
     steps.push({
-      stepNumber: idx + 1,
-      lineNumber: 4 + idx,
-      eventType: 'TREE_SEARCH',
-      variables: { currentNode: v, target: nums[nums.length - 1] },
-      output: [],
+      stepNumber: stepCounter++,
+      lineNumber: 22,
+      eventType: 'TREE_INORDER_VISIT',
+      variables: { visitIndex: idx + 1, currentNode: n.val },
+      output: [`In-Order Visit [${idx + 1}/${inOrderVals.length}]: ${n.val}`],
       dataStructureState: {
         type: 'tree',
-        values: nums.slice(0, idx + 1),
-        activeIndex: idx,
-        label: `Inspecting Tree Node: ${v}`,
-        focusInfo: `Level ${idx === 0 ? '0 (Root)' : '1 (Branch)'} | Value: ${v}`
+        nodes: currentNodes.map((node) => ({ ...node })),
+        activeIndex: n.id,
+        label: `In-Order Traversal: Node ${n.val}`,
+        focusInfo: `Ascending Sequence Element: ${n.val}`
       },
-      explanation: `Examining BST node ${v}. Hierarchical path bifurcates left if smaller, right if larger.`,
-      aiHint: 'Search halves candidate space in O(log n) average time.'
+      explanation: `In-order traversal visited node ${n.val}. In-order BST traversal yields sorted order!`,
+      aiHint: 'In-order traversal of a valid BST always prints elements in non-decreasing sorted order.'
     });
   });
 

@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 
 export default function AuthGate() {
-  const { login, register, loginAsDemo } = useAuth();
+  const { login, register } = useAuth();
   const { isBright, toggleTheme } = useTheme();
   const [isRegister, setIsRegister] = useState(false);
 
@@ -57,15 +57,6 @@ export default function AuthGate() {
           setError(res.message || 'Invalid username or password');
         }
       }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDemoAccess = async () => {
-    setLoading(true);
-    try {
-      await loginAsDemo();
     } finally {
       setLoading(false);
     }

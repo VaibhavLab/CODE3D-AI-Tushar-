@@ -9,23 +9,33 @@ import * as THREE from 'three';
 /**
  * Handles smooth dynamic camera transitions to preset viewpoints (Top, Front, Isometric, Reset).
  */
-function CameraPresetHandler({ preset, onApplied }) {
+function CameraPresetHandler({ preset, onApplied, controlsRef }) {
   const { camera } = useThree();
 
   useEffect(() => {
     if (!preset) return;
+    if (controlsRef?.current) {
+      controlsRef.current.target.set(0, 0, 0);
+    }
     if (preset === 'top') {
-      camera.position.set(0, 16, 0.01);
+      camera.position.set(0, 18, 0.01);
     } else if (preset === 'front') {
-      camera.position.set(0, 2, 11);
+      camera.position.set(0, 2.5, 12);
     } else if (preset === 'iso') {
-      camera.position.set(8, 8, 9);
+      camera.position.set(9, 9, 10);
     } else if (preset === 'reset') {
-      camera.position.set(0, 4, 9);
+      camera.position.set(0, 4.5, 11);
+      if (controlsRef?.current) {
+        controlsRef.current.reset();
+        controlsRef.current.target.set(0, 0, 0);
+      }
     }
     camera.lookAt(0, 0, 0);
+    if (controlsRef?.current) {
+      controlsRef.current.update();
+    }
     onApplied();
-  }, [preset, camera, onApplied]);
+  }, [preset, camera, onApplied, controlsRef]);
 
   return null;
 }
@@ -48,6 +58,7 @@ export default function SceneContainer({
   const { isBright } = useTheme();
   const [cameraPreset, setCameraPreset] = useState(null);
   const [showHologram, setShowHologram] = useState(true);
+  const controlsRef = useRef(null);
 
   return (
     <div className={`relative w-full h-full min-h-[360px] overflow-hidden select-none transition-colors duration-200 ${
@@ -207,6 +218,7 @@ export default function SceneContainer({
           <CameraPresetHandler
             preset={cameraPreset}
             onApplied={() => setCameraPreset(null)}
+            controlsRef={controlsRef}
           />
 
           <Center top>
@@ -289,11 +301,12 @@ export default function SceneContainer({
         </Suspense>
 
         <OrbitControls
+          ref={controlsRef}
           enableDamping
           dampingFactor={0.08}
-          minDistance={3.5}
-          maxDistance={25}
-          maxPolarAngle={Math.PI / 2 - 0.05}
+          minDistance={1.8}
+          maxDistance={45}
+          maxPolarAngle={Math.PI / 2 - 0.02}
         />
       </Canvas>
 
