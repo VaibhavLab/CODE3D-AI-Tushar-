@@ -7,7 +7,7 @@ import { useTheme } from '../context/ThemeContext';
 export default function Navbar({ activeTab, setActiveTab, onOpenCodeDoctor }) {
   const [backendOnline, setBackendOnline] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-  const { user, isAuthenticated, logout, openLoginModal, loginAsDemo } = useAuth();
+  const { user, isAuthenticated, logout, openLoginModal } = useAuth();
   const { theme, toggleTheme, isBright } = useTheme();
 
   useEffect(() => {
@@ -207,19 +207,6 @@ export default function Navbar({ activeTab, setActiveTab, onOpenCodeDoctor }) {
                   >
                     {isBright ? <Moon size={12} /> : <Sun size={12} />}
                     <span>Switch to {isBright ? 'Dark' : 'Bright'} Mode</span>
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      loginAsDemo();
-                      setIsProfileMenuOpen(false);
-                    }}
-                    className={`w-full text-left px-2 py-1.5 rounded-lg flex items-center gap-2 ${
-                      isBright ? 'hover:bg-slate-100 text-slate-700' : 'hover:bg-slate-800 text-slate-300'
-                    }`}
-                  >
-                    <Sparkles size={12} className="text-cyan-500 dark:text-cyan-400" />
-                    <span>Switch to Demo Architect</span>
                   </button>
 
                   <button

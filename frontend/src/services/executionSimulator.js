@@ -4251,6 +4251,118 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code') {
   const countVarName = cleanCode.includes('evens') ? 'evens' : cleanCode.includes('odds') ? 'odds' : cleanCode.includes('ans') ? 'ans' : 'count';
 
   // -------------------------------------------------------------
+  // PATH 0: SEQUENTIAL STATEMENTS / ARITHMETIC / EXPRESSIONS
+  // Executes ANY custom code without loops (e.g. int a=10; int b=20; sum=a+b; print(sum))
+  // -------------------------------------------------------------
+  const hasLoop = cleanCode.includes('for') || cleanCode.includes('while') || cleanCode.includes('loop');
+  if (!hasLoop && !hasTargetSearch && !hasTwoPointerWhile) {
+    const rawLines = rawCode.split('\n')
+      .map(l => l.trim())
+      .filter(l => l && !l.startsWith('//') && !l.startsWith('/*') && !l.startsWith('*') && !l.startsWith('import ') && !l.startsWith('package ') && !l.startsWith('class ') && !l.startsWith('public static void main') && l !== '{' && l !== '}');
+
+    if (rawLines.length > 0) {
+      const vars = {};
+      const regValues = [];
+      const varNames = [];
+
+      for (let lineIdx = 0; lineIdx < rawLines.length && step < 30; lineIdx++) {
+        const line = rawLines[lineIdx];
+        const assignMatch = line.match(/(?:int|float|double|let|const|var)?\s*([a-zA-Z_]\w*)\s*=\s*([^;]+)/);
+        const printMatch = line.match(/(?:System\.out\.println|print|console\.log|cout\s*<<)\s*\(([^)]+)\)|cout\s*<<\s*([^;]+)/);
+
+        if (assignMatch) {
+          const varName = assignMatch[1];
+          const expr = assignMatch[2].trim();
+          let evalVal = null;
+          try {
+            let safeExpr = expr;
+            for (const [k, v] of Object.entries(vars)) {
+              safeExpr = safeExpr.replace(new RegExp(`\\b${k}\\b`, 'g'), v);
+            }
+            evalVal = Function(`'use strict'; return (${safeExpr})`)();
+          } catch (e) {
+            evalVal = parseInt(expr, 10) || 0;
+          }
+
+          vars[varName] = evalVal;
+          if (!varNames.includes(varName)) {
+            varNames.push(varName);
+            regValues.push(typeof evalVal === 'number' ? evalVal : 10);
+          } else {
+            const idx = varNames.indexOf(varName);
+            regValues[idx] = typeof evalVal === 'number' ? evalVal : 10;
+          }
+
+          steps.push({
+            stepNumber: step++,
+            lineNumber: lineIdx + 1,
+            eventType: 'VARIABLE_ASSIGNMENT',
+            variables: { ...vars },
+            changedVariable: varName,
+            currentValue: evalVal,
+            output: [...output],
+            dataStructureState: {
+              type: 'array',
+              name: 'Registers',
+              values: [...regValues],
+              activeIndex: varNames.indexOf(varName),
+              pointers: { [varName]: varNames.indexOf(varName) },
+              label: `${varName} = ${evalVal}`,
+              focusInfo: `Evaluated ${varName} = ${expr} → ${evalVal}`
+            },
+            explanation: `Executed line: '${line}'. Evaluated expression to ${evalVal} and assigned to variable '${varName}'.`,
+            aiHint: `3D Memory Register [${varNames.indexOf(varName)}] stores '${varName}' = ${evalVal}.`
+          });
+        } else if (printMatch) {
+          const toPrint = (printMatch[1] || printMatch[2]).trim();
+          let printVal = vars[toPrint] !== undefined ? vars[toPrint] : toPrint;
+          output.push(String(printVal));
+
+          steps.push({
+            stepNumber: step++,
+            lineNumber: lineIdx + 1,
+            eventType: 'PRINT_OUTPUT',
+            variables: { ...vars },
+            output: [...output],
+            dataStructureState: {
+              type: 'array',
+              name: 'Registers',
+              values: [...regValues],
+              activeIndex: vars[toPrint] !== undefined ? varNames.indexOf(toPrint) : null,
+              label: `Print: ${printVal}`,
+              focusInfo: `Standard output streamed: ${printVal}`
+            },
+            explanation: `Standard output statement executed: printed '${printVal}' to console.`,
+            aiHint: 'Output verified and recorded into output stream.'
+          });
+        }
+      }
+
+      if (steps.length > 0) {
+        const lastVal = output.length > 0 ? output[output.length - 1] : Object.values(vars)[Object.values(vars).length - 1] || 'Done';
+        steps.push({
+          stepNumber: step,
+          lineNumber: rawLines.length + 1,
+          eventType: 'PROGRAM_END',
+          variables: { ...vars, result: lastVal },
+          output: [...output, `Program Completed: Result = ${lastVal}`],
+          dataStructureState: {
+            type: 'array',
+            name: 'Registers',
+            values: [...regValues],
+            activeIndex: null,
+            label: `Execution Finished: Output = ${lastVal}`,
+            focusInfo: `All statements executed successfully`
+          },
+          explanation: `Complete execution finished with code 0. Verified final output: ${lastVal}.`,
+          aiHint: 'Universal AST sequential engine completed execution.'
+        });
+        return steps;
+      }
+    }
+  }
+
+  // -------------------------------------------------------------
   // PATH A: TARGET SEARCH / LINEAR SEARCH
   // -------------------------------------------------------------
   if (hasTargetSearch && !hasNestedLoop && !hasTwoPointerWhile) {

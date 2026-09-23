@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Text, Float } from '@react-three/drei';
 import * as THREE from 'three';
@@ -126,18 +126,21 @@ function ArrayCell({
   isLisActive = false,
   dpValue = null,
 }) {
+  const [isHovered, setIsHovered] = useState(false);
   const meshRef = useRef();
   const isNegative = typeof value === 'number' && value < 0;
 
   // If customHeight is provided (e.g. for Container With Most Water or Trapping Rain Water), scale box height
   const baseHeight = customHeight ? Math.max(0.6, Math.min(customHeight * 0.45, 4.5)) : 1.4;
-  const targetY = isTargetFound ? 1.0 : isActive ? 0.75 : isInWindow ? 0.25 : 0;
-  const targetScale = isTargetFound ? 1.15 : isActive ? 1.08 : isInWindow ? 1.02 : 1.0;
+  const hoverScaleMultiplier = isHovered ? 1.32 : 1.0;
+  const hoverElevation = isHovered ? 0.38 : 0;
+  const targetY = (isTargetFound ? 1.0 : isActive ? 0.75 : isInWindow ? 0.25 : 0) + hoverElevation;
+  const targetScale = (isTargetFound ? 1.15 : isActive ? 1.08 : isInWindow ? 1.02 : 1.0) * hoverScaleMultiplier;
 
   useFrame((_, delta) => {
     if (meshRef.current) {
-      meshRef.current.position.y = THREE.MathUtils.lerp(meshRef.current.position.y, targetY + baseHeight / 2 - 0.7, delta * 10);
-      meshRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), delta * 10);
+      meshRef.current.position.y = THREE.MathUtils.lerp(meshRef.current.position.y, targetY + baseHeight / 2 - 0.7, delta * 12);
+      meshRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), delta * 12);
     }
   });
 
@@ -146,7 +149,11 @@ function ArrayCell({
   let emissiveColor = '#0f172a';
   let wireColor = '#334155';
 
-  if (isTargetFound) {
+  if (isHovered) {
+    boxColor = '#0284c7';
+    emissiveColor = '#0ea5e9';
+    wireColor = '#38bdf8';
+  } else if (isTargetFound) {
     boxColor = '#eab308';
     emissiveColor = '#ca8a04';
     wireColor = '#fef08a';
@@ -176,14 +183,26 @@ function ArrayCell({
     <group position={[positionX, 0, 0]}>
       {/* 3D Cell Box */}
       <group ref={meshRef} position={[0, targetY + baseHeight / 2 - 0.7, 0]}>
-        <mesh castShadow receiveShadow>
+        <mesh
+          castShadow
+          receiveShadow
+          onPointerOver={(e) => {
+            e.stopPropagation();
+            setIsHovered(true);
+            document.body.style.cursor = 'pointer';
+          }}
+          onPointerOut={() => {
+            setIsHovered(false);
+            document.body.style.cursor = 'default';
+          }}
+        >
           <boxGeometry args={[1.45, baseHeight, 1.45]} />
           <meshStandardMaterial
             color={boxColor}
             metalness={0.55}
             roughness={0.18}
             emissive={emissiveColor}
-            emissiveIntensity={isTargetFound ? 1.5 : isActive ? 1.1 : isInWindow ? 0.6 : 0.25}
+            emissiveIntensity={isHovered ? 1.8 : isTargetFound ? 1.5 : isActive ? 1.1 : isInWindow ? 0.6 : 0.25}
           />
         </mesh>
 
@@ -192,6 +211,31 @@ function ArrayCell({
           <edgesGeometry args={[new THREE.BoxGeometry(1.46, baseHeight + 0.01, 1.46)]} />
           <lineBasicMaterial color={wireColor} linewidth={2} />
         </lineSegments>
+
+        {/* Interactive Mouse Hover 3D Inspection Tooltip */}
+        {isHovered && (
+          <Float speed={5} floatIntensity={0.15}>
+            <group position={[0, baseHeight / 2 + 1.25, 0]}>
+              <mesh position={[0, 0, -0.02]}>
+                <planeGeometry args={[2.8, 1.05]} />
+                <meshBasicMaterial color="#080e1e" transparent opacity={0.94} />
+              </mesh>
+              <lineSegments position={[0, 0, -0.01]}>
+                <edgesGeometry args={[new THREE.BoxGeometry(2.82, 1.07, 0.01)]} />
+                <lineBasicMaterial color="#38bdf8" />
+              </lineSegments>
+              <Text position={[0, 0.32, 0.05]} fontSize={0.22} color="#38bdf8" fontWeight="bold">
+                {`arr[${index}] = ${value}`}
+              </Text>
+              <Text position={[0, 0.04, 0.05]} fontSize={0.14} color="#94a3b8">
+                {`Box Size: 1.45 × ${baseHeight.toFixed(2)} × 1.45`}
+              </Text>
+              <Text position={[0, -0.24, 0.05]} fontSize={0.13} color="#22c55e" fontStyle="italic">
+                {`⚡ Scaled 132% on Mouse Over`}
+              </Text>
+            </group>
+          </Float>
+        )}
 
         {/* Active Holo Ring around active cell */}
         {isActive && !isTargetFound && <CellHoloRing color={isNegative ? '#f43f5e' : '#00f2fe'} />}

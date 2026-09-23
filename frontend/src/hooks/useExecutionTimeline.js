@@ -96,6 +96,79 @@ export function useExecutionTimeline(trace = []) {
     };
   }, [isPlaying, playbackSpeed, totalSteps]);
 
+  // Accumulate stdout output from step 0 up to currentStepIndex
+  const cumulativeOutput = (() => {
+    if (!trace || trace.length === 0) return [];
+    const seen = new Set();
+    const result = [];
+
+    // First check if currentStep already has an accumulated array
+    const currOut = currentStep?.output;
+    if (Array.isArray(currOut) && currOut.length > 0) {
+      // Check if previous steps also had outputs
+      for (let i = 0; i <= currentStepIndex && i < trace.length; i++) {
+        const stepOut = trace[i]?.output;
+        if (Array.isArray(stepOut)) {
+          for (const line of stepOut) {
+            if (line && !seen.has(line)) {
+              seen.add(line);
+              result.push(line);
+            }
+          }
+        }
+      }
+      return result.length > 0 ? result : currOut;
+    }
+
+    // Otherwise gather from all steps up to now
+    for (let i = 0; i <= currentStepIndex && i < trace.length; i++) {
+      const stepOut = trace[i]?.output;
+      if (Array.isArray(stepOut)) {
+        for (const line of stepOut) {
+          if (line && !seen.has(line)) {
+            seen.add(line);
+            result.push(line);
+          }
+        }
+      }
+    }
+    return result;
+  })();
+
+  // Extract the verified correct final output / return value
+  const finalCorrectOutput = (() => {
+    if (!trace || trace.length === 0) return null;
+    const lastStep = trace[trace.length - 1];
+    if (!lastStep) return null;
+
+    // 1. Check variables for direct results
+    const vars = lastStep.variables || {};
+    if (vars.result !== undefined) return String(vars.result);
+    if (vars.ans !== undefined) return String(vars.ans);
+    if (vars.sorted !== undefined) return String(vars.sorted);
+    if (vars.maxProfit !== undefined) return `Max Profit: ${vars.maxProfit}`;
+    if (vars.minCoins !== undefined) return `Min Coins: ${vars.minCoins}`;
+    if (vars.maxWater !== undefined) return `Max Water: ${vars.maxWater}`;
+    if (vars.trappedWater !== undefined) return `Trapped Water: ${vars.trappedWater}`;
+    if (vars.maxSum !== undefined) return `Max Subarray Sum: ${vars.maxSum}`;
+    if (vars.totalTrapped !== undefined) return `Total Trapped: ${vars.totalTrapped}`;
+    if (vars.total !== undefined) return `Total: ${vars.total}`;
+    if (vars.sum !== undefined) return `Sum: ${vars.sum}`;
+
+    // 2. Check last step output lines
+    if (Array.isArray(lastStep.output) && lastStep.output.length > 0) {
+      return lastStep.output[lastStep.output.length - 1];
+    }
+
+    // 3. Check dataStructureState label
+    if (lastStep.dataStructureState?.label) {
+      return lastStep.dataStructureState.label;
+    }
+
+    // 4. Return explanation or focusInfo
+    return lastStep.dataStructureState?.focusInfo || 'Execution Completed Successfully';
+  })();
+
   return {
     currentStepIndex,
     currentStep,
@@ -112,5 +185,7 @@ export function useExecutionTimeline(trace = []) {
     pause,
     togglePlay,
     reset,
+    cumulativeOutput,
+    finalCorrectOutput,
   };
 }

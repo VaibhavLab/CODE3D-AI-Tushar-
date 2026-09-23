@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Text, Float } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -98,6 +98,7 @@ function OrangeOrb({ position, type, isActive }) {
 
 export default function MatrixVisualizer3D({ dataStructureState }) {
   const { matrix = [], pointers = {}, label, focusInfo } = dataStructureState || {};
+  const [hoveredCell, setHoveredCell] = useState(null);
   const activeRow = pointers?.activeRow ?? pointers?.R ?? pointers?.r ?? -1;
   const activeCol = pointers?.activeCol ?? pointers?.C ?? pointers?.c ?? -1;
   const conflictRow = pointers?.conflictRow ?? -1;
@@ -187,16 +188,36 @@ export default function MatrixVisualizer3D({ dataStructureState }) {
 
             const numericVal = typeof val === 'number' ? val : 0;
             const blockHeight = isQueen ? 0.35 : Math.max(0.4, Math.min(2.2, 0.4 + (numericVal / 25) * 1.4));
+            const isHovered = hoveredCell && hoveredCell[0] === r && hoveredCell[1] === c;
+            const hoverScale = isHovered ? 1.3 : 1.0;
+            const hoverElevation = isHovered ? 0.35 : 0;
 
             return (
-              <group key={`c-${c}`} position={[posX, isActive ? 0.3 : 0, 0]}>
+              <group
+                key={`c-${c}`}
+                position={[posX, (isActive ? 0.3 : 0) + hoverElevation, 0]}
+                scale={[hoverScale, hoverScale, hoverScale]}
+              >
                 {/* Base Tile Box */}
-                <mesh castShadow receiveShadow position={[0, blockHeight / 2, 0]}>
+                <mesh
+                  castShadow
+                  receiveShadow
+                  position={[0, blockHeight / 2, 0]}
+                  onPointerOver={(e) => {
+                    e.stopPropagation();
+                    setHoveredCell([r, c]);
+                    document.body.style.cursor = 'pointer';
+                  }}
+                  onPointerOut={() => {
+                    setHoveredCell(null);
+                    document.body.style.cursor = 'default';
+                  }}
+                >
                   <boxGeometry args={[1.4, blockHeight, 1.4]} />
                   <meshStandardMaterial
-                    color={tileColor}
-                    emissive={emissiveColor}
-                    emissiveIntensity={emissiveIntensity}
+                    color={isHovered ? '#0284c7' : tileColor}
+                    emissive={isHovered ? '#38bdf8' : emissiveColor}
+                    emissiveIntensity={isHovered ? 1.8 : emissiveIntensity}
                     metalness={0.5}
                     roughness={0.25}
                   />
@@ -207,7 +228,9 @@ export default function MatrixVisualizer3D({ dataStructureState }) {
                   <edgesGeometry args={[new THREE.BoxGeometry(1.41, blockHeight + 0.01, 1.41)]} />
                   <lineBasicMaterial
                     color={
-                      isConflict
+                      isHovered
+                        ? '#38bdf8'
+                        : isConflict
                         ? '#ef4444'
                         : isActive
                         ? '#67e8f9'
@@ -219,6 +242,31 @@ export default function MatrixVisualizer3D({ dataStructureState }) {
                     }
                   />
                 </lineSegments>
+
+                {/* Interactive Mouse Hover 3D Inspection Tooltip */}
+                {isHovered && (
+                  <Float speed={5} floatIntensity={0.15}>
+                    <group position={[0, blockHeight + 1.25, 0]}>
+                      <mesh position={[0, 0, -0.02]}>
+                        <planeGeometry args={[2.7, 1.05]} />
+                        <meshBasicMaterial color="#080e1e" transparent opacity={0.95} />
+                      </mesh>
+                      <lineSegments position={[0, 0, -0.01]}>
+                        <edgesGeometry args={[new THREE.BoxGeometry(2.72, 1.07, 0.01)]} />
+                        <lineBasicMaterial color="#38bdf8" />
+                      </lineSegments>
+                      <Text position={[0, 0.32, 0.05]} fontSize={0.21} color="#38bdf8" fontWeight="bold">
+                        {`Grid [${r}, ${c}] = ${val}`}
+                      </Text>
+                      <Text position={[0, 0.04, 0.05]} fontSize={0.14} color="#94a3b8">
+                        {`Box Size: 1.4 × ${blockHeight.toFixed(2)} × 1.4`}
+                      </Text>
+                      <Text position={[0, -0.24, 0.05]} fontSize={0.13} color="#22c55e" fontStyle="italic">
+                        {`⚡ Scaled 130% on Mouse Over`}
+                      </Text>
+                    </group>
+                  </Float>
+                )}
 
                 {/* N-Queens: Render 3D Queen Crown */}
                 {isQueen && (

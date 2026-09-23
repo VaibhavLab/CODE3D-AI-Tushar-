@@ -2,7 +2,7 @@ import React from 'react';
 import { Variable, CheckCircle2, XCircle, Sparkles, Layers, Cpu, ArrowRight } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 
-export default function StatePanel({ currentStep, totalSteps }) {
+export default function StatePanel({ currentStep, totalSteps, correctOutput = null, isAtEnd = false }) {
   const { isBright } = useTheme();
 
   if (!currentStep) return null;
@@ -77,6 +77,33 @@ export default function StatePanel({ currentStep, totalSteps }) {
             </div>
           </div>
         </div>
+
+        {/* Verified Correct Output Card */}
+        {correctOutput && (
+          <div className={`border rounded-lg p-3 transition-colors ${
+            isAtEnd
+              ? isBright
+                ? 'bg-emerald-50/90 border-emerald-300 text-emerald-950 shadow-sm'
+                : 'bg-emerald-950/40 border-emerald-500/40 text-emerald-200 shadow-emerald-950/40'
+              : isBright
+                ? 'bg-cyan-50/90 border-cyan-200 text-cyan-950'
+                : 'bg-slate-900/60 border-slate-800/80'
+          }`}>
+            <div className="flex items-center justify-between mb-1.5">
+              <span className={`text-[10px] uppercase font-bold tracking-wider ${isAtEnd ? 'text-emerald-500' : 'text-cyan-400'}`}>
+                {isAtEnd ? '🏆 Verified Correct Output' : '⚡ Output Result'}
+              </span>
+              <span className={`text-[9px] px-1.5 py-0.2 rounded font-mono font-bold ${
+                isAtEnd ? 'bg-emerald-500/20 text-emerald-300' : 'bg-cyan-500/20 text-cyan-300'
+              }`}>
+                {isAtEnd ? '100% CORRECT' : 'EVALUATING'}
+              </span>
+            </div>
+            <div className="font-mono text-xs font-bold break-all">
+              {correctOutput}
+            </div>
+          </div>
+        )}
 
         {/* Variables Section */}
         <div className={`border rounded-lg p-3 transition-colors ${

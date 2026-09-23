@@ -86,7 +86,54 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
     play,
     pause,
     reset,
+    cumulativeOutput,
+    finalCorrectOutput,
   } = useExecutionTimeline(trace);
+
+  // Dynamic Box Resizing State (Editor width % and Console height px)
+  const [editorWidthPercent, setEditorWidthPercent] = useState(35);
+  const [consoleHeightPx, setConsoleHeightPx] = useState(165);
+  const [isResizingEditor, setIsResizingEditor] = useState(false);
+  const [isResizingConsole, setIsResizingConsole] = useState(false);
+
+  // Handle dragging horizontal splitter between Code Editor and 3D Viewport
+  const startEditorResize = (e) => {
+    e.preventDefault();
+    setIsResizingEditor(true);
+    const onMouseMove = (moveEvent) => {
+      const containerWidth = window.innerWidth;
+      const newPercent = Math.min(65, Math.max(20, (moveEvent.clientX / containerWidth) * 100));
+      setEditorWidthPercent(Math.round(newPercent));
+    };
+    const onMouseUp = () => {
+      setIsResizingEditor(false);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  };
+
+  // Handle dragging vertical splitter between 3D Canvas and Output Console
+  const startConsoleResize = (e) => {
+    e.preventDefault();
+    setIsResizingConsole(true);
+    const startY = moveEvent => moveEvent.clientY;
+    const initialHeight = consoleHeightPx;
+    const initialY = e.clientY;
+    const onMouseMove = (moveEvent) => {
+      const deltaY = initialY - moveEvent.clientY;
+      const newHeight = Math.min(380, Math.max(70, initialHeight + deltaY));
+      setConsoleHeightPx(Math.round(newHeight));
+    };
+    const onMouseUp = () => {
+      setIsResizingConsole(false);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  };
 
   // Check backend health on mount
   useEffect(() => {
@@ -742,11 +789,14 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
         </button>
       </div>
 
-      {/* Main Studio Workspace */}
-      <div className="flex-1 grid grid-cols-1 md:grid-cols-12 overflow-hidden">
-        {/* Left Column: Monaco Code Editor */}
+      {/* Main Studio Workspace with Draggable Box Resizers */}
+      <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative select-none">
+        {/* Left Box: Monaco Code Editor */}
         {!isFull3DView && (
-          <div className={`${mobileTab === 'code' ? 'block' : 'hidden'} md:block md:col-span-4 h-full overflow-hidden`}>
+          <div
+            className={`${mobileTab === 'code' ? 'block w-full' : 'hidden'} md:block h-full overflow-hidden shrink-0 transition-all duration-75`}
+            style={{ width: isFull3DView ? 0 : `${editorWidthPercent}%` }}
+          >
             <CodeEditor
               code={code}
               onChangeCode={setCode}
@@ -771,11 +821,63 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
           </div>
         )}
 
-        {/* Center Column: 3D Visualization + Console + User Input Bar */}
+        {/* Draggable & Hover Resizing Divider Bar between Code Editor and 3D Visualizer */}
+        {!isFull3DView && (
+          <div
+            onMouseDown={startEditorResize}
+            className={`hidden md:flex flex-col items-center justify-center w-2 relative group cursor-col-resize z-20 transition-colors ${
+              isResizingEditor
+                ? 'bg-cyan-500 shadow-lg shadow-cyan-500/50'
+                : isBright
+                ? 'bg-slate-200 hover:bg-cyan-400'
+                : 'bg-slate-800/80 hover:bg-cyan-500/80'
+            }`}
+            title={`Drag to resize Code vs 3D Box (Current: ${editorWidthPercent}%)`}
+          >
+            {/* Hover Grab Handle Dots */}
+            <div className="w-1 h-8 rounded-full bg-slate-400/50 group-hover:bg-slate-900 group-hover:scale-y-125 transition-all"></div>
+
+            {/* Quick Preset Buttons on Hover */}
+            <div className="absolute top-2 left-3 hidden group-hover:flex items-center gap-1 backdrop-blur-md bg-slate-950/90 border border-slate-700 rounded-lg p-1 text-[10px] shadow-xl z-30 pointer-events-auto">
+              <span className="text-slate-400 font-mono px-1">Editor:</span>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setEditorWidthPercent(25);
+                }}
+                className="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-cyan-600 text-cyan-300 font-mono"
+              >
+                25%
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setEditorWidthPercent(35);
+                }}
+                className="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-cyan-600 text-cyan-300 font-mono"
+              >
+                35%
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setEditorWidthPercent(50);
+                }}
+                className="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-cyan-600 text-cyan-300 font-mono"
+              >
+                50%
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Center Box: 3D Visualization + Console + User Input Bar */}
         <div className={`
           ${mobileTab === '3d' ? 'flex' : 'hidden'} 
-          ${isFull3DView ? 'md:col-span-12' : showStatePanel ? 'md:col-span-5' : 'md:col-span-8'}
-          md:flex h-full flex-col border-r border-slate-800/80 overflow-hidden transition-all duration-300
+          md:flex flex-1 h-full flex-col overflow-hidden transition-all duration-75 border-r border-slate-800/80
         `}>
           {/* Direct Interactive Form User Input Bar */}
           <div className={`px-3 py-1.5 border-b flex flex-wrap items-center justify-between gap-2 text-xs transition-colors shrink-0 ${
@@ -869,11 +971,14 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
             </div>
           </div>
 
-          {/* 3D Canvas Viewport */}
-          <div className="flex-1 relative min-h-[260px] sm:min-h-[340px]">
+          {/* 3D Canvas Viewport Box */}
+          <div className="flex-1 relative min-h-[220px]">
             <SceneContainer
               statusLabel={currentStep?.dataStructureState?.label || null}
               activeDetails={currentStep?.dataStructureState?.focusInfo || null}
+              correctOutput={finalCorrectOutput}
+              isAtEnd={isAtEnd}
+              cumulativeOutput={cumulativeOutput}
               isFull3DView={isFull3DView}
               onToggleFull3D={() => setIsFull3DView((prev) => !prev)}
             >
@@ -883,20 +988,79 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
             </SceneContainer>
           </div>
 
-          {/* Integrated Output Console */}
+          {/* Draggable & Hover Resizing Divider Bar between 3D Canvas and Console */}
           {!isFull3DView && (
-            <div className="h-36 sm:h-44 shrink-0">
-              <OutputConsole output={currentStep?.output || []} />
+            <div
+              onMouseDown={startConsoleResize}
+              className={`h-2 w-full relative group cursor-row-resize z-20 flex items-center justify-center transition-colors ${
+                isResizingConsole
+                  ? 'bg-cyan-500 shadow-lg shadow-cyan-500/50'
+                  : isBright
+                  ? 'bg-slate-200 hover:bg-cyan-400'
+                  : 'bg-slate-800/80 hover:bg-cyan-500/80'
+              }`}
+              title={`Drag to resize Console Height (Current: ${consoleHeightPx}px)`}
+            >
+              {/* Horizontal Grip Line */}
+              <div className="w-12 h-1 rounded-full bg-slate-400/50 group-hover:bg-slate-900 group-hover:scale-x-125 transition-all"></div>
+
+              {/* Quick Height Preset Buttons on Hover */}
+              <div className="absolute right-3 -top-7 hidden group-hover:flex items-center gap-1 backdrop-blur-md bg-slate-950/90 border border-slate-700 rounded-lg p-1 text-[10px] shadow-xl z-30 pointer-events-auto">
+                <span className="text-slate-400 font-mono px-1">Console:</span>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setConsoleHeightPx(90);
+                  }}
+                  className="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-cyan-600 text-cyan-300 font-mono"
+                >
+                  90px
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setConsoleHeightPx(165);
+                  }}
+                  className="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-cyan-600 text-cyan-300 font-mono"
+                >
+                  165px
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setConsoleHeightPx(260);
+                  }}
+                  className="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-cyan-600 text-cyan-300 font-mono"
+                >
+                  260px
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Integrated Output Console Box */}
+          {!isFull3DView && (
+            <div style={{ height: `${consoleHeightPx}px` }} className="shrink-0 overflow-hidden transition-all duration-75">
+              <OutputConsole
+                output={cumulativeOutput}
+                correctOutput={finalCorrectOutput}
+                isAtEnd={isAtEnd}
+              />
             </div>
           )}
         </div>
 
         {/* Right Column: Program State Inspector */}
         {!isFull3DView && showStatePanel && (
-          <div className={`${mobileTab === 'state' ? 'block' : 'hidden'} md:block md:col-span-3 h-full overflow-hidden transition-all duration-300`}>
+          <div className={`${mobileTab === 'state' ? 'block w-full' : 'hidden'} md:block w-72 lg:w-80 h-full overflow-hidden shrink-0 transition-all duration-300`}>
             <StatePanel
               currentStep={currentStep}
               totalSteps={totalSteps}
+              correctOutput={finalCorrectOutput}
+              isAtEnd={isAtEnd}
             />
           </div>
         )}

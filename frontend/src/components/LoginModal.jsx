@@ -4,7 +4,7 @@ import { useTheme } from '../context/ThemeContext';
 import { X, LogIn, UserPlus, Sparkles, ShieldCheck, UserCheck, Key, Mail, User } from 'lucide-react';
 
 export default function LoginModal() {
-  const { isLoginModalOpen, closeLoginModal, login, register, loginAsDemo } = useAuth();
+  const { isLoginModalOpen, closeLoginModal, login, register } = useAuth();
   const { isBright } = useTheme();
   const [isRegister, setIsRegister] = useState(false);
 
@@ -44,16 +44,6 @@ export default function LoginModal() {
     }
   };
 
-  const handleDemoLogin = async () => {
-    setLoading(true);
-    try {
-      await loginAsDemo();
-      closeLoginModal();
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
       <div className={`relative w-full max-w-md border rounded-2xl shadow-2xl overflow-hidden flex flex-col transition-colors duration-200 ${
@@ -76,7 +66,7 @@ export default function LoginModal() {
               <ShieldCheck size={20} />
             </div>
             <div>
-              <h3 className={`text-base font-bold tracking-wide ${isBright ? 'text-slate-900' : 'text-white'}`}>
+              <h3 className={`text-base font-bold tracking-wide ${isBright ? 'text-slate-900' : 'white'}`}>
                 {isRegister ? 'Create CODE3D Account' : 'Welcome to CODE3D AI'}
               </h3>
               <p className={`text-xs ${isBright ? 'text-slate-600' : 'text-slate-400'}`}>
@@ -96,25 +86,6 @@ export default function LoginModal() {
 
         {/* Form Body */}
         <div className="p-5 space-y-4">
-          {/* Quick Demo Access Button */}
-          <button
-            type="button"
-            onClick={handleDemoLogin}
-            className={`w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border text-xs font-semibold shadow-md transition cursor-pointer ${
-              isBright
-                ? 'bg-gradient-to-r from-cyan-50 via-blue-50 to-indigo-50 hover:from-cyan-100 hover:to-indigo-100 border-cyan-300 text-cyan-900'
-                : 'bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-purple-500/20 hover:from-cyan-500/30 hover:to-purple-500/30 border-cyan-500/40 text-cyan-300'
-            }`}
-          >
-            <Sparkles size={14} className={isBright ? 'text-cyan-600' : 'text-cyan-400 animate-pulse'} />
-            <span>⚡ 1-Click Demo Login (Lead Architect)</span>
-          </button>
-
-          <div className="flex items-center gap-2 my-2 text-[11px]">
-            <div className={`flex-1 h-px ${isBright ? 'bg-slate-200' : 'bg-slate-800'}`}></div>
-            <span className={isBright ? 'text-slate-400' : 'text-slate-500'}>or continue with credentials</span>
-            <div className={`flex-1 h-px ${isBright ? 'bg-slate-200' : 'bg-slate-800'}`}></div>
-          </div>
 
           {error && (
             <div className={`p-2.5 rounded-lg text-xs border ${

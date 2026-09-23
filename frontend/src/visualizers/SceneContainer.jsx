@@ -1,8 +1,9 @@
 import React, { Suspense, useState, useEffect, useRef } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, Center, Grid, Sparkles, ContactShadows } from '@react-three/drei';
-import { Compass, RotateCw, ZoomIn, Maximize2, Minimize2, Camera, RefreshCw } from 'lucide-react';
+import { Compass, RotateCw, ZoomIn, Maximize2, Minimize2, Camera, RefreshCw, Trophy, Sparkles as SparklesIcon } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import OutputHologram3D from './OutputHologram3D';
 import * as THREE from 'three';
 
 /**
@@ -31,17 +32,22 @@ function CameraPresetHandler({ preset, onApplied }) {
 
 /**
  * SceneContainer provides the 3D viewport canvas, lighting, camera controls,
- * and realistic studio cyber-pedestal stage.
+ * realistic studio cyber-pedestal stage, and 3D verified output hologram.
  */
 export default function SceneContainer({
   children,
   statusLabel,
   activeDetails,
+  correctOutput = null,
+  isAtEnd = false,
+  cumulativeOutput = [],
+  hoveredBoxInfo = null,
   isFull3DView = false,
   onToggleFull3D
 }) {
   const { isBright } = useTheme();
   const [cameraPreset, setCameraPreset] = useState(null);
+  const [showHologram, setShowHologram] = useState(true);
 
   return (
     <div className={`relative w-full h-full min-h-[360px] overflow-hidden select-none transition-colors duration-200 ${
@@ -64,6 +70,48 @@ export default function SceneContainer({
           </>
         )}
       </div>
+
+      {/* Top Center: Prominent Verified Correct Output HUD Banner */}
+      {correctOutput && (
+        <div className={`absolute top-3 left-1/2 -translate-x-1/2 z-10 hidden sm:flex items-center gap-2 backdrop-blur-md border rounded-xl px-3.5 py-1.5 shadow-xl transition-all ${
+          isAtEnd
+            ? 'bg-gradient-to-r from-emerald-950/90 via-teal-950/90 to-emerald-950/90 border-emerald-500/60 text-emerald-200 shadow-emerald-950/60 ring-1 ring-emerald-500/30'
+            : isBright
+              ? 'bg-white/95 border-cyan-300 text-slate-800 shadow-cyan-950/10'
+              : 'bg-slate-900/90 border-cyan-500/40 text-cyan-200 shadow-cyan-950/40'
+        }`}>
+          <div className="flex items-center gap-1.5">
+            <span className={`w-2 h-2 rounded-full ${isAtEnd ? 'bg-emerald-400 animate-ping' : 'bg-cyan-400'}`}></span>
+            <span className={`text-[11px] font-bold uppercase tracking-wider ${isAtEnd ? 'text-emerald-400' : 'text-cyan-400'}`}>
+              {isAtEnd ? '🏆 Correct Output:' : '⚡ Result Stream:'}
+            </span>
+          </div>
+          <span className="text-xs font-mono font-bold tracking-tight">
+            {correctOutput}
+          </span>
+          <button
+            onClick={() => setShowHologram((prev) => !prev)}
+            className={`ml-1 text-[10px] px-1.5 py-0.5 rounded border transition ${
+              showHologram
+                ? 'bg-cyan-500/20 border-cyan-500/40 text-cyan-300'
+                : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-slate-200'
+            }`}
+            title="Toggle 3D Floating Output Hologram"
+          >
+            3D HUD: {showHologram ? 'ON' : 'OFF'}
+          </button>
+        </div>
+      )}
+
+      {/* Hovered 3D Box HUD Inspector Details */}
+      {hoveredBoxInfo && (
+        <div className={`absolute bottom-12 left-3 z-10 flex items-center gap-2 backdrop-blur-md border rounded-lg px-3 py-1.5 shadow-lg transition-all animate-fadeIn ${
+          isBright ? 'bg-white/95 border-amber-300 text-amber-900' : 'bg-slate-900/90 border-amber-500/40 text-amber-300'
+        }`}>
+          <span className="text-xs font-bold">🔍 Box Hover:</span>
+          <span className="text-xs font-mono font-semibold">{hoveredBoxInfo}</span>
+        </div>
+      )}
 
       {/* Top-Right Control Bar: Camera Presets & Theater Mode */}
       <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
@@ -164,6 +212,16 @@ export default function SceneContainer({
           <Center top>
             {children}
           </Center>
+
+          {/* 3D Correct Output Hologram Banner & Victory Beam */}
+          {showHologram && (correctOutput || (cumulativeOutput && cumulativeOutput.length > 0)) && (
+            <OutputHologram3D
+              correctOutput={correctOutput}
+              isAtEnd={isAtEnd}
+              totalOutputs={cumulativeOutput?.length || 0}
+              recentLine={cumulativeOutput?.[cumulativeOutput.length - 1]}
+            />
+          )}
 
           {/* Realistic Cyber Pedestal Stage */}
           <group position={[0, -0.04, 0]}>

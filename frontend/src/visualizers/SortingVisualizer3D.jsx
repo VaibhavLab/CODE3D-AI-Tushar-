@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Text, Float } from '@react-three/drei';
 import * as THREE from 'three';
 
@@ -30,6 +30,7 @@ function ComparisonLaserArch({ startX, startHeight, endX, endHeight }) {
 }
 
 export default function SortingVisualizer3D({ dataStructureState }) {
+  const [hoveredIdx, setHoveredIdx] = useState(null);
   const {
     values = [],
     comparedIndices = [],
@@ -118,15 +119,35 @@ export default function SortingVisualizer3D({ dataStructureState }) {
           wireColor = '#34d399';
         }
 
+        const isHovered = hoveredIdx === idx;
+        const hoverScale = isHovered ? 1.3 : 1.0;
+        const hoverElevation = isHovered ? 0.35 : 0;
+
         return (
-          <group key={`sort-${idx}`} position={[posX, height / 2, 0]}>
+          <group
+            key={`sort-${idx}`}
+            position={[posX, height / 2 + hoverElevation, 0]}
+            scale={[hoverScale, hoverScale, hoverScale]}
+          >
             {/* 3D Pillar Box */}
-            <mesh castShadow receiveShadow>
+            <mesh
+              castShadow
+              receiveShadow
+              onPointerOver={(e) => {
+                e.stopPropagation();
+                setHoveredIdx(idx);
+                document.body.style.cursor = 'pointer';
+              }}
+              onPointerOut={() => {
+                setHoveredIdx(null);
+                document.body.style.cursor = 'default';
+              }}
+            >
               <boxGeometry args={[1.3, height, 1.2]} />
               <meshStandardMaterial
-                color={color}
-                emissive={emissive}
-                emissiveIntensity={isCompared || isSwapped || isActive || isPivot ? 0.9 : 0.25}
+                color={isHovered ? '#0284c7' : color}
+                emissive={isHovered ? '#38bdf8' : emissive}
+                emissiveIntensity={isHovered ? 1.8 : (isCompared || isSwapped || isActive || isPivot ? 0.9 : 0.25)}
                 metalness={0.4}
                 roughness={0.2}
               />
@@ -135,8 +156,33 @@ export default function SortingVisualizer3D({ dataStructureState }) {
             {/* Glowing Wireframe Border */}
             <lineSegments>
               <edgesGeometry args={[new THREE.BoxGeometry(1.31, height + 0.01, 1.21)]} />
-              <lineBasicMaterial color={wireColor} linewidth={2} />
+              <lineBasicMaterial color={isHovered ? '#38bdf8' : wireColor} linewidth={2} />
             </lineSegments>
+
+            {/* Interactive Mouse Hover 3D Inspection Tooltip */}
+            {isHovered && (
+              <Float speed={5} floatIntensity={0.15}>
+                <group position={[0, height / 2 + 1.25, 0]}>
+                  <mesh position={[0, 0, -0.02]}>
+                    <planeGeometry args={[2.7, 1.0]} />
+                    <meshBasicMaterial color="#080e1e" transparent opacity={0.94} />
+                  </mesh>
+                  <lineSegments position={[0, 0, -0.01]}>
+                    <edgesGeometry args={[new THREE.BoxGeometry(2.72, 1.02, 0.01)]} />
+                    <lineBasicMaterial color="#38bdf8" />
+                  </lineSegments>
+                  <Text position={[0, 0.3, 0.05]} fontSize={0.21} color="#38bdf8" fontWeight="bold">
+                    {`Pillar [${idx}] = ${val}`}
+                  </Text>
+                  <Text position={[0, 0.04, 0.05]} fontSize={0.14} color="#94a3b8">
+                    {`Size: 1.30 × ${height.toFixed(2)} × 1.20`}
+                  </Text>
+                  <Text position={[0, -0.22, 0.05]} fontSize={0.13} color="#22c55e" fontStyle="italic">
+                    {`⚡ Scaled 130% on Mouse Over`}
+                  </Text>
+                </group>
+              </Float>
+            )}
 
             {/* Value above bar */}
             <Text
