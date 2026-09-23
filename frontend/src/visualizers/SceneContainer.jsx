@@ -1,9 +1,10 @@
 import React, { Suspense, useState, useEffect, useRef } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, Center, Grid, Sparkles, ContactShadows } from '@react-three/drei';
-import { Compass, RotateCw, ZoomIn, Maximize2, Minimize2, Camera, RefreshCw, Trophy, Sparkles as SparklesIcon } from 'lucide-react';
+import { Compass, RotateCw, ZoomIn, Maximize2, Minimize2, Camera, RefreshCw, Trophy, Sparkles as SparklesIcon, Cpu, Terminal, Eye, Layers } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import OutputHologram3D from './OutputHologram3D';
+import DryRunHologram3D from './DryRunHologram3D';
 import * as THREE from 'three';
 
 /**
@@ -46,6 +47,8 @@ function CameraPresetHandler({ preset, onApplied, controlsRef }) {
  */
 export default function SceneContainer({
   children,
+  currentStep = null,
+  code = '',
   statusLabel,
   activeDetails,
   correctOutput = null,
@@ -58,7 +61,14 @@ export default function SceneContainer({
   const { isBright } = useTheme();
   const [cameraPreset, setCameraPreset] = useState(null);
   const [showHologram, setShowHologram] = useState(true);
+  const [showDryRunHologram, setShowDryRunHologram] = useState(true);
   const controlsRef = useRef(null);
+
+  // Extract the exact line of code currently being executed for the 3D dry run
+  const codeLines = code ? code.split('\n') : [];
+  const activeCodeLine = (currentStep?.lineNumber && codeLines[currentStep.lineNumber - 1])
+    ? codeLines[currentStep.lineNumber - 1].trim()
+    : null;
 
   return (
     <div className={`relative w-full h-full min-h-[360px] overflow-hidden select-none transition-colors duration-200 ${
@@ -81,6 +91,99 @@ export default function SceneContainer({
           </>
         )}
       </div>
+
+      {/* 3D Live Dry Run HUD Bar: Live Code Line, Condition & Variables Watch */}
+      {currentStep && (
+        <div className={`absolute top-12 left-3 right-3 sm:right-auto sm:max-w-xl z-10 backdrop-blur-md border rounded-xl p-2.5 shadow-xl transition-all animate-fadeIn ${
+          isBright
+            ? 'bg-white/95 border-slate-200 text-slate-800 shadow-slate-200/80'
+            : 'bg-slate-900/90 border-cyan-500/30 text-slate-100 shadow-black/50'
+        }`}>
+          <div className="flex items-center justify-between gap-2 border-b pb-1 mb-1.5 text-[11px] font-mono">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+              <span className="font-bold text-cyan-600 dark:text-cyan-400">⚡ LIVE 3D DRY RUN</span>
+              <span className={`px-1.5 py-0.2 rounded font-bold ${
+                isBright ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+              }`}>
+                Step {currentStep.stepNumber || 1}
+              </span>
+              {currentStep.lineNumber && (
+                <span className={`px-1.5 py-0.2 rounded font-bold ${
+                  isBright ? 'bg-cyan-100 text-cyan-800 border border-cyan-300' : 'bg-cyan-950 text-cyan-400 border border-cyan-800'
+                }`}>
+                  Line {currentStep.lineNumber}
+                </span>
+              )}
+            </div>
+
+            <button
+              onClick={() => setShowDryRunHologram((prev) => !prev)}
+              className={`text-[10px] px-1.5 py-0.5 rounded border transition cursor-pointer shrink-0 ${
+                showDryRunHologram
+                  ? 'bg-cyan-500/20 border-cyan-500/40 text-cyan-300'
+                  : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-slate-200'
+              }`}
+              title="Toggle 3D Floating Dry Run Billboard inside 3D Scene"
+            >
+              3D Billboard: {showDryRunHologram ? 'ON' : 'OFF'}
+            </button>
+          </div>
+
+          {/* Active Executing Code Line */}
+          {activeCodeLine && (
+            <div className={`text-[11px] font-mono px-2 py-0.5 rounded mb-1 flex items-center gap-1.5 border overflow-hidden ${
+              isBright
+                ? 'bg-amber-50/80 border-amber-200 text-amber-950 font-semibold'
+                : 'bg-amber-500/10 border-amber-500/30 text-amber-300'
+            }`}>
+              <span className={`text-[10px] uppercase font-bold shrink-0 ${isBright ? 'text-amber-700' : 'text-amber-400'}`}>Code:</span>
+              <span className="truncate">{activeCodeLine}</span>
+            </div>
+          )}
+
+          {/* Condition Evaluation (If present) */}
+          {currentStep.condition && (
+            <div className={`text-[11px] font-mono px-2 py-0.5 rounded mb-1 flex items-center justify-between border ${
+              currentStep.condition.result
+                ? isBright ? 'bg-emerald-50 text-emerald-900 border-emerald-300' : 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
+                : isBright ? 'bg-rose-50 text-rose-900 border-rose-300' : 'bg-rose-500/10 text-rose-300 border-rose-500/30'
+            }`}>
+              <span className="truncate">If: <strong>{currentStep.condition.expression}</strong> ({currentStep.condition.evaluation})</span>
+              <span className="font-bold shrink-0 ml-2">{currentStep.condition.result ? 'TRUE ✓' : 'FALSE ✗'}</span>
+            </div>
+          )}
+
+          {/* Live Variable Registry Watch */}
+          {currentStep.variables && Object.keys(currentStep.variables).length > 0 && (
+            <div className="flex items-center gap-1.5 flex-wrap text-[11px] font-mono mb-1">
+              <span className={`text-[10px] uppercase font-bold shrink-0 ${isBright ? 'text-slate-500' : 'text-slate-400'}`}>Variables:</span>
+              {Object.entries(currentStep.variables)
+                .filter(([k]) => k !== 'arr' && k !== 'matrix' && k !== 'lang' && k !== 'size')
+                .slice(0, 5)
+                .map(([k, v]) => (
+                  <span
+                    key={k}
+                    className={`px-1.5 py-0.2 rounded border ${
+                      currentStep.changedVariable === k
+                        ? 'bg-cyan-500/20 text-cyan-300 border-cyan-400 font-bold ring-1 ring-cyan-400'
+                        : isBright
+                          ? 'bg-slate-100 border-slate-200 text-slate-800'
+                          : 'bg-slate-950 border-slate-800 text-slate-300'
+                    }`}
+                  >
+                    {k}: <strong>{String(v)}</strong>
+                  </span>
+                ))}
+            </div>
+          )}
+
+          {/* Explanation commentary */}
+          <p className={`text-[11px] leading-snug font-sans line-clamp-2 ${isBright ? 'text-slate-600' : 'text-slate-300'}`}>
+            {currentStep.explanation}
+          </p>
+        </div>
+      )}
 
       {/* Top Center: Prominent Verified Correct Output HUD Banner */}
       {correctOutput && (
@@ -224,6 +327,14 @@ export default function SceneContainer({
           <Center top>
             {children}
           </Center>
+
+          {/* 3D Full-Code Dynamic Dry Run Hologram */}
+          <DryRunHologram3D
+            currentStep={currentStep}
+            activeCodeLine={activeCodeLine}
+            visible={showDryRunHologram}
+            position={[0, 4.4, -2.2]}
+          />
 
           {/* 3D Correct Output Hologram Banner & Victory Beam */}
           {showHologram && (correctOutput || (cumulativeOutput && cumulativeOutput.length > 0)) && (

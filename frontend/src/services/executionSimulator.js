@@ -4347,6 +4347,340 @@ export function generateDynamicSlidingWindowMaxTrace(values, lang = 'java') {
 }
 
 /**
+ * Striver SDE Sheet Flagship: Set Matrix Zeroes (3D In-Place Matrix Simulation)
+ */
+export function generateDynamicSetMatrixZeroesTrace(values = [], lang = 'java') {
+  const steps = [];
+  let step = 1;
+
+  // Initialize a 3x3 matrix from input values or standard flagship example
+  const initialVals = values.length >= 9 ? values.slice(0, 9) : [1, 1, 1, 1, 0, 1, 1, 1, 1];
+  const m = 3, n = 3;
+  let matrix = [
+    [initialVals[0], initialVals[1], initialVals[2]],
+    [initialVals[3], initialVals[4], initialVals[5]],
+    [initialVals[6], initialVals[7], initialVals[8]],
+  ];
+
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 4,
+    eventType: 'MATRIX_INIT',
+    variables: { m, n, col0: false },
+    output: ['Set Matrix Zeroes: Loaded 3x3 matrix into 3D WebGL scene.'],
+    dataStructureState: {
+      type: 'matrix',
+      matrix: matrix.map(r => [...r]),
+      pointers: { activeRow: 0, activeCol: 0 },
+      label: 'Initial 3D Matrix',
+      focusInfo: 'Scanning for zero cells to propagate zero rows and columns.'
+    },
+    explanation: 'Initialized 3x3 matrix in 3D space. First pass will record which rows and columns must be zeroed using first row and column as memory markers.',
+    aiHint: 'In-place optimal O(1) space marks flags in matrix[i][0] and matrix[0][j].'
+  });
+
+  let col0 = false;
+  // Pass 1: Mark zeros
+  for (let i = 0; i < m; i++) {
+    if (matrix[i][0] === 0) col0 = true;
+    for (let j = 1; j < n; j++) {
+      const isZero = matrix[i][j] === 0;
+      steps.push({
+        stepNumber: step++,
+        lineNumber: 8,
+        eventType: 'CONDITION_CHECK',
+        variables: { i, j, [`matrix[${i}][${j}]`]: matrix[i][j], col0 },
+        condition: {
+          expression: `matrix[${i}][${j}] == 0`,
+          evaluation: `${matrix[i][j]} == 0`,
+          result: isZero,
+          branch: isZero ? 'MARK HEADERS' : 'SKIP'
+        },
+        output: isZero ? [`Zero cell detected at (${i}, ${j})! Marking row ${i} and col ${j} headers.`] : [],
+        dataStructureState: {
+          type: 'matrix',
+          matrix: matrix.map(r => [...r]),
+          pointers: { activeRow: i, activeCol: j },
+          label: isZero ? `Zero Cell at [${i}][${j}]!` : `Scanning [${i}][${j}] = ${matrix[i][j]}`,
+          focusInfo: `Coordinate (${i}, ${j})`
+        },
+        explanation: isZero
+          ? `Zero detected at (${i}, ${j})! Marking header matrix[${i}][0] = 0 and matrix[0][${j}] = 0.`
+          : `Inspecting cell at (${i}, ${j}): value ${matrix[i][j]} is non-zero.`,
+        aiHint: 'Condition evaluation guides row-column zero propagation.'
+      });
+
+      if (isZero) {
+        matrix[i][0] = 0;
+        matrix[0][j] = 0;
+      }
+    }
+  }
+
+  // Pass 2: Propagate zeroes from bottom-right backwards
+  for (let i = m - 1; i >= 0; i--) {
+    for (let j = n - 1; j >= 1; j--) {
+      const shouldZero = matrix[i][0] === 0 || matrix[0][j] === 0;
+      if (shouldZero) {
+        matrix[i][j] = 0;
+      }
+      steps.push({
+        stepNumber: step++,
+        lineNumber: 16,
+        eventType: shouldZero ? 'CELL_MUTATION' : 'CELL_UNCHANGED',
+        variables: { i, j, [`matrix[${i}][0]`]: matrix[i][0], [`matrix[0][${j}]`]: matrix[0][j], result: matrix[i][j] },
+        condition: {
+          expression: `matrix[${i}][0] == 0 || matrix[0][${j}] == 0`,
+          evaluation: `${matrix[i][0]} == 0 || ${matrix[0][j]} == 0`,
+          result: shouldZero,
+          branch: shouldZero ? 'SET TO 0' : 'KEEP VALUE'
+        },
+        output: shouldZero ? [`Zeroed cell [${i}][${j}]`] : [],
+        dataStructureState: {
+          type: 'matrix',
+          matrix: matrix.map(r => [...r]),
+          pointers: { activeRow: i, activeCol: j },
+          label: shouldZero ? `Propagated 0 to [${i}][${j}]` : `Kept value ${matrix[i][j]} at [${i}][${j}]`,
+          focusInfo: `Transformed cell at (${i}, ${j})`
+        },
+        explanation: shouldZero
+          ? `Row ${i} or Column ${j} was marked for zeroing. Cell (${i}, ${j}) mutated to 0.`
+          : `Cell (${i}, ${j}) preserved: neither row nor column header was zeroed.`,
+        aiHint: 'Iterating backwards prevents overwriting column headers before processing data.'
+      });
+    }
+
+    if (col0) {
+      matrix[i][0] = 0;
+    }
+  }
+
+  steps.push({
+    stepNumber: step,
+    lineNumber: 22,
+    eventType: 'PROGRAM_END',
+    variables: { m, n, status: 'COMPLETED' },
+    output: ['Set Matrix Zeroes execution complete: All zero rows and columns propagated.'],
+    dataStructureState: {
+      type: 'matrix',
+      matrix: matrix.map(r => [...r]),
+      pointers: {},
+      label: '3D Matrix Transformation Complete',
+      focusInfo: 'In-place zero propagation finished successfully.'
+    },
+    explanation: 'Set Matrix Zeroes complete! All applicable rows and columns transformed in optimal O(m*n) time and O(1) auxiliary space.',
+    aiHint: 'Verified in-place 3D matrix algorithm.'
+  });
+
+  return steps;
+}
+
+/**
+ * Striver SDE Sheet Flagship: Pascal's Triangle (3D Row-by-Row Triangle Construction)
+ */
+export function generateDynamicPascalsTriangleTrace(values = [], lang = 'java') {
+  const steps = [];
+  let step = 1;
+
+  const numRows = (values.length > 0 && values[0] >= 2 && values[0] <= 6) ? values[0] : 5;
+  const triangle = [];
+
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 3,
+    eventType: 'TRIANGLE_INIT',
+    variables: { numRows },
+    output: [`Pascal's Triangle: Generating ${numRows} rows in 3D WebGL.`],
+    dataStructureState: {
+      type: 'matrix',
+      matrix: [[1]],
+      pointers: { activeRow: 0, activeCol: 0 },
+      label: `Pascal's Triangle Initialized (numRows = ${numRows})`,
+      focusInfo: 'Allocating triangle levels'
+    },
+    explanation: `Pascal's Triangle algorithm initialized for ${numRows} rows. Each entry is the sum of the two entries directly above it.`,
+    aiHint: 'Time Complexity: O(n²) | Space Complexity: O(n²).'
+  });
+
+  for (let i = 0; i < numRows; i++) {
+    const row = [];
+    for (let j = 0; j <= i; j++) {
+      let val = 1;
+      let expr = 'j == 0 || j == i';
+      let isEdge = (j === 0 || j === i);
+
+      if (!isEdge) {
+        val = triangle[i - 1][j - 1] + triangle[i - 1][j];
+        expr = `triangle[${i - 1}][${j - 1}] + triangle[${i - 1}][${j}] (${triangle[i - 1][j - 1]} + ${triangle[i - 1][j]})`;
+      }
+      row.push(val);
+
+      // Pad matrix for 3D rectangular visualizer
+      const displayMatrix = triangle.concat([row]).map(r => {
+        const padded = [...r];
+        while (padded.length < numRows) padded.push(0);
+        return padded;
+      });
+
+      steps.push({
+        stepNumber: step++,
+        lineNumber: 7,
+        eventType: isEdge ? 'EDGE_SET' : 'CELL_ADDITION',
+        variables: { row: i, col: j, value: val },
+        condition: {
+          expression: `j == 0 || j == ${i}`,
+          evaluation: `${j} == 0 || ${j} == ${i}`,
+          result: isEdge,
+          branch: isEdge ? 'SET EDGE VALUE 1' : 'COMPUTE SUM FROM ABOVE'
+        },
+        output: [`Row ${i + 1}: Generated cell [${i}][${j}] = ${val}`],
+        dataStructureState: {
+          type: 'matrix',
+          matrix: displayMatrix,
+          pointers: { activeRow: i, activeCol: j },
+          label: `Pascal Cell [${i}][${j}] = ${val}`,
+          focusInfo: isEdge ? 'Boundary element equals 1' : `Sum of ${triangle[i - 1][j - 1]} + ${triangle[i - 1][j]} = ${val}`
+        },
+        explanation: isEdge
+          ? `Boundary condition true: Row edge element [${i}][${j}] initialized to 1.`
+          : `Computed inner element [${i}][${j}] = ${triangle[i - 1][j - 1]} + ${triangle[i - 1][j]} = ${val}.`,
+        aiHint: 'Combinatorial identity C(n, k) = C(n-1, k-1) + C(n-1, k).'
+      });
+    }
+    triangle.push(row);
+  }
+
+  const finalDisplayMatrix = triangle.map(r => {
+    const padded = [...r];
+    while (padded.length < numRows) padded.push(0);
+    return padded;
+  });
+
+  steps.push({
+    stepNumber: step,
+    lineNumber: 14,
+    eventType: 'PROGRAM_END',
+    variables: { totalRows: numRows, completed: true },
+    output: [`Pascal's Triangle Complete: Successfully generated ${numRows} rows.`],
+    dataStructureState: {
+      type: 'matrix',
+      matrix: finalDisplayMatrix,
+      pointers: {},
+      label: `Pascal's Triangle (${numRows} Rows) Generated`,
+      focusInfo: 'Full pyramid verified in 3D.'
+    },
+    explanation: `Pascal's Triangle generation finished for ${numRows} rows. All combinatorial coefficients computed and verified.`,
+    aiHint: 'Rows correspond to binomial coefficients in (x + y)^n.'
+  });
+
+  return steps;
+}
+
+/**
+ * Striver SDE Sheet Flagship: 3Sum (Two-Pointer Triplet Search)
+ */
+export function generateDynamic3SumTrace(values = [], lang = 'java') {
+  const steps = [];
+  let step = 1;
+
+  let nums = values.length >= 4 ? [...values] : [-1, 0, 1, 2, -1, -4];
+  // Sort numbers for two-pointer technique
+  nums.sort((a, b) => a - b);
+  const n = nums.length;
+  const triplets = [];
+
+  steps.push({
+    stepNumber: step++,
+    lineNumber: 4,
+    eventType: 'ARRAY_SORTED',
+    variables: { nums: `[${nums.join(', ')}]`, size: n },
+    output: [`3Sum: Sorted input array to [${nums.join(', ')}] for two-pointer search.`],
+    dataStructureState: {
+      type: 'array',
+      name: 'nums',
+      values: [...nums],
+      activeIndex: null,
+      pointers: { i: 0 },
+      label: `Array Sorted: [${nums.join(', ')}]`,
+      focusInfo: 'Sorting enables linear converging scan in O(n²) total time.'
+    },
+    explanation: `Array sorted in ascending order: [${nums.join(', ')}]. Now iterating pivot index 'i' with converging 'left' and 'right' pointers.`,
+    aiHint: 'Sorting reduces 3Sum from brute force O(n³) to optimal O(n²).'
+  });
+
+  for (let i = 0; i < n - 2 && step < 40; i++) {
+    if (i > 0 && nums[i] === nums[i - 1]) continue; // Skip duplicate pivots
+
+    let left = i + 1;
+    let right = n - 1;
+
+    while (left < right && step < 40) {
+      const sum = nums[i] + nums[left] + nums[right];
+      const isTriplet = (sum === 0);
+
+      steps.push({
+        stepNumber: step++,
+        lineNumber: 10,
+        eventType: isTriplet ? 'TRIPLET_FOUND' : 'SUM_EVALUATION',
+        variables: { i, left, right, 'nums[i]': nums[i], 'nums[left]': nums[left], 'nums[right]': nums[right], sum },
+        condition: {
+          expression: `nums[${i}] + nums[${left}] + nums[${right}] == 0`,
+          evaluation: `${nums[i]} + ${nums[left]} + ${nums[right]} = ${sum}`,
+          result: isTriplet,
+          branch: isTriplet ? 'RECORD TRIPLET [i, left, right]' : (sum < 0 ? 'INCREMENT LEFT (sum < 0)' : 'DECREMENT RIGHT (sum > 0)')
+        },
+        output: isTriplet ? [`🎯 Triplet Found: [${nums[i]}, ${nums[left]}, ${nums[right]}] = 0!`] : [],
+        dataStructureState: {
+          type: 'array',
+          name: 'nums',
+          values: [...nums],
+          activeIndex: isTriplet ? left : right,
+          pointers: { i, left, right },
+          label: isTriplet ? `🎯 3Sum Triplet Found: (${nums[i]}, ${nums[left]}, ${nums[right]}) = 0` : `Sum = ${sum} (${sum < 0 ? 'Need Larger → left++' : 'Need Smaller → right--'})`,
+          focusInfo: `Pointers: i=${i}, left=${left}, right=${right}`
+        },
+        explanation: isTriplet
+          ? `Zero sum verified! nums[${i}] (${nums[i]}) + nums[${left}] (${nums[left]}) + nums[${right}] (${nums[right]}) = 0.`
+          : `Current triplet sum is ${sum}. Since ${sum} ${sum < 0 ? '< 0, advance left pointer to increase sum' : '> 0, retreat right pointer to decrease sum'}.`,
+        aiHint: 'Converging pointers systematically cover all candidate triplets.'
+      });
+
+      if (isTriplet) {
+        triplets.push([nums[i], nums[left], nums[right]]);
+        left++;
+        right--;
+        while (left < right && nums[left] === nums[left - 1]) left++;
+        while (left < right && nums[right] === nums[right + 1]) right--;
+      } else if (sum < 0) {
+        left++;
+      } else {
+        right--;
+      }
+    }
+  }
+
+  steps.push({
+    stepNumber: step,
+    lineNumber: 22,
+    eventType: 'PROGRAM_END',
+    variables: { totalTriplets: triplets.length, triplets: JSON.stringify(triplets) },
+    output: [`3Sum execution finished: Found ${triplets.length} unique triplets ${JSON.stringify(triplets)}`],
+    dataStructureState: {
+      type: 'array',
+      name: 'nums',
+      values: [...nums],
+      pointers: {},
+      label: `3Sum Complete: Found ${triplets.length} Triplets`,
+      focusInfo: `Triplets: ${JSON.stringify(triplets)}`
+    },
+    explanation: `3Sum search complete! Successfully found ${triplets.length} unique triplet(s) totaling zero sum.`,
+    aiHint: 'Time Complexity: O(n²) with zero additional memory.'
+  });
+
+  return steps;
+}
+
+/**
  * Master Universal Arbitrary Code Simulation Engine
  * Intelligently analyzes ANY user-submitted code in Java, Python, C, C++, or JavaScript:
  * - Detects custom array variable names (`nums`, `prices`, `data`, `arr`, etc.)
@@ -4556,6 +4890,12 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code') {
         lineNumber: 4,
         eventType: isMatch ? 'TARGET_FOUND' : 'CONDITION_CHECK',
         variables: { i, [`${arrayName}[${i}]`]: val, target: targetVal, isMatch },
+        condition: {
+          expression: `${arrayName}[${i}] == ${targetVal}`,
+          evaluation: `${val} == ${targetVal}`,
+          result: isMatch,
+          branch: isMatch ? 'TARGET FOUND (BREAK)' : 'CONTINUE SEARCH'
+        },
         output: isMatch ? [...output, `🎯 Found target ${targetVal} at index [${i}]!`] : [...output],
         dataStructureState: {
           type: 'array',
@@ -4644,6 +4984,12 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code') {
         lineNumber: 4,
         eventType: 'TWO_POINTER_STEP',
         variables: { left, right, [`${arrayName}[left]`]: workingArr[left], [`${arrayName}[right]`]: workingArr[right] },
+        condition: {
+          expression: 'left < right',
+          evaluation: `${left} < ${right}`,
+          result: true,
+          branch: 'POINTERS ACTIVE'
+        },
         output: [...output],
         dataStructureState: {
           type: 'array',
@@ -4754,6 +5100,12 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code') {
           lineNumber: 5,
           eventType: 'NESTED_PAIR_EVAL',
           variables: { i, j, [`${arrayName}[${i}]`]: valI, [`${arrayName}[${j}]`]: valJ },
+          condition: {
+            expression: `${arrayName}[${i}] > ${arrayName}[${j}]`,
+            evaluation: `${valI} > ${valJ}`,
+            result: valI > valJ,
+            branch: (valI > valJ) ? (isSortOrSwap ? 'SWAP NEEDED' : 'CONDITION TRUE') : 'ORDER OK'
+          },
           output: [...output],
           dataStructureState: {
             type: 'array',
@@ -5163,6 +5515,21 @@ export function getExecutionTrace(code, language = 'java', customInput = null) {
   // 0A. N-Queens Backtracking
   if (cleanCode.includes('queen') || cleanCode.includes('nqueen')) {
     return generateDynamicNQueensTrace(language);
+  }
+
+  // 0A1. Striver SDE Sheet: Set Matrix Zeroes
+  if (cleanCode.includes('setzero') || cleanCode.includes('set_zero') || (cleanCode.includes('matrix') && cleanCode.includes('col0'))) {
+    return generateDynamicSetMatrixZeroesTrace(values, language);
+  }
+
+  // 0A2. Striver SDE Sheet: Pascal's Triangle
+  if (cleanCode.includes('pascal') || (cleanCode.includes('triangle') && (cleanCode.includes('numrows') || cleanCode.includes('generate')))) {
+    return generateDynamicPascalsTriangleTrace(values, language);
+  }
+
+  // 0A3. Striver SDE Sheet: 3Sum
+  if (cleanCode.includes('threesum') || cleanCode.includes('three_sum') || cleanCode.includes('3sum') || (cleanCode.includes('nums[i]') && cleanCode.includes('nums[left]') && cleanCode.includes('nums[right]'))) {
+    return generateDynamic3SumTrace(values, language);
   }
 
   // 0B. Rotten Oranges (Multi-Source BFS)

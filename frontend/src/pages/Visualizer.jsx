@@ -14,7 +14,7 @@ import { useExecutionTimeline } from '../hooks/useExecutionTimeline';
 import { getExecutionTrace, extractNumbersFromCode } from '../services/executionSimulator';
 import { DEFAULT_JAVA_CODE, SAMPLE_PROGRAMS, LANGUAGE_DEFAULTS, CURRICULUM_CATEGORIES } from '../utils/sampleCodes';
 import { STRIVER_PROBLEMS } from '../utils/striverCatalog';
-import { executeProgram, analyzeCode, checkBackendHealth } from '../services/apiService';
+import { executeProgram, analyzeCode, checkBackendHealth, recordExecutionHistory } from '../services/apiService';
 import { useTheme } from '../context/ThemeContext';
 import {
   Code2,
@@ -208,19 +208,32 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
       setFormInputValues(nums.join(', '));
     }
 
+    let finalSteps = null;
     if (backendOnline) {
-      const res = await executeProgram(prog.code, prog.id, 'java');
-      if (res && res.steps && res.steps.length > 0) {
-        setTrace(res.steps);
-        reset();
-        setTimeout(() => play(), 100);
-        return;
-      }
+      try {
+        const res = await executeProgram(prog.code, prog.id, 'java');
+        if (res && res.steps && res.steps.length > 0) {
+          finalSteps = res.steps;
+        }
+      } catch (e) {}
     }
 
-    setTrace(getExecutionTrace(prog.code, 'java'));
+    if (!finalSteps || finalSteps.length === 0) {
+      finalSteps = getExecutionTrace(prog.code, 'java');
+    }
+
+    setTrace(finalSteps);
     reset();
     setTimeout(() => play(), 100);
+
+    recordExecutionHistory({
+      programTitle: prog.title,
+      conceptId: prog.id,
+      language: 'java',
+      totalSteps: finalSteps.length,
+      status: 'COMPLETED',
+      code: prog.code,
+    });
   };
 
   // Handle language change from editor
@@ -364,6 +377,15 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
       setTrace(newSteps);
       reset();
       setTimeout(() => play(), 50);
+
+      recordExecutionHistory({
+        programTitle: `Custom ${customLang.toUpperCase()} Code`,
+        conceptId: 'custom',
+        language: customLang,
+        totalSteps: newSteps.length,
+        status: 'COMPLETED',
+        code: customCode,
+      });
     }
   };
 
@@ -423,6 +445,15 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
         setLastExecutedCode(code);
         reset();
         setTimeout(() => play(), 60);
+
+        recordExecutionHistory({
+          programTitle: selectedSample?.title || (activeStriverProblem ? activeStriverProblem.title : 'Custom Code Execution'),
+          conceptId: activeStriverProblem ? `striver-${activeStriverProblem.striverId || activeStriverProblem.id}` : (selectedSample?.id || 'custom'),
+          language: language,
+          totalSteps: newSteps.length,
+          status: 'COMPLETED',
+          code: code,
+        });
       } else {
         setExecutionError('Could not parse execution steps for this code. Please check for syntax errors or missing brackets.');
       }
@@ -504,6 +535,15 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
         setTimeout(() => play(), 50);
       }
     }
+
+    recordExecutionHistory({
+      programTitle: problemTitle ? `💡 ${problemTitle}` : `💡 Personal Problem (${correctedLang.toUpperCase()})`,
+      conceptId: 'personal-problem',
+      language: correctedLang,
+      totalSteps: (correctedTrace?.length || 1),
+      status: 'COMPLETED',
+      code: correctedCode,
+    });
   };
 
   // Handle user selecting a Striver SDE Sheet question from drawer
@@ -553,6 +593,15 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
       setTrace(newSteps);
       reset();
       setTimeout(() => play(), 80);
+
+      recordExecutionHistory({
+        programTitle: problem.title,
+        conceptId: `striver-${problem.striverId || problem.id}`,
+        language: problem.language || language,
+        totalSteps: newSteps.length,
+        status: 'COMPLETED',
+        code: problem.code,
+      });
     }
   };
 
@@ -955,15 +1004,15 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
           <div className={`px-3 py-1.5 border-b flex flex-wrap items-center justify-between gap-2 text-xs transition-colors shrink-0 ${
             isBright ? 'bg-slate-50 border-slate-200 text-slate-800' : 'bg-[#0b0f19] border-slate-800 text-slate-200'
           }`}>
-            <div className="flex items-center gap-2 flex-1 min-w-[240px]">
+            <div className="flex items-center gap-2 flex-1 min-w-0">
               <span className={`font-semibold text-[11px] shrink-0 flex items-center gap-1 ${
                 isBright ? 'text-cyan-700' : 'text-cyan-400'
               }`}>
                 <Sparkles size={13} />
-                <span>Input Data:</span>
+                <span className="hidden sm:inline">Input Data:</span>
               </span>
               {activeStriverProblem && (
-                <span className="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                <span className="hidden md:inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/40 shrink-0">
                   <BookOpen size={10} className="text-amber-400" />
                   <span>#{activeStriverProblem.striverId || activeStriverProblem.id}</span>
                 </span>
@@ -973,8 +1022,8 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
                 value={formInputValues}
                 onChange={(e) => setFormInputValues(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleApplyFormInput()}
-                placeholder="e.g. 15, 42, 8, 99, 23, 67 or [10, 20, 30]"
-                className={`flex-1 px-2.5 py-0.5 rounded text-xs font-mono border focus:outline-none focus:ring-1 focus:ring-cyan-500 transition ${
+                placeholder="e.g. 15, 42, 8, 99, 23, 67"
+                className={`flex-1 min-w-0 px-2.5 py-0.5 rounded text-xs font-mono border focus:outline-none focus:ring-1 focus:ring-cyan-500 transition ${
                   isBright
                     ? 'bg-white border-slate-300 text-slate-900'
                     : 'bg-slate-950 border-slate-700 text-cyan-300 placeholder:text-slate-600'
@@ -982,7 +1031,7 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
               />
               <button
                 onClick={handleApplyFormInput}
-                className={`px-2.5 py-0.5 rounded font-semibold text-xs transition shadow-sm shrink-0 ${
+                className={`px-2.5 py-0.5 rounded font-semibold text-xs transition shadow-sm shrink-0 cursor-pointer ${
                   isBright
                     ? 'bg-cyan-600 hover:bg-cyan-700 text-white shadow-cyan-600/20'
                     : 'bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold shadow-cyan-500/20'
@@ -1046,6 +1095,8 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
           {/* 3D Canvas Viewport Box */}
           <div className="flex-1 relative min-h-[220px]">
             <SceneContainer
+              currentStep={currentStep}
+              code={code}
               statusLabel={currentStep?.dataStructureState?.label || null}
               activeDetails={currentStep?.dataStructureState?.focusInfo || null}
               correctOutput={finalCorrectOutput}

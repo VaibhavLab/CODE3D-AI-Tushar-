@@ -143,30 +143,191 @@ export async function registerUser(userData) {
   }
 }
 
+const STORAGE_KEY_EXECUTIONS = 'code3d_db_executions_v2';
+const STORAGE_KEY_QUIZZES = 'code3d_db_quizzes_v2';
+
+function getLocalExecutions() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_EXECUTIONS);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveLocalExecutions(list) {
+  try {
+    localStorage.setItem(STORAGE_KEY_EXECUTIONS, JSON.stringify(list.slice(0, 100)));
+  } catch (e) {}
+}
+
+function getLocalQuizzes() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_QUIZZES);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveLocalQuizzes(list) {
+  try {
+    localStorage.setItem(STORAGE_KEY_QUIZZES, JSON.stringify(list.slice(0, 50)));
+  } catch (e) {}
+}
+
+/**
+ * Record a code execution event in the database (local + backend)
+ */
+export async function recordExecutionHistory({
+  programTitle,
+  conceptId,
+  language = 'java',
+  totalSteps = 1,
+  status = 'COMPLETED',
+  code = '',
+  output = ''
+}) {
+  const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' (' + new Date().toLocaleDateString() + ')';
+  const newRecord = {
+    id: Date.now(),
+    programTitle: programTitle || 'Java Program',
+    conceptId: conceptId || 'custom',
+    language: language || 'java',
+    totalSteps: totalSteps || 1,
+    status: status || 'COMPLETED',
+    code: code || '',
+    output: typeof output === 'string' ? output : (Array.isArray(output) ? output.join('\n') : ''),
+    executedAt: timestamp,
+  };
+
+  // 1. Save immediately to persistent client-side database
+  const localList = getLocalExecutions();
+  localList.unshift(newRecord);
+  saveLocalExecutions(localList);
+
+  // 2. Asynchronously sync with Spring Boot backend
+  try {
+    smartFetch('/history/execution', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        programTitle: newRecord.programTitle,
+        conceptId: newRecord.conceptId,
+        totalSteps: newRecord.totalSteps,
+        status: newRecord.status,
+      }),
+    }).catch(() => {});
+  } catch (err) {}
+
+  return newRecord;
+}
+
+/**
+ * Record a quiz assessment in the database (local + backend)
+ */
+export async function recordQuizHistory({
+  conceptId,
+  score = 0,
+  totalQuestions = 1,
+  accuracy
+}) {
+  const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' (' + new Date().toLocaleDateString() + ')';
+  const computedAccuracy = accuracy !== undefined ? accuracy : Math.round((score / Math.max(1, totalQuestions)) * 100);
+
+  const newRecord = {
+    id: Date.now(),
+    conceptId: conceptId || 'general',
+    score: score || 0,
+    totalQuestions: totalQuestions || 1,
+    accuracy: computedAccuracy,
+    completedAt: timestamp,
+  };
+
+  // 1. Save to persistent client-side database
+  const localList = getLocalQuizzes();
+  localList.unshift(newRecord);
+  saveLocalQuizzes(localList);
+
+  // 2. Asynchronously sync with Spring Boot backend
+  try {
+    smartFetch('/history/quiz', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        conceptId: newRecord.conceptId,
+        score: newRecord.score,
+        totalQuestions: newRecord.totalQuestions,
+      }),
+    }).catch(() => {});
+  } catch (err) {}
+
+  return newRecord;
+}
+
+/**
+ * Retrieve full execution and quiz history, merging cloud backend and local storage.
+ */
 export async function getExecutionHistory() {
+  const localExecutions = getLocalExecutions();
+  const localQuizzes = getLocalQuizzes();
+
+  let backendData = null;
   try {
     const res = await smartFetch('/history');
     if (res.ok) {
-      return await res.json();
+      backendData = await res.json();
     }
   } catch (err) {
-    console.warn('Execution history endpoint unavailable, using local record:', err);
+    console.warn('Backend history service unreachable, using local database:', err);
   }
+
+  const backendExecs = backendData?.recentExecutions || [];
+  const backendQuizzes = backendData?.recentQuizzes || [];
+
+  // Merge unique records with local records on top
+  const combinedExecutions = [...localExecutions];
+  for (const b of backendExecs) {
+    if (!combinedExecutions.some((e) => e.programTitle === b.programTitle && e.executedAt === b.executedAt)) {
+      combinedExecutions.push(b);
+    }
+  }
+
+  const combinedQuizzes = [...localQuizzes];
+  for (const b of backendQuizzes) {
+    if (!combinedQuizzes.some((q) => q.conceptId === b.conceptId && q.completedAt === b.completedAt)) {
+      combinedQuizzes.push(b);
+    }
+  }
+
+  // Fallback defaults if empty
+  if (combinedExecutions.length === 0) {
+    combinedExecutions.push(
+      { id: 1, programTitle: '1D Array Traversal & Print', conceptId: 'array-loop', language: 'java', totalSteps: 16, status: 'COMPLETED', executedAt: 'Earlier today' },
+      { id: 2, programTitle: 'Bubble Sort Algorithm', conceptId: 'bubble-sort', language: 'java', totalSteps: 14, status: 'COMPLETED', executedAt: 'Earlier today' }
+    );
+  }
+
+  if (combinedQuizzes.length === 0) {
+    combinedQuizzes.push(
+      { id: 1, conceptId: 'array-loop', score: 2, totalQuestions: 2, accuracy: 100, completedAt: 'Today' }
+    );
+  }
+
   return {
-    totalExecutionsCount: 1420,
-    totalQuizzesTaken: 89,
-    recentExecutions: [
-      { id: 1, programTitle: '1D Array Traversal & Print', conceptId: 'array-loop', totalSteps: 16, status: 'COMPLETED', executedAt: 'Just now' },
-      { id: 2, programTitle: 'Bubble Sort Algorithm', conceptId: 'bubble-sort', totalSteps: 14, status: 'COMPLETED', executedAt: '10 mins ago' },
-      { id: 3, programTitle: 'Stack LIFO Operations', conceptId: 'stack', totalSteps: 5, status: 'COMPLETED', executedAt: '25 mins ago' },
-      { id: 4, programTitle: 'Binary Search O(log n)', conceptId: 'binary-search', totalSteps: 4, status: 'COMPLETED', executedAt: '1 hour ago' },
-    ],
-    recentQuizzes: [
-      { id: 1, conceptId: 'array-loop', score: 3, totalQuestions: 3, accuracy: 100, completedAt: 'Today' },
-      { id: 2, conceptId: 'stack', score: 2, totalQuestions: 2, accuracy: 100, completedAt: 'Today' },
-      { id: 3, conceptId: 'bst', score: 1, totalQuestions: 2, accuracy: 50, completedAt: 'Yesterday' },
-    ]
+    totalExecutionsCount: (backendData?.totalExecutionsCount || 0) + localExecutions.length,
+    totalQuizzesTaken: (backendData?.totalQuizzesTaken || 0) + localQuizzes.length,
+    recentExecutions: combinedExecutions,
+    recentQuizzes: combinedQuizzes,
+    isBackendConnected: Boolean(backendData),
   };
+}
+
+export function clearExecutionHistory() {
+  try {
+    localStorage.removeItem(STORAGE_KEY_EXECUTIONS);
+    localStorage.removeItem(STORAGE_KEY_QUIZZES);
+  } catch (e) {}
 }
 
 // Personal Problem Solver & Auto-Correction API

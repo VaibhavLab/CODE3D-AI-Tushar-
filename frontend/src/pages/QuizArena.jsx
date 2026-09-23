@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { HelpCircle, CheckCircle, XCircle, Award, RotateCcw, Sparkles, BookOpen } from 'lucide-react';
-import { fetchQuizQuestions } from '../services/apiService';
+import { fetchQuizQuestions, recordQuizHistory } from '../services/apiService';
 import { SAMPLE_PROGRAMS } from '../utils/sampleCodes';
 import { useTheme } from '../context/ThemeContext';
 
@@ -67,6 +67,11 @@ export default function QuizArena() {
       setIsAnswered(false);
     } else {
       setQuizFinished(true);
+      recordQuizHistory({
+        conceptId: selectedConcept,
+        score,
+        totalQuestions: questions.length,
+      });
     }
   };
 

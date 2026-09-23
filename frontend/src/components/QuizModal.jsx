@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { HelpCircle, CheckCircle, XCircle, Award, RotateCcw, X } from 'lucide-react';
-import { fetchQuizQuestions } from '../services/apiService';
+import { fetchQuizQuestions, recordQuizHistory } from '../services/apiService';
 import { useTheme } from '../context/ThemeContext';
 
 export default function QuizModal({ isOpen, onClose, conceptId }) {
@@ -71,6 +71,11 @@ export default function QuizModal({ isOpen, onClose, conceptId }) {
       setIsAnswered(false);
     } else {
       setQuizFinished(true);
+      recordQuizHistory({
+        conceptId: conceptId || 'general',
+        score,
+        totalQuestions: questions.length,
+      });
     }
   };
 

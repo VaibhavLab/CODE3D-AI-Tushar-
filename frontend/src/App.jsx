@@ -45,6 +45,18 @@ function MainApp() {
     setActiveTab('visualizer');
   };
 
+  const handleRerunFromHistory = (record) => {
+    setSelectedConcept({
+      id: record.conceptId || 'history-run',
+      title: record.programTitle,
+      category: 'History Replay',
+      description: `Recorded execution on ${record.executedAt}. Restored into 3D Studio.`,
+      code: record.code || '',
+      language: record.language || 'java',
+    });
+    setActiveTab('visualizer');
+  };
+
   return (
     <div className={`flex flex-col h-[100dvh] w-full overflow-hidden transition-colors duration-200 ${
       isBright ? 'bg-slate-50 text-slate-900' : 'bg-[#070b14] text-slate-100'
@@ -76,7 +88,7 @@ function MainApp() {
           <QuizArena />
         )}
         {activeTab === 'history' && (
-          <HistoryPage />
+          <HistoryPage onRerunProgram={handleRerunFromHistory} />
         )}
         {activeTab === 'settings' && (
           <SettingsPage />
