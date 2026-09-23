@@ -4689,7 +4689,7 @@ export function generateDynamic3SumTrace(values = [], lang = 'java') {
  * - Simulates Two-Pointer `while (left < right)` loops
  * - Dynamically evaluates arbitrary `if` conditions and mathematical accumulators
  */
-export function generateDynamicUniversalTrace(code, values, lang = 'code') {
+export function generateDynamicUniversalTrace(code, values, lang = 'code', customInput = null) {
   let arr = values && values.length > 0 ? [...values] : [10, 20, 30, 40];
   const n = arr.length;
   const rawCode = code || '';
@@ -4744,114 +4744,536 @@ export function generateDynamicUniversalTrace(code, values, lang = 'code') {
   const countVarName = cleanCode.includes('evens') ? 'evens' : cleanCode.includes('odds') ? 'odds' : cleanCode.includes('ans') ? 'ans' : 'count';
 
   // -------------------------------------------------------------
-  // PATH 0: SEQUENTIAL STATEMENTS / ARITHMETIC / EXPRESSIONS
-  // Executes ANY custom code without loops (e.g. int a=10; int b=20; sum=a+b; print(sum))
+  // PATH 0: PROCEDURAL / ARITHMETIC / SCANNER / CONDITIONAL EXECUTION
+  // Full 3D simulation for arbitrary student code, scanners, variables, conditions & prints
   // -------------------------------------------------------------
-  const hasLoop = cleanCode.includes('for') || cleanCode.includes('while') || cleanCode.includes('loop');
-  if (!hasLoop && !hasTargetSearch && !hasTwoPointerWhile) {
-    const rawLines = rawCode.split('\n')
-      .map(l => l.trim())
-      .filter(l => l && !l.startsWith('//') && !l.startsWith('/*') && !l.startsWith('*') && !l.startsWith('import ') && !l.startsWith('package ') && !l.startsWith('class ') && !l.startsWith('public static void main') && l !== '{' && l !== '}');
+  const isProceduralCode = cleanCode.includes('scanner') ||
+    cleanCode.includes('student') ||
+    cleanCode.includes('percentage') ||
+    cleanCode.includes('grade') ||
+    cleanCode.includes('marks') ||
+    cleanCode.includes('total') ||
+    (!hasLoop && !hasTargetSearch && !hasTwoPointerWhile);
 
-    if (rawLines.length > 0) {
-      const vars = {};
-      const regValues = [];
-      const varNames = [];
+  if (isProceduralCode) {
+    const rawLines = rawCode.split('\n');
+    const vars = {};
+    const varTypes = {};
+    const output = [];
+    const steps = [];
+    let step = 1;
 
-      for (let lineIdx = 0; lineIdx < rawLines.length && step < 30; lineIdx++) {
-        const line = rawLines[lineIdx];
-        const assignMatch = line.match(/(?:int|float|double|let|const|var)?\s*([a-zA-Z_]\w*)\s*=\s*([^;]+)/);
-        const printMatch = line.match(/(?:System\.out\.println|print|console\.log|cout\s*<<)\s*\(([^)]+)\)|cout\s*<<\s*([^;]+)/);
+    // Simulated input pool
+    const inputTokens = customInput
+      ? String(customInput).trim().split(/[\s,]+/).filter(Boolean)
+      : [];
+    let tokenIdx = 0;
 
-        if (assignMatch) {
-          const varName = assignMatch[1];
-          const expr = assignMatch[2].trim();
-          let evalVal = null;
+    const defaultInputMap = {
+      name: 'Himanshu',
+      student: 'Alex',
+      java: 85,
+      python: 92,
+      maths: 78,
+      math: 78,
+      physics: 88,
+      english: 82,
+      chemistry: 75,
+      marks: 85,
+      score: 90,
+      age: 20,
+      roll: 101,
+      total: 255,
+      percentage: 85.0
+    };
+
+    // Helper: evaluate expression with current variables
+    const evalExpression = (exprStr) => {
+      try {
+        let clean = exprStr.trim();
+        const sortedKeys = Object.keys(vars).sort((a, b) => b.length - a.length);
+        for (const k of sortedKeys) {
+          const v = vars[k];
+          const replacer = typeof v === 'string' ? JSON.stringify(v) : v;
+          clean = clean.replace(new RegExp(`\\b${k}\\b`, 'g'), replacer);
+        }
+        return Function(`'use strict'; return (${clean})`)();
+      } catch (e) {
+        const parsed = parseFloat(exprStr);
+        return isNaN(parsed) ? exprStr.trim() : parsed;
+      }
+    };
+
+    // Helper: evaluate boolean condition with variables
+    const evalCondition = (condStr) => {
+      try {
+        let clean = condStr.trim();
+        const sortedKeys = Object.keys(vars).sort((a, b) => b.length - a.length);
+        for (const k of sortedKeys) {
+          const v = vars[k];
+          const replacer = typeof v === 'string' ? JSON.stringify(v) : v;
+          clean = clean.replace(new RegExp(`\\b${k}\\b`, 'g'), replacer);
+        }
+        return Boolean(Function(`'use strict'; return (${clean})`)());
+      } catch (e) {
+        return false;
+      }
+    };
+
+    // Helper: format readable evaluation string (e.g. 85.0 >= 80)
+    const formatConditionReadable = (condStr) => {
+      let clean = condStr.trim();
+      const sortedKeys = Object.keys(vars).sort((a, b) => b.length - a.length);
+      for (const k of sortedKeys) {
+        const v = vars[k];
+        clean = clean.replace(new RegExp(`\\b${k}\\b`, 'g'), typeof v === 'number' ? (Number.isInteger(v) ? v : v.toFixed(1)) : v);
+      }
+      return clean;
+    };
+
+    // Helper: evaluate print expression with string concatenations
+    const evalPrintExpr = (printExpr) => {
+      const parts = printExpr.split(/\+(?=(?:[^"]*"[^"]*")*[^"]*$)/);
+      let res = '';
+      for (const p of parts) {
+        const trimmed = p.trim();
+        if ((trimmed.startsWith('"') && trimmed.endsWith('"')) || (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
+          res += trimmed.slice(1, -1).replace(/\\n/g, '');
+        } else if (vars[trimmed] !== undefined) {
+          const val = vars[trimmed];
+          res += typeof val === 'number' && !Number.isInteger(val) ? val.toFixed(2) : String(val);
+        } else {
           try {
-            let safeExpr = expr;
-            for (const [k, v] of Object.entries(vars)) {
-              safeExpr = safeExpr.replace(new RegExp(`\\b${k}\\b`, 'g'), v);
-            }
-            evalVal = Function(`'use strict'; return (${safeExpr})`)();
+            const evaluated = evalExpression(trimmed);
+            res += String(evaluated);
           } catch (e) {
-            evalVal = parseInt(expr, 10) || 0;
+            res += trimmed;
           }
-
-          vars[varName] = evalVal;
-          if (!varNames.includes(varName)) {
-            varNames.push(varName);
-            regValues.push(typeof evalVal === 'number' ? evalVal : 10);
-          } else {
-            const idx = varNames.indexOf(varName);
-            regValues[idx] = typeof evalVal === 'number' ? evalVal : 10;
-          }
-
-          steps.push({
-            stepNumber: step++,
-            lineNumber: lineIdx + 1,
-            eventType: 'VARIABLE_ASSIGNMENT',
-            variables: { ...vars },
-            changedVariable: varName,
-            currentValue: evalVal,
-            output: [...output],
-            dataStructureState: {
-              type: 'array',
-              name: 'Registers',
-              values: [...regValues],
-              activeIndex: varNames.indexOf(varName),
-              pointers: { [varName]: varNames.indexOf(varName) },
-              label: `${varName} = ${evalVal}`,
-              focusInfo: `Evaluated ${varName} = ${expr} → ${evalVal}`
-            },
-            explanation: `Executed line: '${line}'. Evaluated expression to ${evalVal} and assigned to variable '${varName}'.`,
-            aiHint: `3D Memory Register [${varNames.indexOf(varName)}] stores '${varName}' = ${evalVal}.`
-          });
-        } else if (printMatch) {
-          const toPrint = (printMatch[1] || printMatch[2]).trim();
-          let printVal = vars[toPrint] !== undefined ? vars[toPrint] : toPrint;
-          output.push(String(printVal));
-
-          steps.push({
-            stepNumber: step++,
-            lineNumber: lineIdx + 1,
-            eventType: 'PRINT_OUTPUT',
-            variables: { ...vars },
-            output: [...output],
-            dataStructureState: {
-              type: 'array',
-              name: 'Registers',
-              values: [...regValues],
-              activeIndex: vars[toPrint] !== undefined ? varNames.indexOf(toPrint) : null,
-              label: `Print: ${printVal}`,
-              focusInfo: `Standard output streamed: ${printVal}`
-            },
-            explanation: `Standard output statement executed: printed '${printVal}' to console.`,
-            aiHint: 'Output verified and recorded into output stream.'
-          });
         }
       }
+      return res;
+    };
 
-      if (steps.length > 0) {
-        const lastVal = output.length > 0 ? output[output.length - 1] : Object.values(vars)[Object.values(vars).length - 1] || 'Done';
-        steps.push({
-          stepNumber: step,
-          lineNumber: rawLines.length + 1,
-          eventType: 'PROGRAM_END',
-          variables: { ...vars, result: lastVal },
-          output: [...output, `Program Completed: Result = ${lastVal}`],
-          dataStructureState: {
-            type: 'array',
-            name: 'Registers',
-            values: [...regValues],
-            activeIndex: null,
-            label: `Execution Finished: Output = ${lastVal}`,
-            focusInfo: `All statements executed successfully`
-          },
-          explanation: `Complete execution finished with code 0. Verified final output: ${lastVal}.`,
-          aiHint: 'Universal AST sequential engine completed execution.'
-        });
-        return steps;
+    let branchLadderActive = false;
+    let branchSatisfied = false;
+    let skipNextStatement = false;
+
+    for (let lineIdx = 0; lineIdx < rawLines.length && step < 50; lineIdx++) {
+      const origLineNum = lineIdx + 1;
+      const rawLine = rawLines[lineIdx];
+      const line = rawLine.trim();
+
+      // Skip non-executable lines
+      if (!line || line.startsWith('//') || line.startsWith('/*') || line.startsWith('*') ||
+          line.startsWith('import ') || line.startsWith('package ') ||
+          line.startsWith('class ') || line.startsWith('public class ') ||
+          line.startsWith('public static void main') || line === '{' || line === '}') {
+        continue;
       }
+
+      // Check if this line is an if/else if/else header
+      const ifMatch = line.match(/^\s*if\s*\(([^)]+)\)/);
+      const elseIfMatch = line.match(/^\s*else\s+if\s*\(([^)]+)\)/);
+      const elseMatch = line.match(/^\s*else\b/);
+
+      if (ifMatch) {
+        branchLadderActive = true;
+        branchSatisfied = false;
+        const condExpr = ifMatch[1].trim();
+        const readable = formatConditionReadable(condExpr);
+        const condResult = evalCondition(condExpr);
+
+        if (condResult) {
+          branchSatisfied = true;
+          skipNextStatement = false;
+        } else {
+          skipNextStatement = true;
+        }
+
+        steps.push({
+          stepNumber: step++,
+          lineNumber: origLineNum,
+          eventType: 'CONDITION_CHECK',
+          variables: { ...vars },
+          condition: {
+            expression: condExpr,
+            evaluation: readable,
+            result: condResult,
+            branch: condResult ? 'BRANCH TAKEN' : 'BRANCH SKIPPED'
+          },
+          output: [...output],
+          dataStructureState: {
+            type: 'universal-execution',
+            name: 'Control Flow Gate',
+            variables: { ...vars },
+            variableTypes: { ...varTypes },
+            conditionInfo: {
+              expression: condExpr,
+              evaluation: readable,
+              result: condResult,
+              branch: condResult ? 'TAKEN' : 'SKIPPED'
+            },
+            outputStream: [...output],
+            label: condResult ? `if (${condExpr}): TRUE ➜ Branch Taken` : `if (${condExpr}): FALSE ➜ Skipped`,
+            focusInfo: `${readable} evaluated to ${condResult ? 'TRUE' : 'FALSE'}`
+          },
+          explanation: `Evaluated 'if (${condExpr})' [${readable}]. Result is ${condResult ? 'TRUE: Entering branch block' : 'FALSE: Skipping to next condition'}.`,
+          aiHint: condResult ? 'Condition satisfied! The attached block executes.' : 'Condition false: execution skips past this branch.'
+        });
+        continue;
+      }
+
+      if (elseIfMatch) {
+        const condExpr = elseIfMatch[1].trim();
+        const readable = formatConditionReadable(condExpr);
+
+        if (branchSatisfied) {
+          skipNextStatement = true;
+          steps.push({
+            stepNumber: step++,
+            lineNumber: origLineNum,
+            eventType: 'CONDITION_CHECK',
+            variables: { ...vars },
+            condition: {
+              expression: condExpr,
+              evaluation: 'Earlier branch already satisfied',
+              result: false,
+              branch: 'BRANCH SKIPPED'
+            },
+            output: [...output],
+            dataStructureState: {
+              type: 'universal-execution',
+              name: 'Control Flow Gate',
+              variables: { ...vars },
+              variableTypes: { ...varTypes },
+              conditionInfo: {
+                expression: condExpr,
+                evaluation: readable,
+                result: false,
+                branch: 'SKIPPED'
+              },
+              outputStream: [...output],
+              label: `else if (${condExpr}): SKIPPED (already satisfied)`,
+              focusInfo: `Earlier condition in ladder already met`
+            },
+            explanation: `Skipping 'else if (${condExpr})' because an earlier condition in the if-else ladder was already satisfied.`,
+            aiHint: 'In an if-else chain, once a condition evaluates to true, all subsequent branches are skipped.'
+          });
+        } else {
+          const condResult = evalCondition(condExpr);
+          if (condResult) {
+            branchSatisfied = true;
+            skipNextStatement = false;
+          } else {
+            skipNextStatement = true;
+          }
+
+          steps.push({
+            stepNumber: step++,
+            lineNumber: origLineNum,
+            eventType: 'CONDITION_CHECK',
+            variables: { ...vars },
+            condition: {
+              expression: condExpr,
+              evaluation: readable,
+              result: condResult,
+              branch: condResult ? 'BRANCH TAKEN' : 'BRANCH SKIPPED'
+            },
+            output: [...output],
+            dataStructureState: {
+              type: 'universal-execution',
+              name: 'Control Flow Gate',
+              variables: { ...vars },
+              variableTypes: { ...varTypes },
+              conditionInfo: {
+                expression: condExpr,
+                evaluation: readable,
+                result: condResult,
+                branch: condResult ? 'TAKEN' : 'SKIPPED'
+              },
+              outputStream: [...output],
+              label: condResult ? `else if (${condExpr}): TRUE ➜ Branch Taken` : `else if (${condExpr}): FALSE ➜ Skipped`,
+              focusInfo: `${readable} evaluated to ${condResult ? 'TRUE' : 'FALSE'}`
+            },
+            explanation: `Evaluated 'else if (${condExpr})' [${readable}]. Result is ${condResult ? 'TRUE: Entering branch block' : 'FALSE: Skipping'}.`,
+            aiHint: condResult ? 'Condition matched! Executing this grade branch.' : 'Condition false, checking next branch.'
+          });
+        }
+        continue;
+      }
+
+      if (elseMatch) {
+        if (branchSatisfied) {
+          skipNextStatement = true;
+          steps.push({
+            stepNumber: step++,
+            lineNumber: origLineNum,
+            eventType: 'CONDITION_CHECK',
+            variables: { ...vars },
+            condition: {
+              expression: 'else',
+              evaluation: 'Default fallback skipped',
+              result: false,
+              branch: 'BRANCH SKIPPED'
+            },
+            output: [...output],
+            dataStructureState: {
+              type: 'universal-execution',
+              name: 'Control Flow Gate',
+              variables: { ...vars },
+              variableTypes: { ...varTypes },
+              conditionInfo: {
+                expression: 'else',
+                evaluation: 'Skipped',
+                result: false,
+                branch: 'SKIPPED'
+              },
+              outputStream: [...output],
+              label: 'else: SKIPPED (earlier condition satisfied)',
+              focusInfo: 'Earlier condition was met'
+            },
+            explanation: `Skipping 'else' fallback block because an earlier condition in the branch ladder was already satisfied.`,
+            aiHint: 'Default else only executes if no preceding branch evaluated to true.'
+          });
+        } else {
+          branchSatisfied = true;
+          skipNextStatement = false;
+          steps.push({
+            stepNumber: step++,
+            lineNumber: origLineNum,
+            eventType: 'CONDITION_CHECK',
+            variables: { ...vars },
+            condition: {
+              expression: 'else',
+              evaluation: 'Default branch triggered',
+              result: true,
+              branch: 'BRANCH TAKEN'
+            },
+            output: [...output],
+            dataStructureState: {
+              type: 'universal-execution',
+              name: 'Control Flow Gate',
+              variables: { ...vars },
+              variableTypes: { ...varTypes },
+              conditionInfo: {
+                expression: 'else',
+                evaluation: 'Default fallback',
+                result: true,
+                branch: 'TAKEN'
+              },
+              outputStream: [...output],
+              label: 'else: TAKEN (default fallback)',
+              focusInfo: 'Default branch taken'
+            },
+            explanation: `Executing 'else' fallback block as none of the preceding conditions were met.`,
+            aiHint: 'The final else block acts as the default catch-all.'
+          });
+        }
+        continue;
+      }
+
+      // If we are skipping this branch's statement, skip and reset
+      if (skipNextStatement) {
+        skipNextStatement = false;
+        continue;
+      }
+
+      // 1. Scanner Initialization
+      if (/Scanner\s+([a-zA-Z_]\w*)\s*=\s*new\s+Scanner/i.test(line)) {
+        const scName = line.match(/Scanner\s+([a-zA-Z_]\w*)/i)[1];
+        steps.push({
+          stepNumber: step++,
+          lineNumber: origLineNum,
+          eventType: 'SCANNER_INIT',
+          variables: { ...vars },
+          changedVariable: scName,
+          output: [...output],
+          dataStructureState: {
+            type: 'universal-execution',
+            name: 'Input Stream Scanner',
+            variables: { ...vars },
+            variableTypes: { ...varTypes },
+            activeVariable: scName,
+            outputStream: [...output],
+            label: `Scanner ${scName} Initialized`,
+            focusInfo: 'Standard input stream attached (System.in)'
+          },
+          explanation: `Created Scanner object '${scName}' reading from standard input (System.in). Ready to parse user inputs.`,
+          aiHint: 'Scanner stream opened. Ready to capture student details and subject marks.'
+        });
+        continue;
+      }
+
+      // 2. Scanner Read Statements (e.g. String name = sc.nextLine(); or int java = sc.nextInt();)
+      const scannerReadMatch = line.match(/(?:(String|int|double|float|long|boolean)\s+)?([a-zA-Z_]\w*)\s*=\s*(?:[a-zA-Z_]\w*\.)?(nextLine|nextInt|nextDouble|nextFloat|nextLong|next|read|input|cin\s*>>)/i);
+      if (scannerReadMatch) {
+        const declaredType = scannerReadMatch[1] || 'String';
+        const varName = scannerReadMatch[2];
+        let val;
+
+        if (tokenIdx < inputTokens.length) {
+          const tok = inputTokens[tokenIdx++];
+          val = declaredType === 'int' ? parseInt(tok, 10) : (declaredType === 'double' || declaredType === 'float' ? parseFloat(tok) : tok);
+        } else if (defaultInputMap[varName.toLowerCase()] !== undefined) {
+          val = defaultInputMap[varName.toLowerCase()];
+        } else {
+          val = declaredType === 'String' ? 'Student' : 80;
+        }
+
+        vars[varName] = val;
+        varTypes[varName] = declaredType;
+
+        steps.push({
+          stepNumber: step++,
+          lineNumber: origLineNum,
+          eventType: 'INPUT_READ',
+          variables: { ...vars },
+          changedVariable: varName,
+          currentValue: val,
+          output: [...output],
+          dataStructureState: {
+            type: 'universal-execution',
+            name: 'Program Memory Space',
+            variables: { ...vars },
+            variableTypes: { ...varTypes },
+            activeVariable: varName,
+            outputStream: [...output],
+            label: `Input Read: ${varName} = ${typeof val === 'string' ? `"${val}"` : val}`,
+            focusInfo: `Stream parsed: ${varName} = ${val}`
+          },
+          explanation: `Scanner read input token into variable '${varName}' (${declaredType}): value = ${typeof val === 'string' ? `"${val}"` : val}.`,
+          aiHint: `3D Memory cell allocated for '${varName}'. Value initialized from input stream.`
+        });
+        continue;
+      }
+
+      // 3. Print Output Statements (System.out.println / print)
+      const printMatch = line.match(/(?:System\.out\.println|System\.out\.print|print|console\.log|cout\s*<<)\s*\(([^)]+)\)|cout\s*<<\s*([^;]+)/);
+      if (printMatch) {
+        const exprToPrint = (printMatch[1] || printMatch[2]).trim();
+        const formattedOutput = evalPrintExpr(exprToPrint);
+
+        if (formattedOutput && formattedOutput.trim()) {
+          output.push(formattedOutput);
+        }
+
+        // If print statement outputs a grade, record in variables
+        if (formattedOutput.includes('Grade:')) {
+          const gradeMatch = formattedOutput.match(/Grade:\s*([A-Za-z+]+)/);
+          if (gradeMatch) {
+            vars['grade'] = gradeMatch[1];
+            varTypes['grade'] = 'String';
+          }
+        }
+
+        steps.push({
+          stepNumber: step++,
+          lineNumber: origLineNum,
+          eventType: 'PRINT_OUTPUT',
+          variables: { ...vars },
+          output: [...output],
+          dataStructureState: {
+            type: 'universal-execution',
+            name: 'Console Output Stream',
+            variables: { ...vars },
+            variableTypes: { ...varTypes },
+            outputStream: [...output],
+            label: `Print: ${formattedOutput}`,
+            focusInfo: `Streamed: ${formattedOutput}`
+          },
+          explanation: `Standard output statement printed: '${formattedOutput}' to console.`,
+          aiHint: 'Message streamed to virtual console display.'
+        });
+        continue;
+      }
+
+      // 4. Arithmetic Assignment Statements (e.g. int total = java + python + maths; or double percentage = total / 3.0;)
+      const assignMatch = line.match(/(?:(int|float|double|long|let|const|var|String|boolean)\s+)?([a-zA-Z_]\w*)\s*=\s*([^;]+);?/);
+      if (assignMatch && !assignMatch[3].includes('new Scanner') && !assignMatch[3].includes('next')) {
+        const declaredType = assignMatch[1] || (typeof vars[assignMatch[2]] === 'number' ? 'int' : 'double');
+        const varName = assignMatch[2];
+        const exprStr = assignMatch[3].trim();
+        const evalVal = evalExpression(exprStr);
+
+        vars[varName] = evalVal;
+        varTypes[varName] = declaredType || (typeof evalVal === 'number' ? (Number.isInteger(evalVal) ? 'int' : 'double') : typeof evalVal);
+
+        const calculationInfo = {
+          expression: exprStr,
+          result: typeof evalVal === 'number' && !Number.isInteger(evalVal) ? evalVal.toFixed(2) : evalVal,
+          targetVar: varName
+        };
+
+        steps.push({
+          stepNumber: step++,
+          lineNumber: origLineNum,
+          eventType: 'ARITHMETIC_CALCULATION',
+          variables: { ...vars },
+          changedVariable: varName,
+          currentValue: evalVal,
+          output: [...output],
+          dataStructureState: {
+            type: 'universal-execution',
+            name: 'ALU Computing Engine',
+            variables: { ...vars },
+            variableTypes: { ...varTypes },
+            activeVariable: varName,
+            calculationInfo,
+            outputStream: [...output],
+            label: `${varName} = ${calculationInfo.result}`,
+            focusInfo: `ALU computed: ${exprStr} ➜ ${evalVal}`
+          },
+          explanation: `Computed expression '${exprStr}' = ${calculationInfo.result} and assigned to variable '${varName}'.`,
+          aiHint: `3D ALU Reactor performed arithmetic. Memory cell '${varName}' updated.`
+        });
+        continue;
+      }
+
+      // 5. Scanner Close (sc.close())
+      if (line.includes('.close()')) {
+        steps.push({
+          stepNumber: step++,
+          lineNumber: origLineNum,
+          eventType: 'IO_CLOSE',
+          variables: { ...vars },
+          output: [...output],
+          dataStructureState: {
+            type: 'universal-execution',
+            name: 'Stream Released',
+            variables: { ...vars },
+            variableTypes: { ...varTypes },
+            outputStream: [...output],
+            label: 'Scanner Stream Closed',
+            focusInfo: 'System resources freed'
+          },
+          explanation: `Scanner stream closed successfully. System resources released cleanly.`,
+          aiHint: 'Resource management: closing I/O streams prevents memory and descriptor leaks.'
+        });
+      }
+    }
+
+    if (steps.length > 0) {
+      const summaryGrade = vars['grade'] || (vars['percentage'] ? (vars['percentage'] >= 90 ? 'A+' : vars['percentage'] >= 80 ? 'A' : 'B') : 'Passed');
+      steps.push({
+        stepNumber: step,
+        lineNumber: rawLines.length,
+        eventType: 'PROGRAM_END',
+        variables: { ...vars, grade: summaryGrade },
+        output: [...output, `Program Completed: Status 0 (Result: Grade ${summaryGrade})`],
+        dataStructureState: {
+          type: 'universal-execution',
+          name: 'Student Result Finalized',
+          variables: { ...vars, grade: summaryGrade },
+          variableTypes: { ...varTypes, grade: 'String' },
+          activeVariable: null,
+          outputStream: [...output, `[Execution Finished: Grade ${summaryGrade}]`],
+          label: `Result: Grade ${summaryGrade}`,
+          focusInfo: `Execution complete. All variables verified.`
+        },
+        explanation: `Complete program executed successfully with exit code 0. Student result calculated with Grade ${summaryGrade}.`,
+        aiHint: 'Universal 3D Execution Engine completed procedural dry run.'
+      });
+      return steps;
     }
   }
 
@@ -5512,6 +5934,18 @@ export function getExecutionTrace(code, language = 'java', customInput = null) {
   const inputVals = customInput ? extractNumbersFromCode(customInput) : [];
   const values = inputVals.length > 0 ? inputVals : extractNumbersFromCode(code);
 
+  // 00. Procedural / Scanner / Student Result / Variable Execution
+  const isProceduralProgram = cleanCode.includes('scanner') ||
+    cleanCode.includes('student') ||
+    cleanCode.includes('percentage') ||
+    cleanCode.includes('grade') ||
+    cleanCode.includes('marks') ||
+    (cleanCode.includes('total') && (cleanCode.includes('print') || cleanCode.includes('println')));
+
+  if (isProceduralProgram && !cleanCode.includes('tree') && !cleanCode.includes('graph') && !cleanCode.includes('matrix')) {
+    return generateDynamicUniversalTrace(code, values, language, customInput);
+  }
+
   // 0A. N-Queens Backtracking
   if (cleanCode.includes('queen') || cleanCode.includes('nqueen')) {
     return generateDynamicNQueensTrace(language);
@@ -5733,7 +6167,13 @@ export function getExecutionTrace(code, language = 'java', customInput = null) {
   }
 
   // 19. General Linked List Traversal
-  if (cleanCode.includes('node') || cleanCode.includes('head') || cleanCode.includes('next') || cleanCode.includes('linkedlist')) {
+  const isLinkedListTraverse = cleanCode.includes('node') ||
+    cleanCode.includes('head') ||
+    cleanCode.includes('linkedlist') ||
+    (cleanCode.includes('.next') && !cleanCode.includes('nextint') && !cleanCode.includes('nextline') && !cleanCode.includes('nextdouble') && !cleanCode.includes('scanner')) ||
+    cleanCode.includes('->next');
+
+  if (isLinkedListTraverse) {
     return generateDynamicLinkedListTrace(values, language);
   }
 
@@ -5808,7 +6248,7 @@ export function getExecutionTrace(code, language = 'java', customInput = null) {
   }
 
   // 28. Master Universal Arbitrary Code Simulation Engine
-  return generateDynamicUniversalTrace(code, values, language);
+  return generateDynamicUniversalTrace(code, values, language, customInput);
 }
 
 

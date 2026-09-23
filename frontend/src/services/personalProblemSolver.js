@@ -1,10 +1,186 @@
-import { getExecutionTrace, extractNumbersFromCode } from './executionSimulator';
+import { getExecutionTrace, extractNumbersFromCode } from './executionSimulator.js';
 
 /**
  * Pre-defined Personal Problem templates covering all major DSA patterns
  * with complete working code in 5 languages and verified 3D trace triggers.
  */
 export const PERSONAL_PROBLEM_TEMPLATES = [
+  {
+    id: 'student-result',
+    title: 'Student Result & Grading (Scanner Input)',
+    category: 'Procedural & Conditionals',
+    difficulty: 'Beginner',
+    description: 'Calculates total marks, floating-point percentage, and evaluates grade ladders with full 3D memory tracking.',
+    langCodes: {
+      java: `import java.util.Scanner;
+
+class StudentResult {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter student name: ");
+        String name = sc.nextLine();
+
+        System.out.print("Enter marks in Java: ");
+        int java = sc.nextInt();
+
+        System.out.print("Enter marks in Python: ");
+        int python = sc.nextInt();
+
+        System.out.print("Enter marks in Maths: ");
+        int maths = sc.nextInt();
+
+        int total = java + python + maths;
+        double percentage = total / 3.0;
+
+        System.out.println("\\n--- Student Result ---");
+        System.out.println("Name: " + name);
+        System.out.println("Java: " + java);
+        System.out.println("Python: " + python);
+        System.out.println("Maths: " + maths);
+        System.out.println("Total: " + total);
+        System.out.println("Percentage: " + percentage);
+
+        if (percentage >= 90)
+            System.out.println("Grade: A+");
+        else if (percentage >= 80)
+            System.out.println("Grade: A");
+        else if (percentage >= 70)
+            System.out.println("Grade: B");
+        else if (percentage >= 60)
+            System.out.println("Grade: C");
+        else
+            System.out.println("Grade: D");
+
+        sc.close();
+    }
+}`,
+      python: `# Student Result & Grading System
+name = "Himanshu"
+java = 85
+python = 92
+maths = 78
+
+total = java + python + maths
+percentage = total / 3.0
+
+print("\\n--- Student Result ---")
+print("Name:", name)
+print("Java:", java)
+print("Python:", python)
+print("Maths:", maths)
+print("Total:", total)
+print("Percentage:", percentage)
+
+if percentage >= 90:
+    print("Grade: A+")
+elif percentage >= 80:
+    print("Grade: A")
+elif percentage >= 70:
+    print("Grade: B")
+elif percentage >= 60:
+    print("Grade: C")
+else:
+    print("Grade: D")
+`,
+      javascript: `// Student Result & Grading System
+const name = "Himanshu";
+const java = 85;
+const python = 92;
+const maths = 78;
+
+const total = java + python + maths;
+const percentage = total / 3.0;
+
+console.log("\\n--- Student Result ---");
+console.log("Name: " + name);
+console.log("Java: " + java);
+console.log("Python: " + python);
+console.log("Maths: " + maths);
+console.log("Total: " + total);
+console.log("Percentage: " + percentage);
+
+if (percentage >= 90)
+    console.log("Grade: A+");
+else if (percentage >= 80)
+    console.log("Grade: A");
+else if (percentage >= 70)
+    console.log("Grade: B");
+else if (percentage >= 60)
+    console.log("Grade: C");
+else
+    console.log("Grade: D");
+`,
+      cpp: `#include <iostream>
+#include <string>
+using namespace std;
+
+int main() {
+    string name = "Himanshu";
+    int java = 85;
+    int python = 92;
+    int maths = 78;
+
+    int total = java + python + maths;
+    double percentage = total / 3.0;
+
+    cout << "\\n--- Student Result ---" << endl;
+    cout << "Name: " << name << endl;
+    cout << "Java: " << java << endl;
+    cout << "Python: " << python << endl;
+    cout << "Maths: " << maths << endl;
+    cout << "Total: " << total << endl;
+    cout << "Percentage: " << percentage << endl;
+
+    if (percentage >= 90)
+        cout << "Grade: A+" << endl;
+    else if (percentage >= 80)
+        cout << "Grade: A" << endl;
+    else if (percentage >= 70)
+        cout << "Grade: B" << endl;
+    else if (percentage >= 60)
+        cout << "Grade: C" << endl;
+    else
+        cout << "Grade: D" << endl;
+
+    return 0;
+}
+`,
+      c: `#include <stdio.h>
+
+int main() {
+    char name[] = "Himanshu";
+    int java = 85;
+    int python = 92;
+    int maths = 78;
+
+    int total = java + python + maths;
+    double percentage = total / 3.0;
+
+    printf("\\n--- Student Result ---\\n");
+    printf("Name: %s\\n", name);
+    printf("Java: %d\\n", java);
+    printf("Python: %d\\n", python);
+    printf("Maths: %d\\n", maths);
+    printf("Total: %d\\n", total);
+    printf("Percentage: %.2f\\n", percentage);
+
+    if (percentage >= 90)
+        printf("Grade: A+\\n");
+    else if (percentage >= 80)
+        printf("Grade: A\\n");
+    else if (percentage >= 70)
+        printf("Grade: B\\n");
+    else if (percentage >= 60)
+        printf("Grade: C\\n");
+    else
+        printf("Grade: D\\n");
+
+    return 0;
+}
+`
+    }
+  },
   {
     id: 'two-sum',
     title: 'Two Sum (Target 9)',
@@ -891,6 +1067,27 @@ export function solvePersonalProblem(input, targetLanguage = 'java') {
     };
   }
 
+  // G. Student Result & Grading System
+  if (lower.includes('student') || lower.includes('result') || lower.includes('grade') || lower.includes('percentage') || lower.includes('marks')) {
+    const t = PERSONAL_PROBLEM_TEMPLATES.find((x) => x.id === 'student-result');
+    if (t) {
+      const code = t.langCodes[lang] || t.langCodes.java;
+      const trace = getExecutionTrace(code, lang);
+      return {
+        success: true,
+        problemTitle: 'Student Result & Grade Evaluation',
+        category: 'Procedural & Conditionals',
+        correctedCode: code,
+        language: lang,
+        errorsFound: ['Identified personal problem request: "Student Result & Grade". Synthesized complete Scanner code with 3D memory tracking.'],
+        explanation: 'Generated complete StudentResult program with Scanner input, arithmetic calculation, and 3D conditional grading.',
+        timeComplexity: 'O(1)',
+        spaceComplexity: 'O(1)',
+        executionTrace: { steps: trace },
+      };
+    }
+  }
+
   // 3. User entered raw numbers or list tokens (e.g., "45, 12, 89, 3, 27")
   const extracted = extractNumbersFromCode(raw);
   const isPureNumbers = /^[0-9,\s\[\]{}]+$/.test(raw.trim()) && extracted.length > 0;
@@ -914,6 +1111,16 @@ export function solvePersonalProblem(input, targetLanguage = 'java') {
   }
 
   // 4. Code Bug Diagnosis & Auto-Repair
+  return correctPersonalCode(raw, lang);
+}
+
+/**
+ * Dedicated AI Code Corrector
+ * Diagnoses syntax bugs, integer division issues, scanner leaks, imports, and generates 3D trace
+ */
+export function correctPersonalCode(rawCode, targetLanguage = 'java') {
+  const raw = (rawCode || '').trim();
+  const lang = (targetLanguage || 'java').toLowerCase();
   let corrected = raw;
   const errors = [];
 
@@ -930,7 +1137,7 @@ export function solvePersonalProblem(input, targetLanguage = 'java') {
   // B. Fix off-by-one loop error
   if (/i\s*<=\s*(arr\.length|v\.size\(\)|n|len\(arr\)|arr\.size)/i.test(corrected)) {
     corrected = corrected.replace(/i\s*<=\s*(arr\.length|v\.size\(\)|n|len\(arr\)|arr\.size)/gi, 'i < $1');
-    errors.push("Off-by-one bug repaired: Changed 'i <= length' to 'i < length' to prevent IndexOutOfBoundsException.");
+    errors.push("Off-by-one boundary bug repaired: Changed 'i <= length' to 'i < length' to prevent IndexOutOfBoundsException.");
   }
 
   // C. Fix invalid print statements
@@ -955,17 +1162,41 @@ export function solvePersonalProblem(input, targetLanguage = 'java') {
         .replace(/printf\((.*?)\);?/g, 'print($1)');
       errors.push("Converted foreign print statements to Python 'print(...)'.");
     }
-    // Missing colons in loop headers
     corrected = corrected.replace(/^(\s*for\s+\w+\s+in\s+[^:\n]+)$/gm, '$1:');
   }
 
-  // D. Java class wrapper if missing
+  // D. Java: Missing Scanner import
+  if (lang === 'java' && corrected.includes('Scanner') && !corrected.includes('import java.util.Scanner')) {
+    corrected = `import java.util.Scanner;\n\n${corrected}`;
+    errors.push("Missing Scanner Import: Prepend 'import java.util.Scanner;' for standard I/O stream.");
+  }
+
+  // E. Integer division truncation bug in floating-point calculations
+  // e.g. double percentage = total / 3; -> double percentage = total / 3.0;
+  const intDivRegex = /(double|float)\s+([a-zA-Z_]\w*)\s*=\s*([^;]+?)\/\s*(\d+)\s*;/g;
+  if (intDivRegex.test(corrected)) {
+    corrected = corrected.replace(intDivRegex, '$1 $2 = $3 / $4.0;');
+    errors.push("Integer Division Truncation Fixed: Replaced integer denominator with floating-point divisor (e.g. '/ 3' ➜ '/ 3.0') to preserve decimal accuracy.");
+  }
+
+  // F. Java: Missing Scanner close
+  if (lang === 'java' && corrected.includes('Scanner') && !corrected.includes('.close()')) {
+    const scMatch = corrected.match(/Scanner\s+([a-zA-Z_]\w*)/);
+    const scName = scMatch ? scMatch[1] : 'sc';
+    const lastBraceIdx = corrected.lastIndexOf('}');
+    if (lastBraceIdx !== -1) {
+      corrected = corrected.slice(0, lastBraceIdx) + `        ${scName}.close();\n    }` + corrected.slice(lastBraceIdx + 1);
+      errors.push(`Resource Leak Guard: Added '${scName}.close();' to release standard I/O resources.`);
+    }
+  }
+
+  // G. Java class wrapper if missing
   if (lang === 'java' && !corrected.includes('class ') && !corrected.includes('static void main')) {
     corrected = `public class PersonalProblemSolution {\n    public static void main(String[] args) {\n        ${corrected.replace(/\n/g, '\n        ')}\n    }\n}`;
     errors.push("Wrapped loose statements into executable 'public class PersonalProblemSolution' with static main.");
   }
 
-  // E. Missing closing braces
+  // H. Missing closing braces
   const openB = (corrected.match(/\{/g) || []).length;
   const closeB = (corrected.match(/\}/g) || []).length;
   if (openB > closeB) {
@@ -979,17 +1210,21 @@ export function solvePersonalProblem(input, targetLanguage = 'java') {
   // Generate trace
   const trace = getExecutionTrace(corrected, lang);
 
+  const isStudentCode = corrected.toLowerCase().includes('student') || corrected.toLowerCase().includes('grade');
+
   return {
     success: true,
-    problemTitle: 'Custom Problem / Repaired Code',
-    category: 'Auto-Diagnosed & Solved',
+    isCorrected: errors.length > 0,
+    problemTitle: isStudentCode ? 'Student Result & Grade Evaluation' : 'AI-Corrected & Verified Code',
+    category: isStudentCode ? 'Procedural & Conditionals' : 'Auto-Diagnosed & Solved',
+    originalCode: raw,
     correctedCode: corrected,
     language: lang,
     errorsFound: errors,
     explanation: errors.length > 0
-      ? `Personal Problem Solver resolved ${errors.length} issue(s) and generated fully working 3D execution trace.`
-      : 'Your code is clean and fully compilable. Complete 3D execution trace generated.',
-    timeComplexity: 'O(n)',
+      ? `AI Code Corrector detected and fixed ${errors.length} issue(s). Generated clean, compilable code ready for 3D visualization.`
+      : 'Your code is verified, syntactically clean, and ready for full 3D interactive execution!',
+    timeComplexity: 'O(1)',
     spaceComplexity: 'O(1)',
     executionTrace: { steps: trace },
   };

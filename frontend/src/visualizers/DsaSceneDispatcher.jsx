@@ -10,6 +10,7 @@ import RecursionVisualizer3D from './RecursionVisualizer3D';
 import GraphVisualizer3D from './GraphVisualizer3D';
 import HashTableVisualizer3D from './HashTableVisualizer3D';
 import HeapVisualizer3D from './HeapVisualizer3D';
+import UniversalExecutionVisualizer3D from './UniversalExecutionVisualizer3D';
 
 export default function DsaSceneDispatcher({ dataStructureState }) {
   if (!dataStructureState) return null;
@@ -17,6 +18,16 @@ export default function DsaSceneDispatcher({ dataStructureState }) {
   const type = dataStructureState.type ? dataStructureState.type.toLowerCase() : 'array';
 
   switch (type) {
+    case 'universal-execution':
+    case 'universal':
+    case 'memory':
+    case 'variables':
+    case 'procedural':
+    case 'scanner':
+    case 'execution':
+    case 'program':
+    case 'registers':
+      return <UniversalExecutionVisualizer3D dataStructureState={dataStructureState} />;
     case 'heap':
     case 'priority-queue':
     case 'min-heap':
@@ -98,6 +109,9 @@ export default function DsaSceneDispatcher({ dataStructureState }) {
     case 'sliding-window':
     case 'two-pointer':
     default:
+      if (dataStructureState.variables && Object.keys(dataStructureState.variables).length > 0 && (!dataStructureState.values || dataStructureState.name === 'Registers')) {
+        return <UniversalExecutionVisualizer3D dataStructureState={dataStructureState} />;
+      }
       return <ArrayVisualizer3D dataStructureState={dataStructureState} />;
   }
 }

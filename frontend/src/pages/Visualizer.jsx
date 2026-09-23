@@ -483,6 +483,7 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
     problemTitle,
     timeComplexity: tc,
     spaceComplexity: sc,
+    launch3D = true,
   }) => {
     setLanguage(correctedLang);
     setCode(correctedCode);
@@ -508,7 +509,9 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
     if (correctedTrace && correctedTrace.length > 0) {
       setTrace(correctedTrace);
       reset();
-      setTimeout(() => play(), 50);
+      if (launch3D) {
+        setTimeout(() => play(), 50);
+      }
     } else {
       let newSteps = null;
       if (backendOnline) {
@@ -532,7 +535,9 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
       if (newSteps && newSteps.length > 0) {
         setTrace(newSteps);
         reset();
-        setTimeout(() => play(), 50);
+        if (launch3D) {
+          setTimeout(() => play(), 50);
+        }
       }
     }
 
@@ -1228,6 +1233,7 @@ export default function Visualizer({ initialConcept, initialOpenStriver = false 
         onClose={() => setIsCodeDoctorOpen(false)}
         onApplyCorrectedCode={handleApplyCorrectedCode}
         currentLanguage={language}
+        currentCode={code}
       />
 
       <StriverSheetDrawer
