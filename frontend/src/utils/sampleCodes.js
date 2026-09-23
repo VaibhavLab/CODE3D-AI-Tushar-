@@ -15,6 +15,7 @@ export const DEFAULT_JAVA_CODE = `public class Main {
 }`;
 
 export const CURRICULUM_CATEGORIES = [
+  'Procedural & Scanner',
   'Arrays & Matrices',
   'Linked Lists',
   'Stacks & Queues',
@@ -26,6 +27,61 @@ export const CURRICULUM_CATEGORIES = [
 ];
 
 export const SAMPLE_PROGRAMS = [
+  // ========================================================
+  // MODULE 0: PROCEDURAL & SCANNER
+  // ========================================================
+  {
+    id: 'student-result',
+    title: '★ Student Result & Grading (Scanner Input)',
+    category: 'Procedural & Scanner',
+    description: 'Interactive Scanner program calculating student marks, floating percentage, and evaluating grade ladders with 3D memory tracking.',
+    difficulty: 'Beginner',
+    timeComplexity: 'O(1)',
+    spaceComplexity: 'O(1)',
+    code: `import java.util.Scanner;
+
+class StudentResult {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter student name: ");
+        String name = sc.nextLine();
+
+        System.out.print("Enter marks in Java: ");
+        int java = sc.nextInt();
+
+        System.out.print("Enter marks in Python: ");
+        int python = sc.nextInt();
+
+        System.out.print("Enter marks in Maths: ");
+        int maths = sc.nextInt();
+
+        int total = java + python + maths;
+        double percentage = total / 3.0;
+
+        System.out.println("\\n--- Student Result ---");
+        System.out.println("Name: " + name);
+        System.out.println("Java: " + java);
+        System.out.println("Python: " + python);
+        System.out.println("Maths: " + maths);
+        System.out.println("Total: " + total);
+        System.out.println("Percentage: " + percentage);
+
+        if (percentage >= 90)
+            System.out.println("Grade: A+");
+        else if (percentage >= 80)
+            System.out.println("Grade: A");
+        else if (percentage >= 70)
+            System.out.println("Grade: B");
+        else if (percentage >= 60)
+            System.out.println("Grade: C");
+        else
+            System.out.println("Grade: D");
+
+        sc.close();
+    }
+}`,
+  },
   // ========================================================
   // MODULE 1: ARRAYS & MATRICES
   // ========================================================
